@@ -142,28 +142,28 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
     viewBox="0 0 1420 1200" xml:space="preserve">
 
-    <g transform="translate(0, 0)" class="unavailable">
+    <g transform="translate(0, 0)" class="socket-plate">
       <rect width="250" height="275"/>
-      <text x="100" y="50" fill="black">{name}</text>
-      <text x="100" y="75" fill="black">521</text>
-      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
+      <text x="50" y="50" fill="black">Sam 4587</text>
+      <circle class="led-light-green" cx="127" cy="105.9" r="33.5"/>
+      <rect x="102" y="166" width="50" height="50" stroke="#919090"/>
+      <circle cx="126.5" cy="191.5" r="7.5" fill="black"/>
     </g>
 
-    <g transform="translate(275, 0)" class="in-use">
+    <g transform="translate(275, 0)" class="socket-plate">
       <rect width="250" height="275"/>
-      <text x="100" y="50" fill="black">Eve</text>
-      <text x="100" y="75" fill="black">821</text>
-      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
+      <text x="50" y="50" fill="black">Eve 3392</text>
+      <circle class="led-light-red" cx="127" cy="105.9" r="33.5"/>
+      <rect x="102" y="166" width="50" height="50" stroke="#919090"/>
+      <circle cx="126.5" cy="191.5" r="7.5" fill="black"/>
     </g>
 
-    <g transform="translate(550, 0)" class="ringing">
+    <g transform="translate(550, 0)" class="socket-plate">
       <rect width="250" height="275"/>
-      <text x="100" y="50" fill="black">Max</text>
-      <text x="100" y="75" fill="black">543</text>
-      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
+      <text x="50" y="50" fill="black">Max 5497</text>
+      <circle class="led-light-unlit" cx="127" cy="105.9" r="33.5"/>
+      <rect x="102" y="166" width="50" height="50" stroke="#919090"/>
+      <circle cx="126.5" cy="191.5" r="7.5" fill="black"/>
     </g>
 
     <g transform="translate(825, 0)" class="available">
