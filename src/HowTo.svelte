@@ -1,7 +1,5 @@
 <script>
-
-  let name = 'Donaldo';
-  let age = 70;
+  export let audioCaption;
 
 </script>
 
@@ -25,5 +23,6 @@
 
   <div class="captions">
     <h3>Audio Captions</h3>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+    <p>{@html audioCaption} </p>
+    <p>Lorem ipsum dolor </p>
   </div>
