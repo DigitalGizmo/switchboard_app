@@ -19,13 +19,14 @@
 	const ROW_PRAM_IDX = 0; // index for row param
 	const COL_PRAM_IDX = 1; // index for column param
 	const LINE_PRAM_IDX = 2; // index for which line
-	const FIRST_PLUG_IDX = 0; // index for first plug of pair
-	const SECOND_PLUG_IDX = 1; // index for other plug of pair
+	const FIRST_PLUG_USED_IDX = 0; // index for plug used (left or right)
+	const SECOND_PLUG_USED_IDX = 1; // index for other plug of pair
 	const LED_RED = 1;
 	const LED_GREEN = 2;
 	const CALLER_COORD_IDX = 0; // caller is first array in convo set
 	const CALLEE_COORD_IDX = 1; // caller is second array in convo set
 
+	let lineIdxInUse = null;
 
 	// $: uppercaseName = name.toUpperCase();
 	// $: console.log(name);
@@ -52,7 +53,7 @@
 	}
 
 	// --- Handle plug-in ----
-	// plugged in the form of [row, col, lineNum]
+	// plugged in the form of [row index, col index, line index]
 	function identifyPlugged(plugged) {
 		// Get name based on row and col
 		pluggedName = jacks[plugged[ROW_PRAM_IDX]][plugged[COL_PRAM_IDX]].name;
@@ -61,22 +62,10 @@
 		// console.log(plugged);
 		// console.log(caller);
 
-		if (lineStates[plugged[LINE_PRAM_IDX][FIRST_PLUG_IDX]]) { // one end already plugged
-			// Determing correct plugin for second end
-			// if row and column of plugged matches that of callee
-			if (plugged[ROW_PRAM_IDX] === callee[ROW_PRAM_IDX] && 
-				plugged[COL_PRAM_IDX] === callee[COL_PRAM_IDX]) {
-					console.log('got to 2nd plug equal');
-					// Turn led green
-					jacks[plugged[ROW_PRAM_IDX]][plugged[COL_PRAM_IDX]].ledState = LED_GREEN;
-					// Set first end of this line as in-use
-					// pluged[2] is the line index
-					lineStates[plugged[LINE_PRAM_IDX][SECOND_PLUG_IDX]] = true;
-					// Debug message
-					audioCaption += pluggedName + ' on line: ' + plugged[LINE_PRAM_IDX];
-			}
-		} else { // this is the first plugin for this line
-			// Determing correct plugin
+		if (!lineStates[plugged[LINE_PRAM_IDX][FIRST_PLUG_USED_IDX]]) { 
+			// First plugged used is NOT true
+			// No plug has been successfully used for this line
+			// Did user correctly plug into caller?
 			// if row and column of plugged matches that of caller
 			if (plugged[ROW_PRAM_IDX] === caller[ROW_PRAM_IDX] && 
 				plugged[COL_PRAM_IDX] === caller[COL_PRAM_IDX]) {
@@ -84,14 +73,35 @@
 					// Turn led green
 					jacks[plugged[ROW_PRAM_IDX]][plugged[COL_PRAM_IDX]].ledState = LED_GREEN;
 					// Set first end of this line as in-use
-					// pluged[2] is the line index
-					lineStates[plugged[LINE_PRAM_IDX][FIRST_PLUG_IDX]] = true;
+					lineStates[plugged[LINE_PRAM_IDX][FIRST_PLUG_USED_IDX]] = true;
+					// Set this line in use only we have gotten this success
+					lineIdxInUse = plugged[LINE_PRAM_IDX];
+					console.log(' setting lineIdxInUse to: ' + lineIdxInUse);
 					// Debug message
 					audioCaption += pluggedName + ' on line: ' + plugged[LINE_PRAM_IDX] + 
 						' asks for 72 (Olive) <br />';
 			}
-		}
-	}
+		} else { 
+			// First line used IS TRUE, so we might be on the other plug
+			// But first, is this the line in use?
+				console.log(' in else,  lineIdxInUse use is: ' + lineIdxInUse);
+			if (lineIdxInUse === plugged[LINE_PRAM_IDX]) {
+				// one end already plugged
+				// Determing correct plugin for second end
+				// if row and column of plugged matches that of callee
+				if (plugged[ROW_PRAM_IDX] === callee[ROW_PRAM_IDX] && 
+					plugged[COL_PRAM_IDX] === callee[COL_PRAM_IDX]) {
+						console.log('got to 2nd plug equal');
+						// Turn led green
+						jacks[plugged[ROW_PRAM_IDX]][plugged[COL_PRAM_IDX]].ledState = LED_GREEN;
+						// Set first end of this line as in-use
+						lineStates[plugged[LINE_PRAM_IDX][SECOND_PLUG_USED_IDX]] = true;
+						// Debug message
+						audioCaption += pluggedName + ' on line: ' + plugged[LINE_PRAM_IDX];
+				} // end if plug match
+			} // end if this is the line in use
+		} // end else
+	} // end identifyPlugged
 
 	// setInterval(myTimer, 1000);
 
