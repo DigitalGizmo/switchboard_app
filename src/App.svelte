@@ -4,7 +4,7 @@
 
 	let audioCaption = '';
 	let caller = [null, null]; // row, col
-	let callersName = 'caller not yet identified';
+	let pluggedName = 'caller not yet identified';
 	let callee = [null, null]; // row, col
 	// one end engaged, other end engaged for each line
 	let lineStates = [[false, false], [false, false]];
@@ -16,6 +16,17 @@
 	let currConvo = 0;
 	let prevConvo = null;
 
+	const ROW_PRAM_IDX = 0; // index for row param
+	const COL_PRAM_IDX = 1; // index for column param
+	const LINE_PRAM_IDX = 2; // index for which line
+	const FIRST_PLUG_IDX = 0; // index for first plug of pair
+	const SECOND_PLUG_IDX = 1; // index for other plug of pair
+	const LED_RED = 1;
+	const LED_GREEN = 2;
+	const CALLER_COORD_IDX = 0; // caller is first array in convo set
+	const CALLEE_COORD_IDX = 1; // caller is second array in convo set
+
+
 	// $: uppercaseName = name.toUpperCase();
 	// $: console.log(name);
 
@@ -26,9 +37,9 @@
 	function startActivity() {
 		audioCaption = "Charlie's line <strong>flashing</strong> <br />"
 		// First conversation is first pair in first set
-		caller =  conversations[currConvo][0]; // [0,1];
+		caller =  conversations[currConvo][CALLER_COORD_IDX]; // [0,1];
 		// Set "target", person being called
-		callee 	 		 =  conversations[currConvo][1]
+		callee 	 		 =  conversations[currConvo][CALLEE_COORD_IDX]
 		console.log('caller: ' + caller);
 		// Light Charlie
 		setFlashing(caller)
@@ -37,45 +48,47 @@
 
 	function setFlashing(caller) {
 		// Set caller row and column
-		jacks[caller[0]][caller[1]].ledState = 1;		
+		jacks[caller[ROW_PRAM_IDX]][caller[COL_PRAM_IDX]].ledState = LED_RED;		
 	}
 
 	// --- Handle plug-in ----
 	// plugged in the form of [row, col, lineNum]
 	function identifyPlugged(plugged) {
 		// Get name based on row and col
-		callersName = jacks[plugged[0]][plugged[1]].name;
+		pluggedName = jacks[plugged[ROW_PRAM_IDX]][plugged[COL_PRAM_IDX]].name;
 		// Debug msg
-		audioCaption += 'plugged into: ' + callersName + '<br />';
+		audioCaption += 'plugged into: ' + pluggedName + '<br />';
 		// console.log(plugged);
 		// console.log(caller);
 
-		if (lineStates[plugged[2][0]]) { // one end already plugged
+		if (lineStates[plugged[LINE_PRAM_IDX][FIRST_PLUG_IDX]]) { // one end already plugged
 			// Determing correct plugin for second end
 			// if row and column of plugged matches that of callee
-			if (plugged[0] === callee[0] && plugged[1] === callee[1]) {
-				console.log('got to 2nd plug equal');
-				// Turn led green
-				jacks[plugged[0]][plugged[1]].ledState = 2;
-				// Set first end of this line as in-use
-				// pluged[2] is the line index
-				lineStates[plugged[2][1]] = true;
-				// Debug message
-				audioCaption += callersName + ' on line: ' + plugged[2];
+			if (plugged[ROW_PRAM_IDX] === callee[ROW_PRAM_IDX] && 
+				plugged[COL_PRAM_IDX] === callee[COL_PRAM_IDX]) {
+					console.log('got to 2nd plug equal');
+					// Turn led green
+					jacks[plugged[ROW_PRAM_IDX]][plugged[COL_PRAM_IDX]].ledState = LED_GREEN;
+					// Set first end of this line as in-use
+					// pluged[2] is the line index
+					lineStates[plugged[LINE_PRAM_IDX][SECOND_PLUG_IDX]] = true;
+					// Debug message
+					audioCaption += pluggedName + ' on line: ' + plugged[LINE_PRAM_IDX];
 			}
 		} else { // this is the first plugin for this line
 			// Determing correct plugin
 			// if row and column of plugged matches that of caller
-			if (plugged[0] === caller[0] && plugged[1] === caller[1]) {
-				// console.log('got to equal');
-				// Turn led green
-				jacks[plugged[0]][plugged[1]].ledState = 2;
-				// Set first end of this line as in-use
-				// pluged[2] is the line index
-				lineStates[plugged[2][0]] = true;
-				// Debug message
-				audioCaption += callersName + ' on line: ' + plugged[2] + 
-					' asks for 72 (Olive) <br />';
+			if (plugged[ROW_PRAM_IDX] === caller[ROW_PRAM_IDX] && 
+				plugged[COL_PRAM_IDX] === caller[COL_PRAM_IDX]) {
+					// console.log('got to equal');
+					// Turn led green
+					jacks[plugged[ROW_PRAM_IDX]][plugged[COL_PRAM_IDX]].ledState = LED_GREEN;
+					// Set first end of this line as in-use
+					// pluged[2] is the line index
+					lineStates[plugged[LINE_PRAM_IDX][FIRST_PLUG_IDX]] = true;
+					// Debug message
+					audioCaption += pluggedName + ' on line: ' + plugged[LINE_PRAM_IDX] + 
+						' asks for 72 (Olive) <br />';
 			}
 		}
 	}
