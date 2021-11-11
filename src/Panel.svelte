@@ -4,6 +4,7 @@
 
   export let jacks;
   export let identifyPlugged;
+  export let unPlug;
 
   let name = 'Testing';
 
@@ -78,7 +79,18 @@
   onMount(() => {
     d3.selectAll('.plug').style('cursor', 'move')
     .call(d3.drag()
-      .on("drag", function(d) {
+      .on("start", function(d) {
+          plugIdx = d3.select(this).attr("id");
+
+          // Which line is this
+          plugs[plugIdx].lineIndex
+
+          unPlug();
+
+          // Check whether this one is plugged
+          // Unplug if relevant
+
+       }).on("drag", function(d) {
           plugIdx = d3.select(this).attr("id");
           plugs[plugIdx].x = d.x -40;
           plugs[plugIdx].y = d.y -80;

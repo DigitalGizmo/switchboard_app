@@ -7,7 +7,11 @@
 	let pluggedName = 'caller not yet identified';
 	let callee = [null, null]; // row, col
 	// one end engaged, other end engaged for each line
-	let lineStates = [[false, false], [false, false]];
+
+	// let lineStates = [[false, false], [false, false]];
+
+	let lineStates = [{firstUsed: false, secondUsed: false}, {firstUsed: false, secondUsed: false}];
+
 	// ledStates are attached to each person
 	// Guess we need to store who is on what connected line
 	// so we can reset their states on un-plug
@@ -58,6 +62,7 @@
 	// --- Handle plug-in ----
 	// plugged in the form of [row index, col index, line index]
 	function identifyPlugged(pluggedInfo) {
+		// Params sent in plugged info- all indexes -- row: col: lineIdx
 		// Get name based on row and col
 		pluggedName = jacks[pluggedInfo.row][pluggedInfo.col].name;
 		// Debug msg
@@ -65,8 +70,12 @@
 		// console.log(plugged);
 		// console.log(caller);
 
-		if (!lineStates[pluggedInfo.lineIdx[FIRST_PLUG_USED_IDX]]) { 
-			// First plugged used is NOT true
+		// console.log(' - lineStates[pluggedInfo.lineIdx[FIRST_PLUG_USED_IDX]]: ' +
+		// 	lineStates[pluggedInfo.lineIdx[FIRST_PLUG_USED_IDX]]);
+
+		if (!lineStates[pluggedInfo.lineIdx].firstUsed) { 
+			// lineStates for line in question, the firstUsed value
+			// First plugged used is NOT true, aka false  
 			// No plug has been successfully used for this line
 			// Did user correctly plug into caller?
 			// if row and column of plugged matches that of caller
@@ -76,7 +85,7 @@
 					// Turn led green
 					jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN;
 					// Set first end of this line as in-use
-					lineStates[pluggedInfo.lineIdx[FIRST_PLUG_USED_IDX]] = true;
+					lineStates[pluggedInfo.lineIdx].firstUsed = true;
 					// Set this line in use only we have gotten this success
 					lineIdxInUse = pluggedInfo.lineIdx;
 					console.log(' setting lineIdxInUse to: ' + lineIdxInUse);
@@ -98,7 +107,7 @@
 						// Turn led green
 						jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN;
 						// Set first end of this line as in-use
-						lineStates[pluggedInfo.lineIdx[SECOND_PLUG_USED_IDX]] = true;
+						lineStates[pluggedInfo.lineIdx].secondUsed = true;
 						// Debug message
 						audioCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx;
 				} // end if plug match
@@ -106,6 +115,9 @@
 		} // end else
 	} // end identifyPlugged
 
+	function unPlug() {
+		console.log('got to unplug');
+	}
 	// setInterval(myTimer, 1000);
 
 	// function myTimer() {
@@ -194,6 +206,7 @@
 	<Panel 
 		{jacks}
 		{identifyPlugged}
+		{unPlug}
 	/>
 </div><!-- /wrapper -->
 
