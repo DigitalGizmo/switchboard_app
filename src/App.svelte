@@ -16,26 +16,17 @@
 	// Test for >= 0 instead of true
 
 	const conversations = [
-		[[0,1],[1,2]], // Charlie call Olive
-		[[1,4], [0,3]] // Mina calls fire department
+		{caller: {row: 0, col: 1}, callee:{row: 1, col: 2}}, // Charlie call Olive
+		{caller: {row: 1, col: 4}, callee:{row: 0, col: 3}}, // Mina calls fire department
 	];
-	// const conversations = [
-	// 	{caller: {row: 0, col: 1}, callee:{row: 1, col: 2}}, // Charlie call Olive
-	// 	[[1,4], [0,3]] // Mina calls fire department
-	// ];
 
 	let currConvo = 0;
 	let prevConvo = null;
 
-	const ROW_PRAM_IDX = 0; // index for row param
-	const COL_PRAM_IDX = 1; // index for column param
-	const LINE_PRAM_IDX = 2; // index for which line
 	const FIRST_PLUG_USED_IDX = 0; // index for plug used (left or right)
 	const SECOND_PLUG_USED_IDX = 1; // index for other plug of pair
 	const LED_RED = 1;
 	const LED_GREEN = 2;
-	const CALLER_COORD_IDX = 0; // caller is first array in convo set
-	const CALLEE_COORD_IDX = 1; // caller is second array in convo set
 
 	let lineIdxInUse = null;
 
@@ -49,18 +40,19 @@
 	function startActivity() {
 		audioCaption = "Charlie's line <strong>flashing</strong> <br />"
 		// First conversation is first pair in first set
-		caller =  conversations[currConvo][CALLER_COORD_IDX]; // [0,1];
+		caller =  conversations[currConvo].caller; // [0,1];
 		// Set "target", person being called
-		callee 	 		 =  conversations[currConvo][CALLEE_COORD_IDX]
+		callee 	 		 =  conversations[currConvo].callee;
 		console.log('caller: ' + caller);
 		// Light Charlie
+
 		setFlashing(caller)
 		// Set one end of this line engaged
 	}
 
 	function setFlashing(caller) {
 		// Set caller row and column
-		jacks[caller[ROW_PRAM_IDX]][caller[COL_PRAM_IDX]].ledState = LED_RED;		
+		jacks[caller.row][caller.col].ledState = LED_RED;		
 	}
 
 	// --- Handle plug-in ----
@@ -78,8 +70,8 @@
 			// No plug has been successfully used for this line
 			// Did user correctly plug into caller?
 			// if row and column of plugged matches that of caller
-			if (pluggedInfo.row === caller[ROW_PRAM_IDX] && 
-				pluggedInfo.col === caller[COL_PRAM_IDX]) {
+			if (pluggedInfo.row === caller.row && 
+				pluggedInfo.col === caller.col) {
 					// console.log('got to equal');
 					// Turn led green
 					jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN;
@@ -100,8 +92,8 @@
 				// one end already plugged
 				// Determing correct plugin for second end
 				// if row and column of plugged matches that of callee
-				if (pluggedInfo.row === callee[ROW_PRAM_IDX] && 
-					pluggedInfo.col === callee[COL_PRAM_IDX]) {
+				if (pluggedInfo.row === callee.row && 
+					pluggedInfo.col === callee.col) {
 						console.log('got to 2nd plug equal');
 						// Turn led green
 						jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN;
