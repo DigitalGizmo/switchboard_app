@@ -15,6 +15,7 @@
   const BODY_LINE_OFFSET_X = 42; // From plug left to line
   const BODY_LINE_OFFSET_Y = 160; // From plug top to line
   let plugIdx = 0;
+  const pluggedInfo = {row: null, col: null, lineIdx: null};
 
   let plugs = [
     { index: 0,
@@ -87,21 +88,25 @@
        }).on("end", function (d){
           // Calculate closest row
           let proportion_of_total_height = d.y/PANEL_HEIGHT;
-          let which_row_index = Math.trunc(proportion_of_total_height * NUM_ROWS);
+          pluggedInfo.row = Math.trunc(proportion_of_total_height * NUM_ROWS);
           // Snap plug to calculated row
-          plugs[plugIdx].y = (which_row_index * CELL_HEIGHT) + JACK_TOP_OFFSET;
+          plugs[plugIdx].y = (pluggedInfo.row * CELL_HEIGHT) + JACK_TOP_OFFSET;
+
           // Calculate closeest column
           let proportion_of_total = d.x/PANEL_WIDTH;
-          let which_col_index = Math.trunc(proportion_of_total * NUM_COLS);
+          pluggedInfo.col = Math.trunc(proportion_of_total * NUM_COLS);
           // Snap plug to calcuated x
-          plugs[plugIdx].x = (which_col_index * CELL_WIDTH) + (CELL_WIDTH/2) - 55;
-          console.log('col: ' + which_col_index +
-            ' row: ' + which_row_index);
-          console.log('name: ' + jacks[which_row_index][which_col_index].name);
-          // Identify line
-          // which_line = d.index < 2 ? 1 : 2;
-          identifyPlugged([which_row_index, which_col_index, plugs[plugIdx].lineIndex]);
-          // identifyPlugged([which_row_index, which_col_index]);
+          plugs[plugIdx].x = (pluggedInfo.col * CELL_WIDTH) + (CELL_WIDTH/2) - 55;
+          // Set col param
+
+          // Set line index param
+          pluggedInfo.lineIdx = plugs[plugIdx].lineIndex;
+
+          // console.log('-- row: ' + pluggedInfo.row +
+          //   ' obj -col: ' + pluggedInfo.col +
+          //    ' lineIdx: ' + pluggedInfo.lineIdx);
+
+          identifyPlugged(pluggedInfo);
 
        }) // end on end
     ); // end call drag
