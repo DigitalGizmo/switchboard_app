@@ -8,6 +8,12 @@
 	let callee = [null, null]; // row, col
 	// one end engaged, other end engaged for each line
 	let lineStates = [[false, false], [false, false]];
+	// ledStates are attached to each person
+	// Guess we need to store who is on what connected line
+	// so we can reset their states on un-plug
+	// Maybe use values for lineStates [-1, -1] default then
+	// store person indexes. 
+	// Test for >= 0 instead of true
 
 	const conversations = [
 		[[0,1],[1,2]], // Charlie call Olive

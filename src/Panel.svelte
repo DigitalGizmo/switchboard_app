@@ -14,7 +14,7 @@
   const INTER_PLUG_DELTA = 500; // Space between setsw
   const BODY_LINE_OFFSET_X = 42; // From plug left to line
   const BODY_LINE_OFFSET_Y = 160; // From plug top to line
-  let elID = 0;
+  let plugIdx = 0;
 
   let plugs = [
     { index: 0,
@@ -78,27 +78,29 @@
     d3.selectAll('.plug').style('cursor', 'move')
     .call(d3.drag()
       .on("drag", function(d) {
-          elID = d3.select(this).attr("id");
-          plugs[elID].x = d.x -40;
-          plugs[elID].y = d.y -80;
+          plugIdx = d3.select(this).attr("id");
+          plugs[plugIdx].x = d.x -40;
+          plugs[plugIdx].y = d.y -80;
+          // Unplug if relevant
+          // Check whether this one is plugged
 
        }).on("end", function (d){
           // Calculate closest row
           let proportion_of_total_height = d.y/PANEL_HEIGHT;
           let which_row_index = Math.trunc(proportion_of_total_height * NUM_ROWS);
           // Snap plug to calculated row
-          plugs[elID].y = (which_row_index * CELL_HEIGHT) + JACK_TOP_OFFSET;
+          plugs[plugIdx].y = (which_row_index * CELL_HEIGHT) + JACK_TOP_OFFSET;
           // Calculate closeest column
           let proportion_of_total = d.x/PANEL_WIDTH;
           let which_col_index = Math.trunc(proportion_of_total * NUM_COLS);
           // Snap plug to calcuated x
-          plugs[elID].x = (which_col_index * CELL_WIDTH) + (CELL_WIDTH/2) - 55;
+          plugs[plugIdx].x = (which_col_index * CELL_WIDTH) + (CELL_WIDTH/2) - 55;
           console.log('col: ' + which_col_index +
             ' row: ' + which_row_index);
           console.log('name: ' + jacks[which_row_index][which_col_index].name);
           // Identify line
           // which_line = d.index < 2 ? 1 : 2;
-          identifyPlugged([which_row_index, which_col_index, plugs[elID].lineIndex]);
+          identifyPlugged([which_row_index, which_col_index, plugs[plugIdx].lineIndex]);
           // identifyPlugged([which_row_index, which_col_index]);
 
        }) // end on end
