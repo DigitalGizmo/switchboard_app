@@ -6,16 +6,26 @@
 	let caller = [null, null]; // row, col
 	let pluggedName = 'caller not yet identified';
 	let callee = [null, null]; // row, col
-	// one end engaged, other end engaged for each line
 
-	// let lineStates = [[false, false], [false, false]];
+	const phoneLines = [
+		{
+			onePlugIsIn: false, 
+			isEngaged: false,
+			caller: {row: null, col: null},
+			callee: {row: null, col: null},
+		}, 
+		{
+			onePlugIsIn: false, 
+			isEngaged: false,
+			caller: {row: null, col: null},
+			callee: {row: null, col: null},
+		}, 
+	];
 
-	let lineStates = [{firstUsed: false, secondUsed: false}, {firstUsed: false, secondUsed: false}];
-
-	// ledStates are attached to each person
+	// phoneLines could be attached to each person
 	// Guess we need to store who is on what connected line
 	// so we can reset their states on un-plug
-	// Maybe use values for lineStates [-1, -1] default then
+	// Maybe use values for phoneLines [-1, -1] default then
 	// store person indexes. 
 	// Test for >= 0 instead of true
 
@@ -27,8 +37,7 @@
 	let currConvo = 0;
 	let prevConvo = null;
 
-	const FIRST_PLUG_USED_IDX = 0; // index for plug used (left or right)
-	const SECOND_PLUG_USED_IDX = 1; // index for other plug of pair
+	const LED_OFF = 0;
 	const LED_RED = 1;
 	const LED_GREEN = 2;
 
@@ -47,7 +56,7 @@
 		caller =  conversations[currConvo].caller; // [0,1];
 		// Set "target", person being called
 		callee 	 		 =  conversations[currConvo].callee;
-		console.log('caller: ' + caller);
+		// console.log('caller: ' + caller);
 		// Light Charlie
 
 		setFlashing(caller)
@@ -70,13 +79,9 @@
 		// console.log(plugged);
 		// console.log(caller);
 
-		// console.log(' - lineStates[pluggedInfo.lineIdx[FIRST_PLUG_USED_IDX]]: ' +
-		// 	lineStates[pluggedInfo.lineIdx[FIRST_PLUG_USED_IDX]]);
-
-		if (!lineStates[pluggedInfo.lineIdx].firstUsed) { 
-			// lineStates for line in question, the firstUsed value
-			// First plugged used is NOT true, aka false  
-			// No plug has been successfully used for this line
+		if (!phoneLines[pluggedInfo.lineIdx].onePlugIsIn) { 
+			// phoneLines for line in question, test onePlugIsIn value
+			// First plugged used is NOT true, aka false, aka new
 			// Did user correctly plug into caller?
 			// if row and column of plugged matches that of caller
 			if (pluggedInfo.row === caller.row && 
@@ -84,11 +89,12 @@
 					// console.log('got to equal');
 					// Turn led green
 					jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN;
-					// Set first end of this line as in-use
-					lineStates[pluggedInfo.lineIdx].firstUsed = true;
 					// Set this line in use only we have gotten this success
 					lineIdxInUse = pluggedInfo.lineIdx;
-					console.log(' setting lineIdxInUse to: ' + lineIdxInUse);
+					// console.log(' setting lineIdxInUse to: ' + lineIdxInUse);
+					// Set first end of this line as in-use
+					// and Record caller for later unplug
+					setPhoneLineCaller(pluggedInfo);
 					// Debug message
 					audioCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx + 
 						' asks for 72 (Olive) <br />';
@@ -96,18 +102,20 @@
 		} else { 
 			// First line used IS TRUE, so we might be on the other plug
 			// But first, is this the line in use?
-				console.log(' in else,  lineIdxInUse use is: ' + lineIdxInUse);
+				// console.log(' in else,  lineIdxInUse use is: ' + lineIdxInUse);
 			if (lineIdxInUse === pluggedInfo.lineIdx) {
 				// one end already plugged
 				// Determing correct plugin for second end
 				// if row and column of plugged matches that of callee
 				if (pluggedInfo.row === callee.row && 
 					pluggedInfo.col === callee.col) {
-						console.log('got to 2nd plug equal');
+						// console.log('got to 2nd plug equal');
 						// Turn led green
 						jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN;
-						// Set first end of this line as in-use
-						lineStates[pluggedInfo.lineIdx].secondUsed = true;
+						// Set this line as engaged
+						phoneLines[pluggedInfo.lineIdx].isEngaged = true;
+					// Record callee for later unplug
+					setPhoneLineCallee(pluggedInfo);
 						// Debug message
 						audioCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx;
 				} // end if plug match
@@ -115,8 +123,35 @@
 		} // end else
 	} // end identifyPlugged
 
-	function unPlug() {
-		console.log('got to unplug');
+	function setPhoneLineCaller(pluggedInfo) {
+		phoneLines[pluggedInfo.lineIdx].onePlugIsIn = true;
+		// Set caller 
+		phoneLines[pluggedInfo.lineIdx].caller.row = 
+			pluggedInfo.row;
+		phoneLines[pluggedInfo.lineIdx].caller.col = 
+			pluggedInfo.col;
+	}
+
+	function setPhoneLineCallee(pluggedInfo) {
+		// Set callee 
+		phoneLines[pluggedInfo.lineIdx].callee.row = 
+			pluggedInfo.row;
+		phoneLines[pluggedInfo.lineIdx].callee.col = 
+			pluggedInfo.col;
+	}
+
+	function unPlug(lineIndex) {
+		// console.log('ready to unplug line: ' + lineIndex);
+		// console.log('-- unplug: ' + phoneLines[lineIndex]);
+		// console.log('-- unplug caller row: ' + 
+			// phoneLines[lineIndex].caller.row);
+		// Clear the line settings
+		phoneLines[lineIndex].onePlugIsIn = false;
+		phoneLines[lineIndex].isEngaged = false;
+		// Turn of the leds
+		jacks[phoneLines[lineIndex].caller.row][phoneLines[lineIndex].caller.col].ledState = LED_OFF;
+		jacks[phoneLines[lineIndex].callee.row][phoneLines[lineIndex].callee.col].ledState = LED_OFF;
+		// jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN
 	}
 	// setInterval(myTimer, 1000);
 
@@ -207,6 +242,7 @@
 		{jacks}
 		{identifyPlugged}
 		{unPlug}
+		{phoneLines}
 	/>
 </div><!-- /wrapper -->
 

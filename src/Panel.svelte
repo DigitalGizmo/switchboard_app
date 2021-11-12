@@ -5,6 +5,7 @@
   export let jacks;
   export let identifyPlugged;
   export let unPlug;
+  export let phoneLines;
 
   let name = 'Testing';
 
@@ -83,12 +84,16 @@
           plugIdx = d3.select(this).attr("id");
 
           // Which line is this
-          plugs[plugIdx].lineIndex
-
-          unPlug();
-
+          let lineIndex = plugs[plugIdx].lineIndex;
           // Check whether this one is plugged
           // Unplug if relevant
+          // console.log(' - unPlug lineIndex: ' + lineIndex);
+          // console.log(' - unPlug isEngaged: ' + 
+          //   phoneLines[lineIndex].isEngaged);
+
+          if (phoneLines[lineIndex].isEngaged) {
+            unPlug(lineIndex);   
+          }
 
        }).on("drag", function(d) {
           plugIdx = d3.select(this).attr("id");
@@ -104,12 +109,11 @@
           // Snap plug to calculated row
           plugs[plugIdx].y = (pluggedInfo.row * CELL_HEIGHT) + JACK_TOP_OFFSET;
 
-          // Calculate closeest column
+          // Calculate closest column
           let proportion_of_total = d.x/PANEL_WIDTH;
           pluggedInfo.col = Math.trunc(proportion_of_total * NUM_COLS);
           // Snap plug to calcuated x
           plugs[plugIdx].x = (pluggedInfo.col * CELL_WIDTH) + (CELL_WIDTH/2) - 55;
-          // Set col param
 
           // Set line index param
           pluggedInfo.lineIdx = plugs[plugIdx].lineIndex;
