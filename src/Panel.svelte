@@ -146,7 +146,8 @@
   }
 
   .line1 {
-    stroke:#EE4A4A;
+    /*stroke:#EE4A4A;*/
+    stroke:darkorange;
   }
 
   .line2 {

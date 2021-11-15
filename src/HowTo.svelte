@@ -24,5 +24,6 @@
   <div class="captions">
     <h3>Audio Captions</h3>
     <p>{@html audioCaption} </p>
-    <p>Lorem ipsum dolor </p>
+    <p>Lorim ipsum</p>
   </div>
+

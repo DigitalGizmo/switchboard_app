@@ -2,23 +2,25 @@
 	import HowTo from "./HowTo.svelte";
 	import Panel from "./Panel.svelte";
 
-	let audioCaption = '';
+	let audioCaption = "Your're the operator!";
+	let debugCaption = "Press Start";
 	let caller = [null, null]; // row, col
 	let pluggedName = 'caller not yet identified';
 	let callee = [null, null]; // row, col
+	let audioTrack = null;
 
 	const phoneLines = [
 		{
 			onePlugIsIn: false, 
 			isEngaged: false,
-			caller: {row: null, col: null},
-			callee: {row: null, col: null},
+			caller: {row: null, col: null, isPlugged: false},
+			callee: {row: null, col: null, isPlugged: false},
 		}, 
 		{
 			onePlugIsIn: false, 
 			isEngaged: false,
-			caller: {row: null, col: null},
-			callee: {row: null, col: null},
+			caller: {row: null, col: null, isPlugged: false},
+			callee: {row: null, col: null, isPlugged: false},
 		}, 
 	];
 
@@ -30,8 +32,20 @@
 	// Test for >= 0 instead of true
 
 	const conversations = [
-		{caller: {row: 0, col: 1}, callee:{row: 1, col: 2}}, // Charlie call Olive
-		{caller: {row: 1, col: 4}, callee:{row: 0, col: 3}}, // Mina calls fire department
+		// Charlie calls Olive
+		{
+			caller: {row: 0, col: 1}, 
+			callee:{row: 1, col: 2},
+			helloTrack: 'charlie-calls',
+			convoTrack: 'charlie-olive',
+		},  
+		// // Mina calls fire department
+		{
+			caller: {row: 1, col: 4}, 
+			callee:{row: 0, col: 3},
+			helloTrack: 'mina-calls',
+			convoTrack: 'mina-burns',
+		},  
 	];
 
 	let currConvo = 0;
@@ -51,7 +65,7 @@
 	// }
 
 	function startActivity() {
-		audioCaption = "Charlie's line <strong>flashing</strong> <br />"
+		audioCaption = "You need to plug into Charlie's line. <br />"
 		// First conversation is first pair in first set
 		caller =  conversations[currConvo].caller; // [0,1];
 		// Set "target", person being called
@@ -59,14 +73,21 @@
 		// console.log('caller: ' + caller);
 		// Light Charlie
 
-		setFlashing(caller)
+		setIncoming(caller)
 		// Set one end of this line engaged
 	}
 
-	function setFlashing(caller) {
+
+	function setIncoming(caller) {
+    playAudio('buzzer');
 		// Set caller row and column
 		jacks[caller.row][caller.col].ledState = LED_RED;		
 	}
+
+	function playAudio(audioName){
+    audioTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + audioName + ".mp3");
+    audioTrack.play();
+	}	
 
 	// --- Handle plug-in ----
 	// plugged in the form of [row index, col index, line index]
@@ -75,13 +96,13 @@
 		// Get name based on row and col
 		pluggedName = jacks[pluggedInfo.row][pluggedInfo.col].name;
 		// Debug msg
-		audioCaption += 'plugged into: ' + pluggedName + '<br />';
+		debugCaption += 'plugged into: ' + pluggedName + '<br />';
 		// console.log(plugged);
 		// console.log(caller);
 
 		if (!phoneLines[pluggedInfo.lineIdx].onePlugIsIn) { 
 			// phoneLines for line in question, test onePlugIsIn value
-			// First plugged used is NOT true, aka false, aka new
+			// New use of line --First plugged used is NOT true, aka false
 			// Did user correctly plug into caller?
 			// if row and column of plugged matches that of caller
 			if (pluggedInfo.row === caller.row && 
@@ -95,9 +116,15 @@
 					// Set first end of this line as in-use
 					// and Record caller for later unplug
 					setPhoneLineCaller(pluggedInfo);
+					// User message
+					audioCaption = "You'll need to plug into the jack for the" + 
+					"person the caller is askig for"
 					// Debug message
-					audioCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx + 
+					debugCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx + 
 						' asks for 72 (Olive) <br />';
+					// Stop buzzer
+					audioTrack.pause();
+					playAudio(conversations[currConvo].helloTrack);
 			}
 		} else { 
 			// First line used IS TRUE, so we might be on the other plug
@@ -114,10 +141,14 @@
 						jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN;
 						// Set this line as engaged
 						phoneLines[pluggedInfo.lineIdx].isEngaged = true;
-					// Record callee for later unplug
-					setPhoneLineCallee(pluggedInfo);
+						// Record callee for later unplug
+						setPhoneLineCallee(pluggedInfo);
+						audioTrack.pause();
+						playAudio(conversations[currConvo].convoTrack);
+						// User messag message
+						audioCaption = 'Good job, conversation under way';
 						// Debug message
-						audioCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx;
+						debugCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx;
 				} // end if plug match
 			} // end if this is the line in use
 		} // end else
@@ -244,5 +275,7 @@
 		{unPlug}
 		{phoneLines}
 	/>
+
+	<p>Debug: {debugCaption}</p>
 </div><!-- /wrapper -->
 
