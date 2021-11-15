@@ -7,7 +7,8 @@
 	let caller = [null, null]; // row, col
 	let pluggedName = 'caller not yet identified';
 	let callee = [null, null]; // row, col
-	let audioTrack = null;
+	// let audioTrack = null;
+	let audioTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
 
 	const phoneLines = [
 		{
@@ -64,14 +65,18 @@
 	// 	age = 24;
 	// }
 
-	function startActivity() {
-		audioCaption = "You need to plug into Charlie's line. <br />"
+	function initiateCall() {
+		// Stop any converstaion that might be in progress
+		// audioTrack.pause();
 		// First conversation is first pair in first set
 		caller =  conversations[currConvo].caller; // [0,1];
 		// Set "target", person being called
 		callee 	 		 =  conversations[currConvo].callee;
 		// console.log('caller: ' + caller);
 		// Light Charlie
+		audioCaption = "You need to plug into " +
+		" ..." +
+		"'s line. <br />"
 
 		setIncoming(caller)
 		// Set one end of this line engaged
@@ -85,9 +90,22 @@
 	}
 
 	function playAudio(audioName){
+		// Cuts off on ring if here
+		// audioTrack.pause();
+
     audioTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + audioName + ".mp3");
     audioTrack.play();
 	}	
+
+	function setTimer(timeToWait) {
+	  // myVar = 
+	  setTimeout(function(){ 
+			currConvo = 1;
+			prevConvo = 0;
+	  	initiateCall(); 
+	  }, timeToWait);
+	}
+
 
 	// --- Handle plug-in ----
 	// plugged in the form of [row index, col index, line index]
@@ -124,6 +142,7 @@
 						' asks for 72 (Olive) <br />';
 					// Stop buzzer
 					audioTrack.pause();
+					
 					playAudio(conversations[currConvo].helloTrack);
 			}
 		} else { 
@@ -147,6 +166,11 @@
 						playAudio(conversations[currConvo].convoTrack);
 						// User messag message
 						audioCaption = 'Good job, conversation under way';
+						// Set timer for next call
+						// Temp hard-wire to interrupt first only
+						if (currConvo === 0) {
+							setTimer(9000);							
+						}
 						// Debug message
 						debugCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx;
 				} // end if plug match
@@ -183,6 +207,8 @@
 		jacks[phoneLines[lineIndex].caller.row][phoneLines[lineIndex].caller.col].ledState = LED_OFF;
 		jacks[phoneLines[lineIndex].callee.row][phoneLines[lineIndex].callee.col].ledState = LED_OFF;
 		// jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN
+		// Stop the audio
+		audioTrack.pause();
 	}
 	// setInterval(myTimer, 1000);
 
@@ -260,7 +286,7 @@
 
 <header>
   <h5>Switchboard Project 
-  	<button on:click="{startActivity}">Start</button>
+  	<button on:click="{initiateCall}">Start</button>
 	</h5>
   <h1>You're the Operator!</h1>
 </header>
