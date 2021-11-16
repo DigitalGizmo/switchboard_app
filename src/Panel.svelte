@@ -211,7 +211,7 @@
     {/each}
 
     <!-- hard coded jacks -->
-      <g transform="translate(0, 600)" class="unavailable">
+      <g transform="translate(0, 600)" class="available">
         <rect width="250" height="275"/>
         <text x="100" y="50" fill="black">Ben</text>
         <text x="100" y="75" fill="black">476</text>

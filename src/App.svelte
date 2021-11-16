@@ -7,8 +7,9 @@
 	let caller = [null, null]; // row, col
 	let pluggedName = 'caller not yet identified';
 	let callee = [null, null]; // row, col
-	// let audioTrack = null;
-	let audioTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
+	// let convoTrack = null;
+	let convoTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
+	let buzzTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/buzzer.mp3");
 
 	const phoneLines = [
 		{
@@ -37,15 +38,15 @@
 		{
 			caller: {row: 0, col: 1}, 
 			callee:{row: 1, col: 2},
-			helloTrack: 'charlie-calls',
-			convoTrack: 'charlie-olive',
+			helloFile: 'charlie-calls',
+			convoFile: 'charlie-olive',
 		},  
 		// // Mina calls fire department
 		{
 			caller: {row: 1, col: 4}, 
 			callee:{row: 0, col: 3},
-			helloTrack: 'mina-calls',
-			convoTrack: 'mina-burns',
+			helloFile: 'mina-calls',
+			convoFile: 'mina-burns',
 		},  
 	];
 
@@ -67,7 +68,7 @@
 
 	function initiateCall() {
 		// Stop any converstaion that might be in progress
-		// audioTrack.pause();
+		// convoTrack.pause();
 		// First conversation is first pair in first set
 		caller =  conversations[currConvo].caller; // [0,1];
 		// Set "target", person being called
@@ -84,26 +85,37 @@
 
 
 	function setIncoming(caller) {
-    playAudio('buzzer');
+    // playBuzzer();
+    buzzTrack.play();    
 		// Set caller row and column
 		jacks[caller.row][caller.col].ledState = LED_RED;		
 	}
 
-	function playAudio(audioName){
-		// Cuts off on ring if here
-		// audioTrack.pause();
-
-    audioTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + audioName + ".mp3");
-    audioTrack.play();
+	// isFullConvo is false for initiation , true for convo
+	function playConvo(audioName, isFullConvo, lineIndex){
+    convoTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + audioName + ".mp3");
+    convoTrack.play();
+    if (isFullConvo) {
+			convoTrack.addEventListener("ended", function(){
+			     convoTrack.currentTime = 0;
+			     console.log(" -- Audio ended");
+			     setCallFinished(lineIndex);
+			});    	
+    } // end if
 	}	
 
-	function setTimer(timeToWait) {
-	  // myVar = 
-	  setTimeout(function(){ 
-			currConvo = 1;
-			prevConvo = 0;
-	  	initiateCall(); 
-	  }, timeToWait);
+	// function playBuzzer(){
+ //    buzzTrack.play();
+	// }	
+
+	function setTimeToNext(timeToWait) {
+	  setTimeout(startNextCall, timeToWait);
+	}
+
+	function startNextCall() {
+		currConvo = 1;
+		prevConvo = 0;
+  	initiateCall(); 
 	}
 
 
@@ -140,10 +152,12 @@
 					// Debug message
 					debugCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx + 
 						' asks for 72 (Olive) <br />';
-					// Stop buzzer
-					audioTrack.pause();
-					
-					playAudio(conversations[currConvo].helloTrack);
+					// Stop buzzer and other convo
+					buzzTrack.pause();
+					convoTrack.pause();
+					// false is for isConvo -- don't detect end
+					playConvo(conversations[currConvo].helloFile, false, 
+						pluggedInfo.lineIdx);
 			}
 		} else { 
 			// First line used IS TRUE, so we might be on the other plug
@@ -162,15 +176,19 @@
 						phoneLines[pluggedInfo.lineIdx].isEngaged = true;
 						// Record callee for later unplug
 						setPhoneLineCallee(pluggedInfo);
-						audioTrack.pause();
-						playAudio(conversations[currConvo].convoTrack);
+						// convoTrack.pause();
+						playConvo(conversations[currConvo].convoFile, true, 
+							pluggedInfo.lineIdx);
 						// User messag message
 						audioCaption = 'Good job, conversation under way';
 						// Set timer for next call
+
 						// Temp hard-wire to interrupt first only
-						if (currConvo === 0) {
-							setTimer(9000);							
-						}
+						// if (currConvo === 0) {
+						// 	setTimeToNext(9000);							
+						// }
+
+
 						// Debug message
 						debugCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx;
 				} // end if plug match
@@ -202,14 +220,18 @@
 			// phoneLines[lineIndex].caller.row);
 		// Clear the line settings
 		phoneLines[lineIndex].onePlugIsIn = false;
+		// Stop the audio
+		convoTrack.pause();
+		setCallFinished(lineIndex);
+	}
+
+	function setCallFinished(lineIndex) {
 		phoneLines[lineIndex].isEngaged = false;
 		// Turn of the leds
 		jacks[phoneLines[lineIndex].caller.row][phoneLines[lineIndex].caller.col].ledState = LED_OFF;
 		jacks[phoneLines[lineIndex].callee.row][phoneLines[lineIndex].callee.col].ledState = LED_OFF;
-		// jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN
-		// Stop the audio
-		audioTrack.pause();
 	}
+
 	// setInterval(myTimer, 1000);
 
 	// function myTimer() {
@@ -302,6 +324,6 @@
 		{phoneLines}
 	/>
 
-	<p>Debug: {debugCaption}</p>
+	<p>Debug: {@html debugCaption}</p>
 </div><!-- /wrapper -->
 
