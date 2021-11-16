@@ -290,7 +290,6 @@
           x1="42" y1="{d.sleeveLength}" x2="42" y2="160"/>
         <rect width="84" height="120" class="plug-body"/>
         <text class="label" x="42" y="60" text-anchor="middle">PLUG IN</text> 
-        <circle cx="0" cy="0" r="2" fill="green"/>
       </g> 
     {/each}
     <g class="line1"> <!-- first set of lines -->

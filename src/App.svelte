@@ -2,13 +2,13 @@
 	import HowTo from "./HowTo.svelte";
 	import Panel from "./Panel.svelte";
 
-	let audioCaption = "Your're the operator!";
+	let audioCaption = "Transcript: ";
 	let debugCaption = "Press Start";
 	let caller = [null, null]; // row, col
 	let pluggedName = 'caller not yet identified';
 	let callee = [null, null]; // row, col
 	// let convoTrack = null;
-	let convoTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
+	// let convoTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
 	let buzzTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/buzzer.mp3");
 
 	const phoneLines = [
@@ -17,12 +17,14 @@
 			isEngaged: false,
 			caller: {row: null, col: null, isPlugged: false},
 			callee: {row: null, col: null, isPlugged: false},
+			convoTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3"),
 		}, 
 		{
 			onePlugIsIn: false, 
 			isEngaged: false,
 			caller: {row: null, col: null, isPlugged: false},
 			callee: {row: null, col: null, isPlugged: false},
+			convoTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3"),
 		}, 
 	];
 
@@ -40,6 +42,12 @@
 			callee:{row: 1, col: 2},
 			helloFile: 'charlie-calls',
 			convoFile: 'charlie-olive',
+			helloText: "Charlie:  Hi.  72 please.",
+			convoText: 
+				"Olive:  Hello? <br />" +
+				"Charlie:  Hi Olive, it’s Charlie Freeman.  I can’t go tonight. <br />" +
+				"Olive:  Why not? <br />" +
+				"Charlie:  My dad has a sick patient and he took the car. <br />",
 		},  
 		// // Mina calls fire department
 		{
@@ -47,17 +55,25 @@
 			callee:{row: 0, col: 3},
 			helloFile: 'mina-calls',
 			convoFile: 'mina-burns',
+			helloText: "Mina:  Fire department --",
+			convoText: 
+				"Chief Burns: Fire station.  Chief Burns speaking <br />" +
+				"Mina:  I can smell smoke. <br />" +
+				"Chief Burns:  Where are you? <br />" +
+				"Mina:  Mrs. Fowlers house.  You know on Maple St. <br />",
 		},  
 	];
 
 	let currConvo = 0;
 	let prevConvo = null;
 
+
 	const LED_OFF = 0;
 	const LED_RED = 1;
 	const LED_GREEN = 2;
 
-	let lineIdxInUse = null;
+	let lineIdxInUse = -1;
+	let lineIdxPrev = -1;
 
 	// $: uppercaseName = name.toUpperCase();
 	// $: console.log(name);
@@ -73,12 +89,11 @@
 		caller =  conversations[currConvo].caller; // [0,1];
 		// Set "target", person being called
 		callee 	 		 =  conversations[currConvo].callee;
-		// console.log('caller: ' + caller);
-		// Light Charlie
-		audioCaption = "You need to plug into " +
-		" ..." +
-		"'s line. <br />"
 
+		// console.log('caller: ' + caller);
+		// audioCaption = "in init: Charlie:  Hi.  72 please."
+
+		// Light Charlie
 		setIncoming(caller)
 		// Set one end of this line engaged
 	}
@@ -86,19 +101,21 @@
 
 	function setIncoming(caller) {
     // playBuzzer();
-    buzzTrack.play();    
+    buzzTrack.play();
+    buzzTrack.volume = .2;    
 		// Set caller row and column
 		jacks[caller.row][caller.col].ledState = LED_RED;		
 	}
 
 	// isFullConvo is false for initiation , true for convo
 	function playConvo(audioName, isFullConvo, lineIndex){
-    convoTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + audioName + ".mp3");
-    convoTrack.play();
+		phoneLines[lineIndex].convoTrack =
+     new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + audioName + ".mp3");
+    phoneLines[lineIndex].convoTrack.play();
     if (isFullConvo) {
-			convoTrack.addEventListener("ended", function(){
-			     convoTrack.currentTime = 0;
-			     console.log(" -- Audio ended");
+			phoneLines[lineIndex].convoTrack.addEventListener("ended", function(){
+			     phoneLines[lineIndex].convoTrack.currentTime = 0;
+			     console.log(" -- Audio ended on lineIdx: " + lineIndex);
 			     setCallFinished(lineIndex);
 			});    	
     } // end if
@@ -130,6 +147,7 @@
 		// console.log(plugged);
 		// console.log(caller);
 
+		// Fresh plugged
 		if (!phoneLines[pluggedInfo.lineIdx].onePlugIsIn) { 
 			// phoneLines for line in question, test onePlugIsIn value
 			// New use of line --First plugged used is NOT true, aka false
@@ -140,21 +158,36 @@
 					// console.log('got to equal');
 					// Turn led green
 					jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN;
-					// Set this line in use only we have gotten this success
-					lineIdxInUse = pluggedInfo.lineIdx;
-					// console.log(' setting lineIdxInUse to: ' + lineIdxInUse);
+
 					// Set first end of this line as in-use
 					// and Record caller for later unplug
 					setPhoneLineCaller(pluggedInfo);
+
 					// User message
-					audioCaption = "You'll need to plug into the jack for the" + 
-					"person the caller is askig for"
+					audioCaption = conversations[currConvo].helloText;
+
 					// Debug message
 					debugCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx + 
 						' asks for 72 (Olive) <br />';
 					// Stop buzzer and other convo
 					buzzTrack.pause();
-					convoTrack.pause();
+
+					// Stop previous conversation, if there is one
+					// phoneLines[pluggedInfo.lineIdx].convoTrack.pause();
+					console.log(' - lineIdxPrev: ' + lineIdxPrev);
+					if (lineIdxPrev >= 0) {
+						phoneLines[lineIdxPrev].convoTrack.volume = 0.1;
+					}
+
+					// phoneLines[lineIdxPrev].convoTrack.volume = 0.1;
+
+					// Set this line in use only we have gotten this success
+					lineIdxInUse = pluggedInfo.lineIdx;
+					// Set prev for use in next call.
+					lineIdxPrev = lineIdxInUse;
+					// console.log(' setting lineIdxInUse to: ' + lineIdxInUse);
+
+
 					// false is for isConvo -- don't detect end
 					playConvo(conversations[currConvo].helloFile, false, 
 						pluggedInfo.lineIdx);
@@ -179,15 +212,20 @@
 						// convoTrack.pause();
 						playConvo(conversations[currConvo].convoFile, true, 
 							pluggedInfo.lineIdx);
+
 						// User messag message
-						audioCaption = 'Good job, conversation under way';
+						audioCaption = conversations[currConvo].convoText;
+
+
+
+
+
 						// Set timer for next call
 
 						// Temp hard-wire to interrupt first only
-						// if (currConvo === 0) {
-						// 	setTimeToNext(9000);							
-						// }
-
+						if (currConvo === 0) {
+							setTimeToNext(9000);							
+						}
 
 						// Debug message
 						debugCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx;
@@ -221,7 +259,7 @@
 		// Clear the line settings
 		phoneLines[lineIndex].onePlugIsIn = false;
 		// Stop the audio
-		convoTrack.pause();
+		phoneLines[lineIndex].convoTrack.pause();
 		setCallFinished(lineIndex);
 	}
 
