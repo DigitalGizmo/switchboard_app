@@ -23,24 +23,28 @@
   let plugs = [
     { index: 0,
       lineIndex: 0,
+      xStart: PLUG_START_X, 
       x: PLUG_START_X, 
       y: PLUG_START_Y,
       sleeveLength: -20, // to shorten on plug-in
     },
     { index: 1, 
       lineIndex: 0,
+      xStart: PLUG_START_X + INTRA_PLUG_DELTA, 
       x: PLUG_START_X + INTRA_PLUG_DELTA, 
       y: PLUG_START_Y, 
       sleeveLength: -20,
     },
     { index: 2, 
       lineIndex: 1,
+      xStart: PLUG_START_X + INTER_PLUG_DELTA, 
       x: PLUG_START_X + INTER_PLUG_DELTA, 
       y: PLUG_START_Y,
       sleeveLength: -20,
     },
     { index: 3, 
       lineIndex: 1,
+      xStart: PLUG_START_X + INTER_PLUG_DELTA + INTRA_PLUG_DELTA, 
       x: PLUG_START_X + INTER_PLUG_DELTA + INTRA_PLUG_DELTA, 
       y: PLUG_START_Y,
       sleeveLength: -20,
@@ -118,15 +122,24 @@
           // Calculate closest row
           let proportion_of_total_height = (d.y + PLUG_SNAP_FUDG_Y)/PANEL_HEIGHT;
           pluggedInfo.row = Math.trunc(proportion_of_total_height * NUM_ROWS);
-          // Snap plug to calculated row
-          plugs[plugIdx].y = (pluggedInfo.row * CELL_HEIGHT) + JACK_TOP_OFFSET;
+          // Snap plug to calculated row (unless putting it away)
+          if (pluggedInfo.row < 3) {
+            plugs[plugIdx].y = (pluggedInfo.row * CELL_HEIGHT) + JACK_TOP_OFFSET;
+          } else { // Bottom -- putting it away
+            plugs[plugIdx].y = PLUG_START_Y;
+          }
           plugs[plugIdx].sleeveLength = -5;
 
           // Calculate closest column
           let proportion_of_total = d.x/PANEL_WIDTH;
           pluggedInfo.col = Math.trunc(proportion_of_total * NUM_COLS);
-          // Snap plug to calcuated x
-          plugs[plugIdx].x = (pluggedInfo.col * CELL_WIDTH) + (CELL_WIDTH/2) - 55;
+          // Snap plug to calcuated x (unless putting it away, based on row)
+          if (pluggedInfo.row < 3) {
+            plugs[plugIdx].x = (pluggedInfo.col * CELL_WIDTH) + (CELL_WIDTH/2) - 55;
+          } else { // Bottom -- putting it away
+            plugs[plugIdx].x = plugs[plugIdx].xStart;
+            plugs[plugIdx].sleeveLength = -20;
+          }
 
           // Set line index param
           pluggedInfo.lineIdx = plugs[plugIdx].lineIndex;
