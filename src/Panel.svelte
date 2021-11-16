@@ -16,6 +16,7 @@
   const INTER_PLUG_DELTA = 500; // Space between setsw
   const BODY_LINE_OFFSET_X = 42; // From plug left to line
   const BODY_LINE_OFFSET_Y = 160; // From plug top to line
+  const PLUG_SNAP_FUDG_Y = -80;
   let plugIdx = 0;
   const pluggedInfo = {row: null, col: null, lineIdx: null};
 
@@ -23,19 +24,27 @@
     { index: 0,
       lineIndex: 0,
       x: PLUG_START_X, 
-      y: PLUG_START_Y },
+      y: PLUG_START_Y,
+      sleeveLength: -20, // to shorten on plug-in
+    },
     { index: 1, 
       lineIndex: 0,
       x: PLUG_START_X + INTRA_PLUG_DELTA, 
-      y: PLUG_START_Y },
+      y: PLUG_START_Y, 
+      sleeveLength: -20,
+    },
     { index: 2, 
       lineIndex: 1,
       x: PLUG_START_X + INTER_PLUG_DELTA, 
-      y: PLUG_START_Y },
+      y: PLUG_START_Y,
+      sleeveLength: -20,
+    },
     { index: 3, 
       lineIndex: 1,
       x: PLUG_START_X + INTER_PLUG_DELTA + INTRA_PLUG_DELTA, 
-      y: PLUG_START_Y},
+      y: PLUG_START_Y,
+      sleeveLength: -20,
+    },
   ]
 
   const plugLineClases = ['line1', 'line1', 'line2', 'line2'];
@@ -73,7 +82,7 @@
   // Take 2 Calculated
   const JACK_DELTA_X = 275;
   const ROW_OFFSETS = [0, 300];
-  const JACK_TOP_OFFSET = 191 + 20;
+  const JACK_TOP_OFFSET = 191 + 28;
 
 
 
@@ -91,8 +100,11 @@
           // console.log(' - unPlug isEngaged: ' + 
           //   phoneLines[lineIndex].isEngaged);
 
+          // Re-lengthen the sleeve
+          plugs[plugIdx].sleeveLength = -20;
+
           if (phoneLines[lineIndex].isEngaged) {
-            unPlug(lineIndex);   
+            unPlug(lineIndex);
           }
 
        }).on("drag", function(d) {
@@ -104,10 +116,11 @@
 
        }).on("end", function (d){
           // Calculate closest row
-          let proportion_of_total_height = d.y/PANEL_HEIGHT;
+          let proportion_of_total_height = (d.y + PLUG_SNAP_FUDG_Y)/PANEL_HEIGHT;
           pluggedInfo.row = Math.trunc(proportion_of_total_height * NUM_ROWS);
           // Snap plug to calculated row
           plugs[plugIdx].y = (pluggedInfo.row * CELL_HEIGHT) + JACK_TOP_OFFSET;
+          plugs[plugIdx].sleeveLength = -5;
 
           // Calculate closest column
           let proportion_of_total = d.x/PANEL_WIDTH;
@@ -179,8 +192,18 @@
   }
 
   .led-red {
-    fill:red;
     stroke:#919090;
+    stroke-width:3;
+    stroke-miterlimit:10;
+    animation: blinkingLED 1.75s infinite;
+  }
+
+  @keyframes blinkingLED {
+      0% { fill: red; }
+      49% { fill: white; }
+      60% { fill: red; }
+      99% { fill: white; }
+      100% { fill: red; }
   }
 
 </style>
@@ -196,16 +219,17 @@
       {#each jacks[ri] as k, i}
         <g transform="translate({ i * JACK_DELTA_X }, { r })" class="socket-plate">
           <rect width="250" height="275"/>
-          <text x="50" y="50" fill="black">{k.name} <tspan>-</tspan>{k.number}</text>
+          <text x="125" y="50" text-anchor="middle">{k.name}</text>
+          <text x="125" y="80" text-anchor="middle">{k.number}</text>
           <circle 
             class="led-light"
             class:led-green="{k.ledState === 2}"
             class:led-red="{k.ledState === 1}"
             cx="127" 
-            cy="105.9" 
+            cy="130" 
             r="33.5"/>
-          <rect x="102" y="166" width="50" height="50" stroke="#919090"/>
-          <circle cx="126.5" cy="191.5" r="7.5" fill="black"/>
+          <rect x="102" y="186" width="50" height="50" stroke="#919090"/>
+          <circle cx="126.5" cy="211.5" r="7.5" fill="black"/>
         </g>
       {/each}
     {/each}
@@ -263,9 +287,10 @@
         id="{d.index}">
         <line 
           class="{d.index < 2 ? 'rounded-line line1' : 'rounded-line line2'}"  
-          x1="42" y1="-20" x2="42" y2="160"/>
+          x1="42" y1="{d.sleeveLength}" x2="42" y2="160"/>
         <rect width="84" height="120" class="plug-body"/>
         <text class="label" x="42" y="60" text-anchor="middle">PLUG IN</text> 
+        <circle cx="0" cy="0" r="2" fill="green"/>
       </g> 
     {/each}
     <g class="line1"> <!-- first set of lines -->

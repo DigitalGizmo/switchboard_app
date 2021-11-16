@@ -182,7 +182,7 @@ header {
 
 .sockets text {
   font-size:  2em;
-  font-weight: bold;
+  fill: black;
 }
 
 .sockets text.label {
