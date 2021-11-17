@@ -122,6 +122,13 @@
           // Calculate closest row
           let proportion_of_total_height = (d.y + PLUG_SNAP_FUDG_Y)/PANEL_HEIGHT;
           pluggedInfo.row = Math.trunc(proportion_of_total_height * NUM_ROWS);
+          // Calculate closest column
+          let proportion_of_total = d.x/PANEL_WIDTH;
+          pluggedInfo.col = Math.trunc(proportion_of_total * NUM_COLS);
+
+          // Test whether there's already a plug in this jack
+
+
           // Snap plug to calculated row (unless putting it away)
           if (pluggedInfo.row < 3) {
             plugs[plugIdx].y = (pluggedInfo.row * CELL_HEIGHT) + JACK_TOP_OFFSET;
@@ -130,9 +137,6 @@
           }
           plugs[plugIdx].sleeveLength = -5;
 
-          // Calculate closest column
-          let proportion_of_total = d.x/PANEL_WIDTH;
-          pluggedInfo.col = Math.trunc(proportion_of_total * NUM_COLS);
           // Snap plug to calcuated x (unless putting it away, based on row)
           if (pluggedInfo.row < 3) {
             plugs[plugIdx].x = (pluggedInfo.col * CELL_WIDTH) + (CELL_WIDTH/2) - 55;
@@ -140,6 +144,7 @@
             plugs[plugIdx].x = plugs[plugIdx].xStart;
             plugs[plugIdx].sleeveLength = -20;
           }
+
 
           // Set line index param
           pluggedInfo.lineIdx = plugs[plugIdx].lineIndex;

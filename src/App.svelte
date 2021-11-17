@@ -49,7 +49,7 @@
 				"Olive:  Why not? <br />" +
 				"Charlie:  My dad has a sick patient and he took the car. <br />",
 		},  
-		// // Mina calls fire department
+		// Mina calls fire department
 		{
 			caller: {row: 1, col: 4}, 
 			callee:{row: 0, col: 3},
@@ -61,6 +61,18 @@
 				"Mina:  I can smell smoke. <br />" +
 				"Chief Burns:  Where are you? <br />" +
 				"Mina:  Mrs. Fowlers house.  You know on Maple St. <br />",
+		},  
+		// Tom calls fire department
+		{
+			caller: {row: 0, col: 2}, 
+			callee:{row: 0, col: 3},
+			helloFile: 'tom-calls',
+			convoFile: 'tom-burns',
+			helloText: "Tom:  Fire!  Fire station. I have to talk to the fire station…Fire!",
+			convoText: 
+				"Chief Burns: Fire Station. Chief B… <br />" +
+				"Tom:  Fire!  In the barn.  My uncle’s trying to get the cows out.  I ran…but… <br />" +
+				"Chief Burns:  We’re on our way.  Stay calm, son. <br />",
 		},  
 	];
 
@@ -130,8 +142,8 @@
 	}
 
 	function startNextCall() {
-		currConvo = 1;
-		prevConvo = 0;
+		currConvo += 1;
+		prevConvo += 1;
   	initiateCall(); 
 	}
 
@@ -176,7 +188,7 @@
 					// phoneLines[pluggedInfo.lineIdx].convoTrack.pause();
 					console.log(' - lineIdxPrev: ' + lineIdxPrev);
 					if (lineIdxPrev >= 0) {
-						phoneLines[lineIdxPrev].convoTrack.volume = 0.1;
+						phoneLines[lineIdxPrev].convoTrack.volume = 0;
 					}
 
 					// phoneLines[lineIdxPrev].convoTrack.volume = 0.1;
@@ -216,15 +228,12 @@
 						// User messag message
 						audioCaption = conversations[currConvo].convoText;
 
-
-
-
-
 						// Set timer for next call
 
 						// Temp hard-wire to interrupt first only
 						if (currConvo === 0) {
-							setTimeToNext(9000);							
+							console.log(' currConvo = 0, 15000 to next')
+							setTimeToNext(15000);							
 						}
 
 						// Debug message
@@ -256,29 +265,31 @@
 		// console.log('-- unplug: ' + phoneLines[lineIndex]);
 		// console.log('-- unplug caller row: ' + 
 			// phoneLines[lineIndex].caller.row);
-		// Clear the line settings
-		phoneLines[lineIndex].onePlugIsIn = false;
 		// Stop the audio
 		phoneLines[lineIndex].convoTrack.pause();
 		setCallFinished(lineIndex);
 	}
 
 	function setCallFinished(lineIndex) {
+		// Clear the line settings
+		phoneLines[lineIndex].onePlugIsIn = false;
 		phoneLines[lineIndex].isEngaged = false;
 		// Turn of the leds
 		jacks[phoneLines[lineIndex].caller.row][phoneLines[lineIndex].caller.col].ledState = LED_OFF;
 		jacks[phoneLines[lineIndex].callee.row][phoneLines[lineIndex].callee.col].ledState = LED_OFF;
+
+		// Reset the volume
+		// phoneLines[lineIdxPrev].convoTrack.volume = 0;
+		phoneLines[lineIndex].convoTrack.volume = 1;
+
+		// Pause and start next call
+		// console.log('setCallFinished, currConvo: ' + currConvo);
+		// Don't start next call on finish if other line is engaged
+		let otherLineIdx = (lineIndex === 0) ? 1 : 0;
+		if (!phoneLines[otherLineIdx].isEngaged) {
+			setTimeToNext(2000);							
+		}
 	}
-
-	// setInterval(myTimer, 1000);
-
-	// function myTimer() {
-	//   const d = new Date();
-	//   document.getElementById("demo").innerHTML = d.toLocaleTimeString();
-	// }	
-	// function newName(event) {
-	// 	name = event.target.value;
-	// }
 
   // Jacks
   let jacks = [
@@ -295,7 +306,7 @@
       },
       { index: 2,
         name: 'Tom',
-        number: '94',
+        number: '84',
         ledState: 0, 
       },
       { index: 3,
