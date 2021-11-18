@@ -5,7 +5,6 @@
   export let jacks;
   export let identifyPlugged;
   export let unPlug;
-  export let phoneLines;
 
   let name = 'Testing';
 
@@ -88,29 +87,16 @@
   const ROW_OFFSETS = [0, 300];
   const JACK_TOP_OFFSET = 191 + 28;
 
-
-
   onMount(() => {
     d3.selectAll('.plug').style('cursor', 'move')
     .call(d3.drag()
       .on("start", function(d) {
           plugIdx = d3.select(this).attr("id");
-
           // Which line is this
           let lineIndex = plugs[plugIdx].lineIndex;
-          // Check whether this one is plugged
-          // Unplug if relevant
-          // console.log(' - unPlug lineIndex: ' + lineIndex);
-          // console.log(' - unPlug isEngaged: ' + 
-          //   phoneLines[lineIndex].isEngaged);
-
+          unPlug(plugIdx, lineIndex);
           // Re-lengthen the sleeve
           plugs[plugIdx].sleeveLength = -20;
-
-          if (phoneLines[lineIndex].isEngaged) {
-            unPlug(lineIndex);
-          }
-
        }).on("drag", function(d) {
           plugIdx = d3.select(this).attr("id");
           plugs[plugIdx].x = d.x -40;

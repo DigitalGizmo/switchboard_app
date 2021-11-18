@@ -171,6 +171,9 @@
 					// Turn led green
 					jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN;
 
+					// Set jack to plugged
+					// jacks[pluggedInfo.row][pluggedInfo.col].isPluggedJack = true;
+
 					// Set first end of this line as in-use
 					// and Record caller for later unplug
 					setPhoneLineCaller(pluggedInfo);
@@ -217,6 +220,10 @@
 						// console.log('got to 2nd plug equal');
 						// Turn led green
 						jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN;
+
+						// // Set jack to plugged
+						// jacks[pluggedInfo.row][pluggedInfo.col].isPluggedJack = true;
+						
 						// Set this line as engaged
 						phoneLines[pluggedInfo.lineIdx].isEngaged = true;
 						// Record callee for later unplug
@@ -260,14 +267,26 @@
 			pluggedInfo.col;
 	}
 
-	function unPlug(lineIndex) {
-		// console.log('ready to unplug line: ' + lineIndex);
-		// console.log('-- unplug: ' + phoneLines[lineIndex]);
-		// console.log('-- unplug caller row: ' + 
-			// phoneLines[lineIndex].caller.row);
-		// Stop the audio
-		phoneLines[lineIndex].convoTrack.pause();
-		setCallFinished(lineIndex);
+
+	function unPlug(plugIdx, lineIndex) {
+
+		// Set isPluggedJack to false
+		// how to get coords of unplug???
+		// Maybe store in person what jack
+		// index is ingaged
+		// wait until I have single person/jack id
+		// before I tackle this.
+		// It's just so you can't plug into an
+		// already plugged jack.
+
+    // If conversation is in progress
+    // (Or even wrong number)
+
+    if (phoneLines[lineIndex].isEngaged) {
+			// Stop the audio
+			phoneLines[lineIndex].convoTrack.pause();
+			setCallFinished(lineIndex);
+    }
 	}
 
 	function setCallFinished(lineIndex) {
@@ -297,54 +316,64 @@
       { index: 0,
         name: 'Dr. Freeman',
         number: '82',
-        ledState: 0, 
+        ledState: 0,
+        // isPluggedJack: false,
       },
       { index: 1,
         name: 'Charlie',
         number: '56',
-        ledState: 0, 
+        ledState: 0,
+        // isPluggedJack: false,
       },
       { index: 2,
         name: 'Tom',
         number: '84',
-        ledState: 0, 
+        ledState: 0,
+        // isPluggedJack: false,
       },
       { index: 3,
         name: 'Chief Burns',
         number: '71',
-        ledState: 0, 
+        ledState: 0,
+        // isPluggedJack: false,
       },
       { index: 4,
         name: 'Tressa',
         number: '32',
-        ledState: 0, 
+        ledState: 0,
+        // isPluggedJack: false,
       },
     ],
     [
       { index: 5,
         name: 'Emma',
         number: '53',
-        ledState: 0, 
+        ledState: 0,
+        // isPluggedJack: false,
       },
       { index: 6,
         name: 'Mrs. White',
         number: '51',
-        ledState: 0, 
+        ledState: 0,
+        // isPluggedJack: false,
       },
       { index: 7,
         name: 'Olive',
         number: '72',
-        ledState: 0, 
+        ledState: 0,
+        // isPluggedJack: false,
       },
       { index: 8,
         name: 'Sally',
         number: '59',
-        ledState: 0, 
+        ledState: 0,
+        // isPluggedJack: false,
       },
       { index: 9,
         name: 'Mina',
         number: '24',
-        ledState: 0, 
+        ledState: 0,
+        // isPluggedJack: false,
       },
     ]
   ]
@@ -370,9 +399,9 @@
 		{jacks}
 		{identifyPlugged}
 		{unPlug}
-		{phoneLines}
 	/>
 
 	<p>Debug: {@html debugCaption}</p>
-</div><!-- /wrapper -->
+</div><!-- /wrapper --> 		<!-- phoneLines -->
+
 
