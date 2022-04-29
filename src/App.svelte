@@ -61,7 +61,7 @@
 		// First conversation is first pair in first set
 		caller =  conversations[currConvo].caller; // [0,1];
 		// Set "target", person being called
-		callee 	 		 =  conversations[currConvo].callee;
+		callee =  conversations[currConvo].callee;
 
 		// console.log('caller: ' + caller);
 		// audioCaption = "in init: Charlie:  Hi.  72 please."

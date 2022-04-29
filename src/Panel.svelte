@@ -84,8 +84,8 @@
   const CELL_HEIGHT = PANEL_HEIGHT/NUM_ROWS;
   // Take 2 Calculated
   const JACK_DELTA_X = 275;
-  const ROW_OFFSETS = [0, 300];
-  const JACK_TOP_OFFSET = 191 + 28;
+  const ROW_OFFSETS = [0, 300]; // Starting y for each row
+  const JACK_TOP_OFFSET = 202 + 28;
 
   onMount(() => {
     d3.selectAll('.plug').style('cursor', 'move')
@@ -181,6 +181,12 @@
     font-family:'PTSans-Bold';
   }
 
+  /* don made this */
+  .jack-name {
+    font-size: 1.6em;
+    /* font-family:'PTSans-Bold'; */
+  }
+
   /* from global css*/
 
   .led-light {
@@ -219,70 +225,67 @@
     viewBox="0 0 1420 1200" xml:space="preserve">
 
 
-    {#each ROW_OFFSETS as r, ri}
-      {#each jacks[ri] as k, i}
-        <g transform="translate({ i * JACK_DELTA_X }, { r })" class="socket-plate">
+    {#each ROW_OFFSETS as rowY, rowIndex}
+      {#each jacks[rowIndex] as jack, columnIndex}
+        <g transform="translate({ columnIndex * JACK_DELTA_X }, { rowY })" class="socket-plate">
           <rect width="250" height="275"/>
-          <text x="125" y="50" text-anchor="middle">{k.name}</text>
-          <text x="125" y="80" text-anchor="middle">{k.number}</text>
+          <text x="125" y="35" class="jack-name" text-anchor="middle">{jack.company}</text>
+          <text x="125" y="70" class="jack-name" text-anchor="middle">{jack.name}</text>
+          <text x="125" y="103" class="jack-name" text-anchor="middle">{jack.number}</text>
           <circle 
             class="led-light"
-            class:led-green="{k.ledState === 2}"
-            class:led-red="{k.ledState === 1}"
+            class:led-green="{jack.ledState === 2}"
+            class:led-red="{jack.ledState === 1}"
             cx="127" 
-            cy="130" 
-            r="33.5"/>
-          <rect x="102" y="186" width="50" height="50" stroke="#919090"/>
-          <circle cx="126.5" cy="211.5" r="7.5" fill="black"/>
+            cy="150" 
+            r="32"/>
+          <rect x="102" y="200" width="50" height="50" stroke="#919090"/>
+          <circle cx="126.5" cy="225.5" r="7.5" fill="black"/>
         </g>
       {/each}
     {/each}
 
     <!-- hard coded jacks -->
-      <g transform="translate(0, 600)" class="available">
-        <rect width="250" height="275"/>
-        <text x="100" y="50" fill="black">Ben</text>
-        <text x="100" y="75" fill="black">476</text>
-       <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-        <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
-      </g>
-
-      <g transform="translate(275, 600)" class="available">
-        <rect width="250" height="275"/>
-        <text x="100" y="50" fill="black">Sue</text>
-        <text x="100" y="75" fill="black">989</text>
-        <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-        <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
-      </g>
-
-      <g transform="translate(550, 600)" class="available">
-        <rect width="250" height="275"/>
-        <text x="100" y="50" fill="black">Ann</text>
-        <text x="100" y="75" fill="black">977</text>
-        <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-        <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
-      </g>
-
-      <g transform="translate(825, 600)" class="available">
-        <rect width="250" height="275"/>
-        <text x="100" y="50" fill="black">Sue</text>
-        <text x="100" y="75" fill="black">989</text>
-        <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-        <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
-      </g>
-
-      <g transform="translate(1100, 600)" class="available">
-        <rect width="250" height="275"/>
-        <text x="100" y="50" fill="black">Ann</text>
-        <text x="100" y="75" fill="black">977</text>
-        <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-        <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
-      </g>    
-
-    <!-- plug base -->
-    <g transform="translate(0, 1090)">
-      <rect width="1380" height="90" fill="#919090"/>
+    <g transform="translate(0, 600)" class="available">
+      <rect width="250" height="275"/>
+      <text x="100" y="50" fill="black">Ben</text>
+      <text x="100" y="75" fill="black">476</text>
+      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
+      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
     </g>
+
+    <g transform="translate(275, 600)" class="available">
+      <rect width="250" height="275"/>
+      <text x="100" y="50" fill="black">Sue</text>
+      <text x="100" y="75" fill="black">989</text>
+      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
+      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
+    </g>
+
+    <g transform="translate(550, 600)" class="available">
+      <rect width="250" height="275"/>
+      <text x="100" y="50" fill="black">Ann</text>
+      <text x="100" y="75" fill="black">977</text>
+      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
+      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
+    </g>
+
+    <g transform="translate(825, 600)" class="available">
+      <rect width="250" height="275"/>
+      <text x="100" y="50" fill="black">Sue</text>
+      <text x="100" y="75" fill="black">989</text>
+      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
+      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
+    </g>
+
+    <g transform="translate(1100, 600)" class="available">
+      <rect width="250" height="275"/>
+      <text x="100" y="50" fill="black">Ann</text>
+      <text x="100" y="75" fill="black">977</text>
+      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
+      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
+    </g>    
+
 
     {#each plugs as d}
       <g 
@@ -307,6 +310,10 @@
       <line class="rounded-line" x1="{x32}" y1="{y2}" x2="{x42}" y2="{y2}" />
     </g>
 
+    <!-- plug base -->
+    <g transform="translate(0, 1090)">
+      <rect width="1380" height="90" fill="#919090"/>
+    </g>
 
   </svg>
 </div>
