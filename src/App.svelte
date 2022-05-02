@@ -1,11 +1,15 @@
 <script>
 	import HowTo from "./HowTo.svelte";
 	import Panel from "./Panel.svelte";
-	import { conversations, jacks } from './Content.js';
+	import { conversations, jacks, persons,
+		personIndexRowCol } from './Content.js';
+	//  
+	// import {setJackState} from './ProtoPanelHelper.js';
 
 	let audioCaption = "Transcript: ";
 	let debugCaption = "Press Start";
 	let caller = [null, null]; // row, col
+	let callerIndex = 0;
 	let pluggedName = 'caller not yet identified';
 	let callee = [null, null]; // row, col
 	// let convoTrack = null;
@@ -56,10 +60,13 @@
 	// }
 
 	function initiateCall() {
+		console.log('got to init call ');
 		// Stop any converstaion that might be in progress
 		// convoTrack.pause();
 		// First conversation is first pair in first set
 		caller =  conversations[currConvo].caller; // [0,1];
+		callerIndex =  conversations[currConvo].caller.index; // [0,1];
+		console.log('callerIndex: ' + callerIndex);
 		// Set "target", person being called
 		callee =  conversations[currConvo].callee;
 
@@ -67,18 +74,22 @@
 		// audioCaption = "in init: Charlie:  Hi.  72 please."
 
 		// Light Charlie
-		setIncoming(caller)
+		// setIncoming(caller)
+		setIncoming(callerIndex)
 		// Set one end of this line engaged
 	}
 
 
-	function setIncoming(caller) {
+	// function setIncoming(caller) {
+	function setIncoming(callerIndex) {
     // playBuzzer();
     buzzTrack.play();
     buzzTrack.volume = .2;    
 		// Set caller row and column
-		jacks[caller.row][caller.col].ledState = LED_RED;
-		// jacks[]
+		// jacks[caller.row][caller.col].ledState = LED_RED;
+		jacks[personIndexRowCol[callerIndex][0]][personIndexRowCol[callerIndex][1]].ledState = LED_RED;
+		// I wish I could call this function in the Panel child
+		// jacks = setJackState(jacks, callerIndex);
 	}
 
 	// isFullConvo is false for initiation , true for convo
@@ -291,6 +302,7 @@
 	/>
 	<Panel 
 		{jacks}
+		{persons}
 		{identifyPlugged}
 		{unPlug}
 	/>

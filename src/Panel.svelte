@@ -3,6 +3,7 @@
   import * as d3 from 'd3';
 
   export let jacks;
+  export let persons;
   export let identifyPlugged;
   export let unPlug;
 
