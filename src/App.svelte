@@ -77,7 +77,8 @@
     buzzTrack.play();
     buzzTrack.volume = .2;    
 		// Set caller row and column
-		jacks[caller.row][caller.col].ledState = LED_RED;		
+		jacks[caller.row][caller.col].ledState = LED_RED;
+		// jacks[]
 	}
 
 	// isFullConvo is false for initiation , true for convo
@@ -165,7 +166,7 @@
 
 
 					// false is for isConvo -- don't detect end
-					playConvo(conversations[currConvo].helloFile, false, 
+					playConvo(conversations[currConvo].audioFile, false, 
 						pluggedInfo.lineIdx);
 			}
 		} else { 
