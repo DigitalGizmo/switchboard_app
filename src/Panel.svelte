@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import * as d3 from 'd3';
+  import {rowColToIndex, getPerson} from './ProtoPanelHelper.js'
 
   export let jacks;
   export let persons;
@@ -226,17 +227,24 @@
     viewBox="0 0 1420 1200" xml:space="preserve">
 
 
+    <!-- The following yields the person index nubmer
+    rowColToIndex[rowIndex][colIndex] -->
     {#each ROW_OFFSETS as rowY, rowIndex}
-      {#each jacks[rowIndex] as jack, columnIndex}
-        <g transform="translate({ columnIndex * JACK_DELTA_X }, { rowY })" class="socket-plate">
+      {#each rowColToIndex[rowIndex] as jack, colIndex}
+        <g transform="translate({ colIndex * JACK_DELTA_X }, { rowY })" class="socket-plate">
           <rect width="250" height="275"/>
-          <text x="125" y="35" class="jack-name" text-anchor="middle">{jack.company}</text>
-          <text x="125" y="70" class="jack-name" text-anchor="middle">{jack.name}</text>
-          <text x="125" y="103" class="jack-name" text-anchor="middle">{jack.number}</text>
+          <text x="125" y="35" class="jack-name" text-anchor="middle">
+            {persons[rowColToIndex[rowIndex][colIndex]].company}
+          </text>
+          <text x="125" y="70" class="jack-name" text-anchor="middle">
+            {persons[rowColToIndex[rowIndex][colIndex]].name}
+          </text>
+          <text x="125" y="103" class="jack-name" text-anchor="middle">
+            {persons[rowColToIndex[rowIndex][colIndex]].number}
+          </text>
           <circle 
             class="led-light"
-            class:led-green="{jack.ledState === 2}"
-            class:led-red="{jack.ledState === 1}"
+
             cx="127" 
             cy="150" 
             r="32"/>
@@ -245,6 +253,7 @@
         </g>
       {/each}
     {/each}
+
 
     <!-- hard coded jacks -->
     <g transform="translate(0, 600)" class="available">

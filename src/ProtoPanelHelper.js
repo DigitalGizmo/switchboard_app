@@ -1,4 +1,4 @@
-// import { jacks } from './Content.js';
+import { persons } from './Content.js';
 
 const indexToRowCol = [
   [1,0], // 0 Village store
@@ -11,6 +11,37 @@ const indexToRowCol = [
   [0,3],  // 7 Fire Burns
 ]
 
+let rowColToIndex = [
+  [
+    8, // name: 'no name',
+    3, // name: 'Charlie Freeman',
+    6, // name: 'Tom Libby',
+    7, // name: 'Chief Aurthur Burns',
+    5, // 'Tressa Howe', 
+  ],
+  [
+    9, // 'Emma Powers'/ place holder?,
+    1, // 'Mrs. White',
+    4, // 'Olive Powers',
+    10, //'Place Holder',
+    2, // 'Mina Newell' Paula Fowler?,
+  ]
+];
+
+const getPerson = (row, col) => {
+  personIndex = rowColToIndex[row][col];
+  console.log('person index: ' + personIndex);
+  // return persons[personIndex];
+  // return personIndex;
+  return persons[personIndex].number;
+}
+
+// const getPerson = (row, col) => {
+//   for (let i = 0; i < rowColToIndex.length; i++) {
+
+//   }
+// }
+
 const setJackState = (jacks, index) => {
   jacks[indexToRowCol[index][0]][indexToRowCol[index][1]].ledState = LED_RED;
   return jacks;
@@ -20,3 +51,5 @@ const setJackState = (jacks, index) => {
 // And this verions get sent as a prop to Panel
 
 export {setJackState}
+export {rowColToIndex}
+export { getPerson }
