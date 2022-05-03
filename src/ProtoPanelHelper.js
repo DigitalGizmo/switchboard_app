@@ -28,12 +28,12 @@ let rowColToIndex = [
   ]
 ];
 
-const getPerson = (row, col) => {
-  personIndex = rowColToIndex[row][col];
-  console.log('person index: ' + personIndex);
-  // return persons[personIndex];
-  // return personIndex;
-  return persons[personIndex].number;
+const getPersonIdx = (row, col) => {
+  return rowColToIndex[row][col];
+  // console.log('person index: ' + personIndex);
+  // // return persons[personIndex];
+  // // return personIndex;
+  // return persons[personIndex].number;
 }
 
 // const getPerson = (row, col) => {
@@ -52,4 +52,4 @@ const setJackState = (jacks, index) => {
 
 export {setJackState}
 export {rowColToIndex}
-export { getPerson }
+export { getPersonIdx }

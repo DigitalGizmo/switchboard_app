@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import * as d3 from 'd3';
-  import {rowColToIndex, getPerson} from './ProtoPanelHelper.js'
+  import {rowColToIndex, getPersonIdx} from './ProtoPanelHelper.js'
 
   export let jacks;
   export let persons;
@@ -20,6 +20,8 @@
   const PLUG_SNAP_FUDG_Y = -80;
   let plugIdx = 0;
   const pluggedInfo = {row: null, col: null, lineIdx: null};
+  // New
+  const pluggedIdxInfo = {personIdx: null, lineIdx: null};
 
   let plugs = [
     { index: 0,
@@ -141,7 +143,13 @@
           //   ' obj -col: ' + pluggedInfo.col +
           //    ' lineIdx: ' + pluggedInfo.lineIdx);
 
+          // Get person index from row, col
+          pluggedIdxInfo.personIdx = getPersonIdx(pluggedInfo.row, pluggedInfo.col);
+          // console.log('pluggedIdxInfo personIdx: ' + pluggedIdxInfo.personIdx);
+          pluggedIdxInfo.lineIdx = pluggedInfo.lineIdx;
+
           identifyPlugged(pluggedInfo);
+          // identifyPlugged(pluggedIdxInfo);
 
        }) // end on end
     ); // end call drag
@@ -244,7 +252,8 @@
           </text>
           <circle 
             class="led-light"
-
+            class:led-green="{persons[rowColToIndex[rowIndex][colIndex]].ledState === 2}"
+            class:led-red="{persons[rowColToIndex[rowIndex][colIndex]].ledState === 1}"
             cx="127" 
             cy="150" 
             r="32"/>

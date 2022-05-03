@@ -49,18 +49,6 @@ const conversations = [
   },  
 ];
 
-// Hoping to move this to ProtoPaneHelper
-const personIndexRowCol = [
-  [1,0], // 0 Village store
-  [1,1],  // 1 M White
-  [1,4],  // 2 Mina / Paula
-  [0,1],  // 3 Charlie Freeman
-  [1,2],  // 4 Olive
-  [0,4],  // 5 Tressa Howe
-  [0,2],  // 6 Tom Libby
-  [0,3],  // 7 Fire Burns
-]
-
 let persons = [
   { // index  0,
     company: 'Village Store',
@@ -248,5 +236,5 @@ let jacks = [
 
 export {persons}
 export {conversations};
-export {personIndexRowCol};
+// export {personIndexRowCol};
 export {jacks};

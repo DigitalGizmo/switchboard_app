@@ -1,8 +1,7 @@
 <script>
 	import HowTo from "./HowTo.svelte";
 	import Panel from "./Panel.svelte";
-	import { conversations, jacks, persons,
-		personIndexRowCol } from './Content.js';
+	import { conversations, jacks, persons } from './Content.js';
 	//  
 	// import {setJackState} from './ProtoPanelHelper.js';
 
@@ -60,7 +59,7 @@
 	// }
 
 	function initiateCall() {
-		console.log('got to init call ');
+		// console.log('got to init call ');
 		// Stop any converstaion that might be in progress
 		// convoTrack.pause();
 		// First conversation is first pair in first set
@@ -80,16 +79,18 @@
 	}
 
 
-	// function setIncoming(caller) {
+	// This just rings the buzzer. Next action will
+	// be when user plugs in a plug
 	function setIncoming(callerIndex) {
     // playBuzzer();
     buzzTrack.play();
     buzzTrack.volume = .2;    
 		// Set caller row and column
 		// jacks[caller.row][caller.col].ledState = LED_RED;
-		jacks[personIndexRowCol[callerIndex][0]][personIndexRowCol[callerIndex][1]].ledState = LED_RED;
+		// jacks[personIndexRowCol[callerIndex][0]][personIndexRowCol[callerIndex][1]].ledState = LED_RED;
 		// I wish I could call this function in the Panel child
 		// jacks = setJackState(jacks, callerIndex);
+		persons[callerIndex].ledState = LED_RED;
 	}
 
 	// isFullConvo is false for initiation , true for convo
