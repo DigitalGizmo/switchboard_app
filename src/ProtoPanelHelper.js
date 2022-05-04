@@ -2,17 +2,24 @@
 let rowColToIndex = [
   [
     8, // name: 'no name',
+    0, // 'Emma Powers - store'
+    1, // 'Mrs. White',
+    2, // 'Mina Newell' Paula Fowler?,
+    9, //'Place Holder',
+  ],
+  [
     3, // name: 'Charlie Freeman',
-    6, // name: 'Tom Libby',
-    7, // name: 'Chief Aurthur Burns',
+    10, //'Place Holder',
+    4, // 'Olive Powers',
+    11, //'Place Holder',
     5, // 'Tressa Howe', 
   ],
   [
-    9, // 'Emma Powers'/ place holder?,
-    1, // 'Mrs. White',
-    4, // 'Olive Powers',
-    10, //'Place Holder',
-    2, // 'Mina Newell' Paula Fowler?,
+    12, //'Place Holder',
+    6, // name: 'Tom Libby',
+    13, //'Place Holder',
+    7, // name: 'Chief Aurthur Burns',
+    14, //'Place Holder',
   ]
 ];
 

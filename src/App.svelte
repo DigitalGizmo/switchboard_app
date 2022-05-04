@@ -6,7 +6,7 @@
 	// import {setJackState} from './ProtoPanelHelper.js';
 
 	let audioCaption = "Transcript: ";
-	let debugCaption = "Press Start";
+	let debugCaption = "Press Start <br />";
 	let caller = [null, null]; // row, col
 	let callerIndex = 0;
 	let pluggedName = 'caller not yet identified';
@@ -66,7 +66,7 @@
 		// First conversation is first pair in first set
 		caller =  conversations[currConvo].caller; // [0,1];
 		callerIndex =  conversations[currConvo].caller.index; // [0,1];
-		console.log('callerIndex: ' + callerIndex);
+		// console.log('callerIndex: ' + callerIndex);
 		// Set "target", person being called
 		callee =  conversations[currConvo].callee;
 		calleeIndex = conversations[currConvo].callee.index
@@ -139,7 +139,6 @@
 
 		// Fresh plugged
 		if (!phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn) { 
-			console.log('got to this line not plugged');
 			// phoneLines for line in question, test onePlugIsIn value
 			// New use of line --First plugged used is NOT true, aka false
 			// Did user correctly plug into caller?
@@ -168,7 +167,7 @@
 
 					// Stop previous conversation, if there is one
 					// phoneLines[pluggedInfo.lineIdx].convoTrack.pause();
-					console.log(' - lineIdxPrev: ' + lineIdxPrev);
+					// console.log(' - lineIdxPrev: ' + lineIdxPrev);
 					if (lineIdxPrev >= 0) {
 						phoneLines[lineIdxPrev].convoTrack.volume = 0;
 					}

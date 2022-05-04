@@ -88,7 +88,8 @@
   const CELL_HEIGHT = PANEL_HEIGHT/NUM_ROWS;
   // Take 2 Calculated
   const JACK_DELTA_X = 275;
-  const ROW_OFFSETS = [0, 300]; // Starting y for each row
+  // Starting y for each row
+  const ROW_OFFSETS = [0, 300, 600]; 
   const JACK_TOP_OFFSET = 202 + 28;
 
   onMount(() => {
@@ -142,7 +143,6 @@
        }) // end on end
     ); // end call drag
   });
-
 </script>
 
 <style>
@@ -151,7 +151,6 @@
   }
 
   /*//PLUGS//*/
-
   .rounded-line {
     /*stroke:#4D4D4D;*/
     /*stroke:red;*/
@@ -159,26 +158,17 @@
     stroke-linecap:round;
     stroke-miterlimit:10;
   }
-
   .line1 {
     /*stroke:#EE4A4A;*/
     stroke:darkorange;
   }
-
   .line2 {
     stroke:#4A4AEE;
   }
-
-/*  .plug-line {
-    stroke:#4D4D4D;
-  }
-
-*/      
   .label {
     fill:#FFFFFF;
     font-family:'PTSans-Bold';
   }
-
   /* don made this */
   .jack-name {
     font-size: 1.6em;
@@ -186,7 +176,6 @@
   }
 
   /* from global css*/
-
   .led-light {
     fill:gray;
     stroke:#919090;
@@ -222,7 +211,6 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
     viewBox="0 0 1420 1200" xml:space="preserve">
 
-
     <!-- The following yields the person index nubmer
     rowColToIndex[rowIndex][colIndex] -->
     {#each ROW_OFFSETS as rowY, rowIndex}
@@ -250,49 +238,6 @@
         </g>
       {/each}
     {/each}
-
-
-    <!-- hard coded jacks -->
-    <g transform="translate(0, 600)" class="available">
-      <rect width="250" height="275"/>
-      <text x="100" y="50" fill="black">Ben</text>
-      <text x="100" y="75" fill="black">476</text>
-      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
-    </g>
-
-    <g transform="translate(275, 600)" class="available">
-      <rect width="250" height="275"/>
-      <text x="100" y="50" fill="black">Sue</text>
-      <text x="100" y="75" fill="black">989</text>
-      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
-    </g>
-
-    <g transform="translate(550, 600)" class="available">
-      <rect width="250" height="275"/>
-      <text x="100" y="50" fill="black">Ann</text>
-      <text x="100" y="75" fill="black">977</text>
-      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
-    </g>
-
-    <g transform="translate(825, 600)" class="available">
-      <rect width="250" height="275"/>
-      <text x="100" y="50" fill="black">Sue</text>
-      <text x="100" y="75" fill="black">989</text>
-      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
-    </g>
-
-    <g transform="translate(1100, 600)" class="available">
-      <rect width="250" height="275"/>
-      <text x="100" y="50" fill="black">Ann</text>
-      <text x="100" y="75" fill="black">977</text>
-      <rect x="102" y="116" width="50" height="50" fill="#919090"/>
-      <circle cx="126.5" cy="141.5" r="7.5" fill="black"/>
-    </g>    
-
 
     {#each plugs as d}
       <g 
