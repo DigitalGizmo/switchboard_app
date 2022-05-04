@@ -3,7 +3,6 @@
   import * as d3 from 'd3';
   import {rowColToIndex, getPersonIdx} from './ProtoPanelHelper.js'
 
-  export let jacks;
   export let persons;
   export let identifyPlugged;
   export let unPlug;
@@ -19,7 +18,8 @@
   const BODY_LINE_OFFSET_Y = 160; // From plug top to line
   const PLUG_SNAP_FUDG_Y = -80;
   let plugIdx = 0;
-  const pluggedInfo = {row: null, col: null, lineIdx: null};
+  let pluggedRow = 0;
+  let pluggedCol = 0;
   // New
   const pluggedIdxInfo = {personIdx: null, lineIdx: null};
 
@@ -111,46 +111,34 @@
        }).on("end", function (d){
           // Calculate closest row
           let proportion_of_total_height = (d.y + PLUG_SNAP_FUDG_Y)/PANEL_HEIGHT;
-          pluggedInfo.row = Math.trunc(proportion_of_total_height * NUM_ROWS);
+          pluggedRow = Math.trunc(proportion_of_total_height * NUM_ROWS);
           // Calculate closest column
           let proportion_of_total = d.x/PANEL_WIDTH;
-          pluggedInfo.col = Math.trunc(proportion_of_total * NUM_COLS);
+          pluggedCol = Math.trunc(proportion_of_total * NUM_COLS);
 
           // Test whether there's already a plug in this jack
 
 
           // Snap plug to calculated row (unless putting it away)
-          if (pluggedInfo.row < 3) {
-            plugs[plugIdx].y = (pluggedInfo.row * CELL_HEIGHT) + JACK_TOP_OFFSET;
+          if (pluggedRow < 3) {
+            plugs[plugIdx].y = (pluggedRow * CELL_HEIGHT) + JACK_TOP_OFFSET;
           } else { // Bottom -- putting it away
             plugs[plugIdx].y = PLUG_START_Y;
           }
           plugs[plugIdx].sleeveLength = -5;
 
           // Snap plug to calcuated x (unless putting it away, based on row)
-          if (pluggedInfo.row < 3) {
-            plugs[plugIdx].x = (pluggedInfo.col * CELL_WIDTH) + (CELL_WIDTH/2) - 55;
+          if (pluggedRow < 3) {
+            plugs[plugIdx].x = (pluggedCol * CELL_WIDTH) + (CELL_WIDTH/2) - 55;
           } else { // Bottom -- putting it away
             plugs[plugIdx].x = plugs[plugIdx].xStart;
             plugs[plugIdx].sleeveLength = -20;
           }
-
-
           // Set line index param
-          pluggedInfo.lineIdx = plugs[plugIdx].lineIndex;
-
-          // console.log('-- row: ' + pluggedInfo.row +
-          //   ' obj -col: ' + pluggedInfo.col +
-          //    ' lineIdx: ' + pluggedInfo.lineIdx);
-
+          pluggedIdxInfo.lineIdx = plugs[plugIdx].lineIndex;
           // Get person index from row, col
-          pluggedIdxInfo.personIdx = getPersonIdx(pluggedInfo.row, pluggedInfo.col);
-          // console.log('pluggedIdxInfo personIdx: ' + pluggedIdxInfo.personIdx);
-          pluggedIdxInfo.lineIdx = pluggedInfo.lineIdx;
-
-          identifyPlugged(pluggedInfo);
-          // identifyPlugged(pluggedIdxInfo);
-
+          pluggedIdxInfo.personIdx = getPersonIdx(pluggedRow, pluggedCol);
+          identifyPlugged(pluggedIdxInfo);
        }) // end on end
     ); // end call drag
   });

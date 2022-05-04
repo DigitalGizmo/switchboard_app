@@ -1,7 +1,7 @@
 <script>
 	import HowTo from "./HowTo.svelte";
 	import Panel from "./Panel.svelte";
-	import { conversations, jacks, persons } from './Content.js';
+	import { conversations, persons } from './Content.js';
 	//  
 	// import {setJackState} from './ProtoPanelHelper.js';
 
@@ -11,6 +11,7 @@
 	let callerIndex = 0;
 	let pluggedName = 'caller not yet identified';
 	let callee = [null, null]; // row, col
+	let calleeIndex = 0;
 	// let convoTrack = null;
 	// let convoTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
 	let buzzTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/buzzer.mp3");
@@ -19,15 +20,15 @@
 		{
 			onePlugIsIn: false, 
 			isEngaged: false,
-			caller: {row: null, col: null, isPlugged: false},
-			callee: {row: null, col: null, isPlugged: false},
+			caller: {row: null, col: null, index: null, isPlugged: false},
+			callee: {row: null, col: null, index: null, isPlugged: false},
 			convoTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3"),
 		}, 
 		{
 			onePlugIsIn: false, 
 			isEngaged: false,
-			caller: {row: null, col: null, isPlugged: false},
-			callee: {row: null, col: null, isPlugged: false},
+			caller: {row: null, col: null, index: null,  isPlugged: false},
+			callee: {row: null, col: null, index: null, isPlugged: false},
 			convoTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3"),
 		}, 
 	];
@@ -68,6 +69,7 @@
 		console.log('callerIndex: ' + callerIndex);
 		// Set "target", person being called
 		callee =  conversations[currConvo].callee;
+		calleeIndex = conversations[currConvo].callee.index
 
 		// console.log('caller: ' + caller);
 		// audioCaption = "in init: Charlie:  Hi.  72 please."
@@ -124,39 +126,42 @@
 
 	// --- Handle plug-in ----
 	// plugged in the form of [row index, col index, line index]
-	function identifyPlugged(pluggedInfo) {
+	function identifyPlugged(pluggedIdxInfo) {
 		// Params sent in plugged info- all indexes -- row: col: lineIdx
 		// Get name based on row and col
-		pluggedName = jacks[pluggedInfo.row][pluggedInfo.col].name;
+		pluggedName = persons[pluggedIdxInfo.personIdx].name;
 		// Debug msg
 		debugCaption += 'plugged into: ' + pluggedName + '<br />';
 		// console.log(plugged);
 		// console.log(caller);
+		
+		// console.log('identify plugged, t or f? ' + phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn);
 
 		// Fresh plugged
-		if (!phoneLines[pluggedInfo.lineIdx].onePlugIsIn) { 
+		if (!phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn) { 
+			console.log('got to this line not plugged');
 			// phoneLines for line in question, test onePlugIsIn value
 			// New use of line --First plugged used is NOT true, aka false
 			// Did user correctly plug into caller?
 			// if row and column of plugged matches that of caller
-			if (pluggedInfo.row === caller.row && 
-				pluggedInfo.col === caller.col) {
+			if (pluggedIdxInfo.personIdx === callerIndex) {
 					// console.log('got to equal');
 					// Turn led green
-					jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN;
+					persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
+					// console.log('should be green: ' + persons[pluggedIdxInfo.personIdx].ledStat);
 
 					// Set jack to plugged
 					// jacks[pluggedInfo.row][pluggedInfo.col].isPluggedJack = true;
 
 					// Set first end of this line as in-use
 					// and Record caller for later unplug
-					setPhoneLineCaller(pluggedInfo);
+					setPhoneLineCaller(pluggedIdxInfo);
 
 					// User message
 					audioCaption = conversations[currConvo].helloText;
 
 					// Debug message
-					debugCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx + 
+					debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx + 
 						' asks for 72 (Olive) <br />';
 					// Stop buzzer and other convo
 					buzzTrack.pause();
@@ -171,7 +176,7 @@
 					// phoneLines[lineIdxPrev].convoTrack.volume = 0.1;
 
 					// Set this line in use only we have gotten this success
-					lineIdxInUse = pluggedInfo.lineIdx;
+					lineIdxInUse = pluggedIdxInfo.lineIdx;
 					// Set prev for use in next call.
 					lineIdxPrev = lineIdxInUse;
 					// console.log(' setting lineIdxInUse to: ' + lineIdxInUse);
@@ -179,32 +184,31 @@
 
 					// false is for isConvo -- don't detect end
 					playConvo(conversations[currConvo].audioFile, false, 
-						pluggedInfo.lineIdx);
+						pluggedIdxInfo.lineIdx);
 			}
 		} else { 
 			// First line used IS TRUE, so we might be on the other plug
 			// But first, is this the line in use?
 				// console.log(' in else,  lineIdxInUse use is: ' + lineIdxInUse);
-			if (lineIdxInUse === pluggedInfo.lineIdx) {
+			if (lineIdxInUse === pluggedIdxInfo.lineIdx) {
 				// one end already plugged
 				// Determing correct plugin for second end
 				// if row and column of plugged matches that of callee
-				if (pluggedInfo.row === callee.row && 
-					pluggedInfo.col === callee.col) {
+				if (pluggedIdxInfo.personIdx === calleeIndex) {
 						// console.log('got to 2nd plug equal');
 						// Turn led green
-						jacks[pluggedInfo.row][pluggedInfo.col].ledState = LED_GREEN;
+						persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
 
 						// // Set jack to plugged
 						// jacks[pluggedInfo.row][pluggedInfo.col].isPluggedJack = true;
 						
 						// Set this line as engaged
-						phoneLines[pluggedInfo.lineIdx].isEngaged = true;
+						phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
 						// Record callee for later unplug
-						setPhoneLineCallee(pluggedInfo);
+						setPhoneLineCallee(pluggedIdxInfo);
 						// convoTrack.pause();
 						playConvo(conversations[currConvo].convoFile, true, 
-							pluggedInfo.lineIdx);
+							pluggedIdxInfo.lineIdx);
 
 						// User messag message
 						audioCaption = conversations[currConvo].convoText;
@@ -218,27 +222,29 @@
 						}
 
 						// Debug message
-						debugCaption += pluggedName + ' on line: ' + pluggedInfo.lineIdx;
+						debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx;
 				} // end if plug match
 			} // end if this is the line in use
 		} // end else
 	} // end identifyPlugged
 
-	function setPhoneLineCaller(pluggedInfo) {
-		phoneLines[pluggedInfo.lineIdx].onePlugIsIn = true;
+	function setPhoneLineCaller(pluggedIdxInfo) {
+		phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn = true;
 		// Set caller 
-		phoneLines[pluggedInfo.lineIdx].caller.row = 
-			pluggedInfo.row;
-		phoneLines[pluggedInfo.lineIdx].caller.col = 
-			pluggedInfo.col;
+		phoneLines[pluggedIdxInfo.lineIdx].caller.index = pluggedIdxInfo.personIdx;
+		// phoneLines[pluggedInfo.lineIdx].caller.row = 
+		// 	pluggedInfo.row;
+		// phoneLines[pluggedInfo.lineIdx].caller.col = 
+		// 	pluggedInfo.col;
 	}
 
-	function setPhoneLineCallee(pluggedInfo) {
+	function setPhoneLineCallee(pluggedIdxInfo) {
 		// Set callee 
-		phoneLines[pluggedInfo.lineIdx].callee.row = 
-			pluggedInfo.row;
-		phoneLines[pluggedInfo.lineIdx].callee.col = 
-			pluggedInfo.col;
+		phoneLines[pluggedIdxInfo.lineIdx].callee.index = pluggedIdxInfo.personIdx;
+		// phoneLines[pluggedInfo.lineIdx].callee.row = 
+		// 	pluggedInfo.row;
+		// phoneLines[pluggedInfo.lineIdx].callee.col = 
+		// 	pluggedInfo.col;
 	}
 
 
@@ -268,8 +274,8 @@
 		phoneLines[lineIndex].onePlugIsIn = false;
 		phoneLines[lineIndex].isEngaged = false;
 		// Turn of the leds
-		jacks[phoneLines[lineIndex].caller.row][phoneLines[lineIndex].caller.col].ledState = LED_OFF;
-		jacks[phoneLines[lineIndex].callee.row][phoneLines[lineIndex].callee.col].ledState = LED_OFF;
+		persons[phoneLines[lineIndex].caller.index].ledState = LED_OFF;
+		persons[phoneLines[lineIndex].callee.index].ledState = LED_OFF;
 
 		// Reset the volume
 		// phoneLines[lineIdxPrev].convoTrack.volume = 0;
@@ -302,7 +308,7 @@
 		{audioCaption}
 	/>
 	<Panel 
-		{jacks}
+
 		{persons}
 		{identifyPlugged}
 		{unPlug}
