@@ -3,7 +3,7 @@ const conversations = [
   {
     caller: {index: 3}, // Charlie Freeman row: 0, col: 1, 
     callee:{index: 4}, // Olive Powers row: 1, col: 2, 
-    audioFile: 'charlie-calls',
+    helloFile: 'charlie-calls',
     convoFile: 'charlie-olive',
     helloText: "Charlie:  Hi.  72 please.",
     convoText: 
@@ -16,7 +16,7 @@ const conversations = [
   {
     caller: {index: 2},  // Mina Newell row: 1, col: 4, 
     callee:{index: 7}, // Fire, Cheif Burns row: 0, col: 3, 
-    audioFile: '3-Mina_Calls_Operator',
+    helloFile: '3-Mina_Calls_Operator',
     convoFile: '4-Mina_Calls_ChiefBurns',
     helloText: "Mina:  Fire department --",
     convoText: 
@@ -29,7 +29,7 @@ const conversations = [
   {
     caller: {index: 6}, // Tom Libby row: 0, col: 2, 
     callee:{index: 7}, // Fire, Burns row: 0, col: 3, 
-    audioFile: '5-Tom_Calls_Operator_1',
+    helloFile: '5-Tom_Calls_Operator_1',
     convoFile: '6-Tom_Calls_Burns',
     helloText: "Tom:  Fire!  Fire station. I have to talk to the fire station…Fire!",
     convoText: 
@@ -41,7 +41,7 @@ const conversations = [
   {
     caller: { index: 5}, // Tressa to operator row: 0, col: 2,
     callee:{index: 15}, // None! row: 0, col: 3, 
-    audioFile: '7-Tressa_Calls_Operator',
+    helloFile: '7-Tressa_Calls_Operator',
     convoFile: '',
     helloText: "I smell smoke.  Do you know what’s going on?  Any calls with…",
     convoText: 
@@ -51,7 +51,7 @@ const conversations = [
   {
     caller: { index: 0}, // Emma to operator 
     callee:{index: 4}, // None! row: 0, col: 3, 
-    audioFile: '8-Emma_Calls_Operator',
+    helloFile: '8-Emma_Calls_Operator',
     convoFile: '9-Emma_Calls_Olive',
     helloText: "72, please",
     convoText: 

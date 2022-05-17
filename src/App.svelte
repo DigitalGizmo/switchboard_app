@@ -12,8 +12,8 @@
 	let pluggedName = 'caller not yet identified';
 	let callee = [null, null]; // row, col
 	let calleeIndex = 0;
-	// let convoTrack = null;
-	// let convoTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
+	// let audioTrack = null;
+	// let audioTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
 	let buzzTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/buzzer.mp3");
 
 	const phoneLines = [
@@ -22,14 +22,14 @@
 			isEngaged: false,
 			caller: {row: null, col: null, index: null, isPlugged: false},
 			callee: {row: null, col: null, index: null, isPlugged: false},
-			convoTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3"),
+			audioTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3"),
 		}, 
 		{
 			onePlugIsIn: false, 
 			isEngaged: false,
 			caller: {row: null, col: null, index: null,  isPlugged: false},
 			callee: {row: null, col: null, index: null, isPlugged: false},
-			convoTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3"),
+			audioTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3"),
 		}, 
 	];
 
@@ -40,7 +40,7 @@
 	// store person indexes. 
 	// Test for >= 0 instead of true
 
-	let currConvo = 3;
+	let currConvo = 2;
 	let prevConvo = null;
 
 	const LED_OFF = 0;
@@ -60,7 +60,7 @@
 	function initiateCall() {
 		// console.log('got to init call ');
 		// Stop any converstaion that might be in progress
-		// convoTrack.pause();
+		// audioTrack.pause();
 		// First conversation is first pair in first set
 		caller =  conversations[currConvo].caller; // [0,1];
 		callerIndex =  conversations[currConvo].caller.index; // [0,1];
@@ -94,17 +94,35 @@
 	}
 
 	// isFullConvo is false for initiation , true for convo
-	function playConvo(audioName, isFullConvo, lineIndex){
-		phoneLines[lineIndex].convoTrack =
-     new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + audioName + ".mp3");
-    phoneLines[lineIndex].convoTrack.play();
-    if (isFullConvo) {
-			phoneLines[lineIndex].convoTrack.addEventListener("ended", function(){
-			     phoneLines[lineIndex].convoTrack.currentTime = 0;
-			     console.log(" -- Audio ended on lineIdx: " + lineIndex);
-			     setCallFinished(lineIndex);
+	// function playConvo(audioName, isFullConvo, lineIndex){
+	function playHello(currConvo, lineIndex){
+		phoneLines[lineIndex].audioTrack =
+     new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
+		 conversations[currConvo].helloFile +  ".mp3");
+
+    phoneLines[lineIndex].audioTrack.play();
+
+		// Only track if this is converation index 3
+		if (currConvo === 3) {
+			phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
+						phoneLines[lineIndex].audioTrack.currentTime = 0;
+						console.log(" -- Hello ended on lineIdx: " + lineIndex);
+						setCallFinished(lineIndex);
 			});    	
-    } // end if
+		}
+	}	
+
+	function playConvo(currConvo, lineIndex){
+		phoneLines[lineIndex].audioTrack =
+     new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
+		 conversations[currConvo].convoFile +  ".mp3");
+    phoneLines[lineIndex].audioTrack.play();
+		// Handle call end
+		phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
+					phoneLines[lineIndex].audioTrack.currentTime = 0;
+					console.log(" -- conversation ended on lineIdx: " + lineIndex);
+					setCallFinished(lineIndex);
+		});    	
 	}	
 
 	// function playBuzzer(){
@@ -181,12 +199,12 @@
 					buzzTrack.pause();
 
 					// Stop previous conversation, if there is one
-					// phoneLines[pluggedInfo.lineIdx].convoTrack.pause();
+					// phoneLines[pluggedInfo.lineIdx].audioTrack.pause();
 					console.log(' - lineIdxPrev: ' + lineIdxPrev);
 					if (lineIdxPrev >= 0) {
-						phoneLines[lineIdxPrev].convoTrack.volume = 0;
+						phoneLines[lineIdxPrev].audioTrack.volume = 0;
 					}
-					// phoneLines[lineIdxPrev].convoTrack.volume = 0.1;
+					// phoneLines[lineIdxPrev].audioTrack.volume = 0.1;
 
 					// Set this line in use only we have gotten this success
 					lineIdxInUse = pluggedIdxInfo.lineIdx;
@@ -194,18 +212,13 @@
 					lineIdxPrev = lineIdxInUse;
 					// console.log(' setting lineIdxInUse to: ' + lineIdxInUse);
 
-					// 2nd param, isFullConvo, is false for initiation , true for convo
-					// e.g. Hello, 72 please
-					playConvo(conversations[currConvo].audioFile, false, 
-						pluggedIdxInfo.lineIdx);
+					playHello(currConvo, pluggedIdxInfo.lineIdx);
 
 					// if this is a call that requries no furhter action
 					// if (currConvo === 3) {
 					// 		console.log(' currConvo = 3, no further action')
 					// 		setTimeToHangUp(10000, pluggedIdxInfo.lineIdx);							
 					// }
-
-						
 			}
 		} else { 
 			// First line used IS TRUE, so we might be on the other plug
@@ -227,16 +240,12 @@
 						phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
 						// Record callee for later unplug
 						setPhoneLineCallee(pluggedIdxInfo);
-						// convoTrack.pause();
-						// 2nd param, isFullConvo, true for full conversation
-						playConvo(conversations[currConvo].convoFile, true, 
-							pluggedIdxInfo.lineIdx);
-
+						// audioTrack.pause();
+						playConvo(currConvo,	pluggedIdxInfo.lineIdx);
 						// User messag message
 						audioCaption = conversations[currConvo].convoText;
 
 						// Set timer for next call
-
 						// Temp hard-wire to interrupt first only
 						if (currConvo === 0) {
 							console.log(' currConvo = 0, 15000 to next')
@@ -286,7 +295,7 @@
 
     if (phoneLines[lineIndex].isEngaged) {
 			// Stop the audio
-			phoneLines[lineIndex].convoTrack.pause();
+			phoneLines[lineIndex].audioTrack.pause();
 			setCallFinished(lineIndex);
     }
 	}
@@ -297,19 +306,24 @@
 		phoneLines[lineIndex].isEngaged = false;
 		// Turn of the leds
 		persons[phoneLines[lineIndex].caller.index].ledState = LED_OFF;
-		persons[phoneLines[lineIndex].callee.index].ledState = LED_OFF;
+		// Can't turn off callee led if callee index hasn't been defined
+		console.log('phoneLines[lineIndex].callee.index: '+ phoneLines[lineIndex].callee.index);
+		if (phoneLines[lineIndex].callee.index) {
+			// console.log('got into callee index not null');
+			persons[phoneLines[lineIndex].callee.index].ledState = LED_OFF;
+		}
+		console.log('got past turn callee off');
 
 		// Reset the volume
-		// phoneLines[lineIdxPrev].convoTrack.volume = 0;
-		phoneLines[lineIndex].convoTrack.volume = 1;
+		// phoneLines[lineIdxPrev].audioTrack.volume = 0;
+		phoneLines[lineIndex].audioTrack.volume = 1;
 
 		// Pause and start next call
-		// console.log('setCallFinished, currConvo: ' + currConvo);
 		// Don't start next call on finish if other line is engaged
 		let otherLineIdx = (lineIndex === 0) ? 1 : 0;
-		if (!phoneLines[otherLineIdx].isEngaged) {
+		// if (!phoneLines[otherLineIdx].isEngaged) {
 			setTimeToNext(2000);							
-		}
+		// }
 	}
 
 </script>
