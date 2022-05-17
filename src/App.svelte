@@ -40,10 +40,8 @@
 	// store person indexes. 
 	// Test for >= 0 instead of true
 
-
-	let currConvo = 0;
+	let currConvo = 3;
 	let prevConvo = null;
-
 
 	const LED_OFF = 0;
 	const LED_RED = 1;
@@ -86,7 +84,7 @@
 	function setIncoming(callerIndex) {
     // playBuzzer();
     buzzTrack.play();
-    buzzTrack.volume = .2;    
+    buzzTrack.volume = .8;    
 		// Set caller row and column
 		// jacks[caller.row][caller.col].ledState = LED_RED;
 		// jacks[personIndexRowCol[callerIndex][0]][personIndexRowCol[callerIndex][1]].ledState = LED_RED;
@@ -117,6 +115,16 @@
 	  setTimeout(startNextCall, timeToWait);
 	}
 
+	function setTimeToHangUp(timeToWait, lineIndex) {
+		clearTimeout();
+		console.log('got to setTimeToHangUp, time to wait: ' + timeToWait);
+	  // setTimeout(setCallFinished(lineIndex), timeToWait);
+	  // setTimeout(alert('time is up'), timeToWait);
+		setTimeout(() => {
+			setCallFinished(lineIndex)
+		}, timeToWait)
+	}
+
 	function startNextCall() {
 		currConvo += 1;
 		prevConvo += 1;
@@ -125,24 +133,22 @@
 
 
 	// --- Handle plug-in ----
-	// plugged in the form of [row index, col index, line index]
+	// plugged in the form of [person index, line index]
 	function identifyPlugged(pluggedIdxInfo) {
-		// Params sent in plugged info- all indexes -- row: col: lineIdx
-		// Get name based on row and col
+		// Get name based on index
 		pluggedName = persons[pluggedIdxInfo.personIdx].name;
 		// Debug msg
-		debugCaption += 'plugged into: ' + pluggedName + '<br />';
+		debugCaption += '<br />------- <br />New plug into: ' + pluggedName + '<br />';
 		// console.log(plugged);
 		// console.log(caller);
-		
 		// console.log('identify plugged, t or f? ' + phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn);
 
-		// Fresh plugged
+		// If Fresh plugged
 		if (!phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn) { 
 			// phoneLines for line in question, test onePlugIsIn value
 			// New use of line --First plugged used is NOT true, aka false
 			// Did user correctly plug into caller?
-			// if row and column of plugged matches that of caller
+			// if person index plugged matches that of caller
 			if (pluggedIdxInfo.personIdx === callerIndex) {
 					// console.log('got to equal');
 					// Turn led green
@@ -154,24 +160,32 @@
 
 					// Set first end of this line as in-use
 					// and Record caller for later unplug
+
+					console.log('callerIdx: ' + pluggedIdxInfo.personIdx +
+					' line index: ' + pluggedIdxInfo.lineIdx);
+
 					setPhoneLineCaller(pluggedIdxInfo);
 
+					// Start Debug messages
 					// User message
 					audioCaption = conversations[currConvo].helloText;
+					// console.log('plugged name: ' + pluggedName);
 
 					// Debug message
 					debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx + 
-						' asks for 72 (Olive) <br />';
+						' asks for ' + 
+						persons[conversations[currConvo].callee.index].name + 
+						' <br />';
+
 					// Stop buzzer and other convo
 					buzzTrack.pause();
 
 					// Stop previous conversation, if there is one
 					// phoneLines[pluggedInfo.lineIdx].convoTrack.pause();
-					// console.log(' - lineIdxPrev: ' + lineIdxPrev);
+					console.log(' - lineIdxPrev: ' + lineIdxPrev);
 					if (lineIdxPrev >= 0) {
 						phoneLines[lineIdxPrev].convoTrack.volume = 0;
 					}
-
 					// phoneLines[lineIdxPrev].convoTrack.volume = 0.1;
 
 					// Set this line in use only we have gotten this success
@@ -180,10 +194,18 @@
 					lineIdxPrev = lineIdxInUse;
 					// console.log(' setting lineIdxInUse to: ' + lineIdxInUse);
 
-
-					// false is for isConvo -- don't detect end
+					// 2nd param, isFullConvo, is false for initiation , true for convo
+					// e.g. Hello, 72 please
 					playConvo(conversations[currConvo].audioFile, false, 
 						pluggedIdxInfo.lineIdx);
+
+					// if this is a call that requries no furhter action
+					// if (currConvo === 3) {
+					// 		console.log(' currConvo = 3, no further action')
+					// 		setTimeToHangUp(10000, pluggedIdxInfo.lineIdx);							
+					// }
+
+						
 			}
 		} else { 
 			// First line used IS TRUE, so we might be on the other plug
@@ -192,7 +214,7 @@
 			if (lineIdxInUse === pluggedIdxInfo.lineIdx) {
 				// one end already plugged
 				// Determing correct plugin for second end
-				// if row and column of plugged matches that of callee
+				// if person index matches that of callee
 				if (pluggedIdxInfo.personIdx === calleeIndex) {
 						// console.log('got to 2nd plug equal');
 						// Turn led green
@@ -206,6 +228,7 @@
 						// Record callee for later unplug
 						setPhoneLineCallee(pluggedIdxInfo);
 						// convoTrack.pause();
+						// 2nd param, isFullConvo, true for full conversation
 						playConvo(conversations[currConvo].convoFile, true, 
 							pluggedIdxInfo.lineIdx);
 
@@ -224,7 +247,7 @@
 						debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx;
 				} // end if plug match
 			} // end if this is the line in use
-		} // end else
+		} // end (else) this is "other" end of line in use
 	} // end identifyPlugged
 
 	function setPhoneLineCaller(pluggedIdxInfo) {

@@ -1,8 +1,8 @@
 const conversations = [
-  // Charlie calls Olive - Call 1
+  // 0 Charlie calls Olive - Call 1
   {
-    caller: {row: 0, col: 1, index: 3}, // Charlie Freeman
-    callee:{row: 1, col: 2, index: 4}, // Olive Powers
+    caller: {index: 3}, // Charlie Freeman row: 0, col: 1, 
+    callee:{index: 4}, // Olive Powers row: 1, col: 2, 
     audioFile: 'charlie-calls',
     convoFile: 'charlie-olive',
     helloText: "Charlie:  Hi.  72 please.",
@@ -12,12 +12,12 @@ const conversations = [
       "Olive:  Why not? <br />" +
       "Charlie:  My dad has a sick patient and he took the car. <br />",
   },  
-  // Mina calls fire department - Call 2
+  // 1 Mina calls fire department - Call 3 - 4
   {
-    caller: {row: 1, col: 4, index: 2},  // Mina Newell 
-    callee:{row: 0, col: 3, index: 7}, // Fire, Cheif Burns
-    audioFile: 'mina-calls',
-    convoFile: 'mina-burns',
+    caller: {index: 2},  // Mina Newell row: 1, col: 4, 
+    callee:{index: 7}, // Fire, Cheif Burns row: 0, col: 3, 
+    audioFile: '3-Mina_Calls_Operator',
+    convoFile: '4-Mina_Calls_ChiefBurns',
     helloText: "Mina:  Fire department --",
     convoText: 
       "Chief Burns: Fire station.  Chief Burns speaking <br />" +
@@ -25,27 +25,46 @@ const conversations = [
       "Chief Burns:  Where are you? <br />" +
       "Mina:  Mrs. Fowlers house.  You know on Maple St. <br />",
   },  
-  // Tom calls fire department - Call 3
+  // 2 Tom calls fire department - Call 5 - 6
   {
-    caller: {row: 0, col: 2, index: 6}, // Tom Libby
-    callee:{row: 0, col: 3, index: 7}, // Fire, Burns
-    audioFile: 'tom-calls',
-    convoFile: 'tom-burns',
+    caller: {index: 6}, // Tom Libby row: 0, col: 2, 
+    callee:{index: 7}, // Fire, Burns row: 0, col: 3, 
+    audioFile: '5-Tom_Calls_Operator_1',
+    convoFile: '6-Tom_Calls_Burns',
     helloText: "Tom:  Fire!  Fire station. I have to talk to the fire station…Fire!",
     convoText: 
       "Chief Burns: Fire Station. Chief B… <br />" +
       "Tom:  Fire!  In the barn.  My uncle’s trying to get the cows out.  I ran…but… <br />" +
       "Chief Burns:  We’re on our way.  Stay calm, son. <br />",
   },  
-  // Tressa calls  - Call 4
+  // 3 Tressa calls  - Call 7
   {
-    caller: {row: 0, col: 2, index: 5}, // Tressa to operator
-    callee:{row: 0, col: 3, index: 0}, // None!
-    audioFile: '',
+    caller: { index: 5}, // Tressa to operator row: 0, col: 2,
+    callee:{index: 15}, // None! row: 0, col: 3, 
+    audioFile: '7-Tressa_Calls_Operator',
     convoFile: '',
     helloText: "I smell smoke.  Do you know what’s going on?  Any calls with…",
     convoText: 
       "none" ,
+  },  
+  // 4 Emma calls Olive  - Call 8-9
+  {
+    caller: { index: 0}, // Emma to operator 
+    callee:{index: 4}, // None! row: 0, col: 3, 
+    audioFile: '8-Emma_Calls_Operator',
+    convoFile: '9-Emma_Calls_Olive',
+    helloText: "72, please",
+    convoText: 
+      "Olive: Hello? " +
+      "Emma:  Honey, are you OK?   " +
+      "Olive:  There’s a fire at the Libbey’s barn! " +
+      "Emma:  I heard the fire truck.  You stay inside.  " + 
+      "Olive:  I can see the flames and Tom was running  " +
+      "Emma: Olive, do you hear me?  You stay there.  I can’t leave the store yet, but I’ll be home soon and.  " +
+      "Olive:  Ooo the truck just got there.  " +
+      "Emma:  Honey, I don’t like you home alone.  Stay there. " +
+      "Olive:  Oh, mom. " +
+      "Emma:  Sit tight.  Bye" ,
   },  
 ];
 
@@ -149,9 +168,16 @@ let persons = [
     // isPluggedJack: false,
   },
   { // index  14,
-    company: '120',
+    company: '',
     name: 'Place Holder 7',
-    number: '',
+    number: '120',
+    ledState: 0,
+    // isPluggedJack: false,
+  },
+  { // index  15,
+    company: '0',
+    name: 'Operator',
+    number: '999',
     ledState: 0,
     // isPluggedJack: false,
   },
