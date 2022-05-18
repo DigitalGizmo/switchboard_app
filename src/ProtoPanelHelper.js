@@ -26,11 +26,11 @@ const getPersonIdx = (row, col) => {
   return rowColToIndex[row][col].personIdx;
 }
 
-const setJackState = (jacks, index) => {
-  jacks[indexToRowCol[index][0]][indexToRowCol[index][1]].ledState = LED_RED;
-  return jacks;
-}
+// const setJackState = (jacks, index) => {
+//   jacks[indexToRowCol[index][0]][indexToRowCol[index][1]].ledState = LED_RED;
+//   return jacks;
+// }
 
-export {setJackState}
+// export {setJackState}
 export {rowColToIndex}
 export { getPersonIdx }

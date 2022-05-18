@@ -100,8 +100,9 @@
           // Which line is this
           let lineIndex = plugs[plugIdx].lineIndex;
           // unplug it -- may or may not be in plug
-          // May want to determind row and call here to set isPlugged
           unPlug(plugIdx, lineIndex);
+          // May want to determind row and cell here to set isPlugged=false
+          // May separate out the determine Row Call from end to do this.
           // Re-lengthen the sleeve
           plugs[plugIdx].sleeveLength = -20;
        }).on("drag", function(d) {
@@ -112,6 +113,7 @@
           // Check whether this one is plugged
 
        }).on("end", function (d){
+          // May want to separate out this as a function to be called by unplug
           // Calculate closest row
           let proportion_of_total_height = (d.y + PLUG_SNAP_FUDG_Y)/PANEL_HEIGHT;
           pluggedRow = Math.trunc(proportion_of_total_height * NUM_ROWS);
@@ -139,6 +141,12 @@
           }
           // Set line index param
           pluggedIdxInfo.lineIdx = plugs[plugIdx].lineIndex;
+
+          // Register this jack as plugged
+          // This won't be of any use unless/until I'm able to
+          // translate an unPlug to a specific jack
+          rowColToIndex[pluggedRow][pluggedCol].isPlugged = true;
+        
           // Get person index from row, col
           pluggedIdxInfo.personIdx = getPersonIdx(pluggedRow, pluggedCol);
           identifyPlugged(pluggedIdxInfo);
