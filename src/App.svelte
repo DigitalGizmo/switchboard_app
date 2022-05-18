@@ -174,7 +174,8 @@
 					// console.log('should be green: ' + persons[pluggedIdxInfo.personIdx].ledStat);
 
 					// Set jack to plugged
-					// jacks[pluggedInfo.row][pluggedInfo.col].isPluggedJack = true;
+					// Hopeully handle in Panel ony
+					// persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
 
 					// Set first end of this line as in-use
 					// and Record caller for later unplug
@@ -234,7 +235,8 @@
 						persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
 
 						// // Set jack to plugged
-						// jacks[pluggedInfo.row][pluggedInfo.col].isPluggedJack = true;
+						// Hopeully handle in Panel ony
+						// persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
 						
 						// Set this line as engaged
 						phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
@@ -289,6 +291,9 @@
 		// before I tackle this.
 		// It's just so you can't plug into an
 		// already plugged jack.
+
+		// Hope to leave this in Panel only
+		// persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
 
     // If conversation is in progress
     // (Or even wrong number)

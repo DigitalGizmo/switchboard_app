@@ -99,6 +99,8 @@
           plugIdx = d3.select(this).attr("id");
           // Which line is this
           let lineIndex = plugs[plugIdx].lineIndex;
+          // unplug it -- may or may not be in plug
+          // May want to determind row and call here to set isPlugged
           unPlug(plugIdx, lineIndex);
           // Re-lengthen the sleeve
           plugs[plugIdx].sleeveLength = -20;
@@ -218,18 +220,18 @@
         <g transform="translate({ colIndex * JACK_DELTA_X }, { rowY })" class="socket-plate">
           <rect width="250" height="275"/>
           <text x="125" y="35" class="jack-name" text-anchor="middle">
-            {persons[rowColToIndex[rowIndex][colIndex]].company}
+            {persons[rowColToIndex[rowIndex][colIndex].personIdx].company}
           </text>
           <text x="125" y="70" class="jack-name" text-anchor="middle">
-            {persons[rowColToIndex[rowIndex][colIndex]].name}
+            {persons[rowColToIndex[rowIndex][colIndex].personIdx].name}
           </text>
           <text x="125" y="103" class="jack-name" text-anchor="middle">
-            {persons[rowColToIndex[rowIndex][colIndex]].number}
+            {persons[rowColToIndex[rowIndex][colIndex].personIdx].number}
           </text>
           <circle 
             class="led-light"
-            class:led-green="{persons[rowColToIndex[rowIndex][colIndex]].ledState === 2}"
-            class:led-red="{persons[rowColToIndex[rowIndex][colIndex]].ledState === 1}"
+            class:led-green="{persons[rowColToIndex[rowIndex][colIndex].personIdx].ledState === 2}"
+            class:led-red="{persons[rowColToIndex[rowIndex][colIndex].personIdx].ledState === 1}"
             cx="127" 
             cy="150" 
             r="32"/>

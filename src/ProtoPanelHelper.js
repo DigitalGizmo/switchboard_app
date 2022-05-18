@@ -1,30 +1,29 @@
-
 let rowColToIndex = [
   [
-    8, // name: 'no name',
-    0, // 'Emma Powers - store'
-    1, // 'Mrs. White',
-    2, // 'Mina Newell' Paula Fowler?,
-    9, //'Place Holder',
+    {personIdx: 8, isPlugged: false}, // name: 'no name',
+    {personIdx: 0, isPlugged: false}, // 'Emma Powers - store'
+    {personIdx: 1, isPlugged: false}, // 'Mrs. White',
+    {personIdx: 2, isPlugged: false}, // 'Mina Newell' Paula Fowler?,
+    {personIdx: 9, isPlugged: false}, //'Place Holder',
   ],
   [
-    3, // name: 'Charlie Freeman',
-    10, //'Place Holder',
-    4, // 'Olive Powers',
-    11, //'Place Holder',
-    5, // 'Tressa Howe', 
+    {personIdx: 3, isPlugged: false}, // name: 'Charlie Freeman',
+    {personIdx: 10, isPlugged: false}, //'Place Holder',
+    {personIdx: 4, isPlugged: false}, // 'Olive Powers',
+    {personIdx: 11, isPlugged: false}, //'Place Holder',
+    {personIdx: 5, isPlugged: false}, // 'Tressa Howe', 
   ],
   [
-    12, //'Place Holder',
-    6, // name: 'Tom Libby',
-    13, //'Place Holder',
-    7, // name: 'Chief Aurthur Burns',
-    14, //'Place Holder',
+    {personIdx: 12, isPlugged: false},  //'Place Holder',
+    {personIdx: 6, isPlugged: false}, // name: 'Tom Libby',
+    {personIdx: 13, isPlugged: false}, //'Place Holder',
+    {personIdx: 7, isPlugged: false}, // name: 'Chief Aurthur Burns',
+    {personIdx: 14, isPlugged: false}, //'Place Holder',
   ]
 ];
 
 const getPersonIdx = (row, col) => {
-  return rowColToIndex[row][col];
+  return rowColToIndex[row][col].personIdx;
 }
 
 const setJackState = (jacks, index) => {
