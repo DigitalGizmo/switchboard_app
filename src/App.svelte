@@ -40,7 +40,7 @@
 	// store person indexes. 
 	// Test for >= 0 instead of true
 
-	let currConvo = 2;
+	let currConvo = 0;
 	let prevConvo = null;
 
 	const LED_OFF = 0;
@@ -83,6 +83,7 @@
 	// be when user plugs in a plug
 	function setIncoming(callerIndex) {
     // playBuzzer();
+		// console.log('hoping to play buzzer');
     buzzTrack.play();
     buzzTrack.volume = .8;    
 		// Set caller row and column
@@ -132,7 +133,7 @@
 	function setTimeToNext(timeToWait) {
 	  setTimeout(startNextCall, timeToWait);
 	}
-
+	// So far, just for Tressa's one-way call
 	function setTimeToHangUp(timeToWait, lineIndex) {
 		clearTimeout();
 		console.log('got to setTimeToHangUp, time to wait: ' + timeToWait);
@@ -326,9 +327,9 @@
 		// Pause and start next call
 		// Don't start next call on finish if other line is engaged
 		let otherLineIdx = (lineIndex === 0) ? 1 : 0;
-		// if (!phoneLines[otherLineIdx].isEngaged) {
+		if (!phoneLines[otherLineIdx].isEngaged) {
 			setTimeToNext(2000);							
-		// }
+		}
 	}
 
 </script>

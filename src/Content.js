@@ -1,5 +1,5 @@
 const conversations = [
-  // 0 Charlie calls Olive - Call 1
+  // index 0, call 1  Charlie calls Olive - Audio 1,2
   {
     caller: {index: 3}, // Charlie Freeman row: 0, col: 1, 
     callee:{index: 4}, // Olive Powers row: 1, col: 2, 
@@ -12,7 +12,7 @@ const conversations = [
       "Olive:  Why not? <br />" +
       "Charlie:  My dad has a sick patient and he took the car. <br />",
   },  
-  // 1 Mina calls fire department - Call 3 - 4
+  // index 1. call 2 Mina calls fire department - Audio 3 - 4
   {
     caller: {index: 2},  // Mina Newell row: 1, col: 4, 
     callee:{index: 7}, // Fire, Cheif Burns row: 0, col: 3, 
@@ -25,7 +25,7 @@ const conversations = [
       "Chief Burns:  Where are you? <br />" +
       "Mina:  Mrs. Fowlers house.  You know on Maple St. <br />",
   },  
-  // 2 Tom calls fire department - Call 5 - 6
+  // index 2, call 3 Tom calls fire department - audio 5 - 6
   {
     caller: {index: 6}, // Tom Libby row: 0, col: 2, 
     callee:{index: 7}, // Fire, Burns row: 0, col: 3, 
@@ -37,7 +37,7 @@ const conversations = [
       "Tom:  Fire!  In the barn.  My uncle’s trying to get the cows out.  I ran…but… <br />" +
       "Chief Burns:  We’re on our way.  Stay calm, son. <br />",
   },  
-  // 3 Tressa calls  - Call 7
+  // index 3, call 4 Tressa calls  - Audio 7
   {
     caller: { index: 5}, // Tressa to operator row: 0, col: 2,
     callee:{index: 15}, // None! row: 0, col: 3, 
@@ -47,7 +47,7 @@ const conversations = [
     convoText: 
       "none" ,
   },  
-  // 4 Emma calls Olive  - Call 8-9
+  // index 4 call, 5 Emma calls Olive  - Audio 8-9
   {
     caller: { index: 0}, // Emma to operator 
     callee:{index: 4}, // None! row: 0, col: 3, 
@@ -66,6 +66,68 @@ const conversations = [
       "Olive:  Oh, mom. " +
       "Emma:  Sit tight.  Bye" ,
   },  
+  // index 5 , call 6 Tom to Doctor  Audio 10, 11
+  {
+    caller: { index: 6}, // Tom Libby
+    callee:{index: 3}, //  
+    helloFile: '10-Tom_Calls_Operator_2',
+    convoFile: '11-Tom_Calls_Charlie',
+    helloText: 'I need the doctor.  Doc Freeman.',
+    convoText: 
+      "Charlie Freeman:  Freeman residence.  " +
+      "Tom:  I gotta talk to the Doctor." +
+      "Charlie:  He went to see Mrs. White.  Who’s this?  …Hello?  Hello?",
+  },  
+  // // index , call  Audio 
+  // {
+  //   caller: { index: }, // 
+  //   callee:{index: }, //  
+  //   helloFile: '',
+  //   convoFile: '',
+  //   helloText: '',
+  //   convoText: 
+  //     "none" ,
+  // },  
+  // // index , call  Audio 
+  // {
+  //   caller: { index: }, // 
+  //   callee:{index: }, //  
+  //   helloFile: '',
+  //   convoFile: '',
+  //   helloText: '',
+  //   convoText: 
+  //     "none" ,
+  // },  
+  // // index , call  Audio 
+  // {
+  //   caller: { index: }, // 
+  //   callee:{index: }, //  
+  //   helloFile: '',
+  //   convoFile: '',
+  //   helloText: '',
+  //   convoText: 
+  //     "none" ,
+  // },  
+  // // index , call  Audio 
+  // {
+  //   caller: { index: }, // 
+  //   callee:{index: }, //  
+  //   helloFile: '',
+  //   convoFile: '',
+  //   helloText: '',
+  //   convoText: 
+  //     "none" ,
+  // },  
+  // // index , call  Audio 
+  // {
+  //   caller: { index: }, // 
+  //   callee:{index: }, //  
+  //   helloFile: '',
+  //   convoFile: '',
+  //   helloText: '',
+  //   convoText: 
+  //     "none" ,
+  // },  
 ];
 
 let persons = [
