@@ -78,36 +78,37 @@ const conversations = [
       "Tom:  I gotta talk to the Doctor." +
       "Charlie:  He went to see Mrs. White.  Who’s this?  …Hello?  Hello?",
   },  
-  // // index , call  Audio 
-  // {
-  //   caller: { index: }, // 
-  //   callee:{index: }, //  
-  //   helloFile: '',
-  //   convoFile: '',
-  //   helloText: '',
-  //   convoText: 
-  //     "none" ,
-  // },  
-  // // index , call  Audio 
-  // {
-  //   caller: { index: }, // 
-  //   callee:{index: }, //  
-  //   helloFile: '',
-  //   convoFile: '',
-  //   helloText: '',
-  //   convoText: 
-  //     "none" ,
-  // },  
-  // // index , call  Audio 
-  // {
-  //   caller: { index: }, // 
-  //   callee:{index: }, //  
-  //   helloFile: '',
-  //   convoFile: '',
-  //   helloText: '',
-  //   convoText: 
-  //     "none" ,
-  // },  
+  // index 6, call 6A  Audio 12-13
+  {
+    caller: { index: 6}, // Tom Libby
+    callee:{index: 1}, // Mrs. White  
+    helloFile: '12-Tom_Calls_Operator_3',
+    convoFile: '13-Tom_Calls_Mrs.White',
+    helloText: 'Operator, operator -- I need Mrs. White’s house. I don’t' + 
+    'know Mrs. White.  I gotta find Dr. Freeman.',
+    convoText: 'Mrs. Mildred White:  Hello.  White residence. ' +
+    'Tom:  Is Dr. Freeman there?',
+  },  
+  // index 7, call 7 Audio 14
+  {
+    caller: { index: 7}, // Chief Burns
+    callee:{index: 15}, //  Operator only
+    helloFile: '14-ChiefBurns_Calls_Operator',
+    convoFile: '',
+    helloText: 'Chief Burns:  Operator, it’s Chief Burns.  I know half the town is calling,',
+    convoText: 
+      "none" ,
+  },  
+  // index 8, call 8 Audio 16-16
+  {
+    caller: { index: 3}, // Dr. Freeman
+    callee:{index: 0}, //  Emma, Village store
+    helloFile: '15-Doctor_Calls_Operator',
+    convoFile: '16-Doctor_Calls_Store',
+    helloText: 'Dr. Freeman:  Village Store, please',
+    convoText: 'Emma:  Village Store. ' +
+    'Dr. Freeman:  Emma, wondering if you could get...' ,
+  },  
   // // index , call  Audio 
   // {
   //   caller: { index: }, // 

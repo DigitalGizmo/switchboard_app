@@ -104,7 +104,7 @@
     phoneLines[lineIndex].audioTrack.play();
 
 		// Only track if this is converation index 3
-		if (currConvo === 3) {
+		if (currConvo === 3 || currConvo === 7) {
 			phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
 						phoneLines[lineIndex].audioTrack.currentTime = 0;
 						console.log(" -- Hello ended on lineIdx: " + lineIndex);
@@ -250,8 +250,8 @@
 
 						// Set timer for next call
 						// Temp hard-wire to interrupt first only
-						if (currConvo === 0) {
-							console.log(' currConvo = 0, 15000 to next')
+						if (currConvo === 0 || currConvo === 4) {
+							console.log(' currConvo = 0 or 4, 15000 to next')
 							setTimeToNext(15000);							
 						}
 
@@ -314,7 +314,7 @@
 		persons[phoneLines[lineIndex].caller.index].ledState = LED_OFF;
 		// Can't turn off callee led if callee index hasn't been defined
 		console.log('phoneLines[lineIndex].callee.index: '+ phoneLines[lineIndex].callee.index);
-		if (phoneLines[lineIndex].callee.index) {
+		if (phoneLines[lineIndex].callee.index !== null) {
 			// console.log('got into callee index not null');
 			persons[phoneLines[lineIndex].callee.index].ledState = LED_OFF;
 		}
