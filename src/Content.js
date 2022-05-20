@@ -186,7 +186,7 @@ let persons = [
     name: 'Chief Aurthur Burns',
     number: '111',
     ledState: 0,
-    // isPluggedJack: false,
+    wrongNumAnswer: 'ChiefBurns_WrongNumber_Callee',
   },
   { // index  8,
     company: '',
