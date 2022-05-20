@@ -185,6 +185,12 @@
     /* font-family:'PTSans-Bold'; */
   }
 
+  .jack-number {
+    font-size: 1.8em;
+    font-weight: bold;
+    /* font-family:'PTSans-Bold'; */
+  }
+
   /* from global css*/
   .led-light {
     fill:gray;
@@ -233,7 +239,7 @@
           <text x="125" y="70" class="jack-name" text-anchor="middle">
             {persons[rowColToIndex[rowIndex][colIndex].personIdx].name}
           </text>
-          <text x="125" y="103" class="jack-name" text-anchor="middle">
+          <text x="125" y="103" class="jack-number" text-anchor="middle">
             {persons[rowColToIndex[rowIndex][colIndex].personIdx].number}
           </text>
           <circle 

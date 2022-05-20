@@ -1,10 +1,10 @@
 const conversations = [
   // index 0, call 1  Charlie calls Olive - Audio 1,2
   {
-    caller: {index: 3}, // Charlie Freeman row: 0, col: 1, 
-    callee:{index: 4}, // Olive Powers row: 1, col: 2, 
-    helloFile: 'charlie-calls',
-    convoFile: 'charlie-olive',
+    caller: {index: 3}, // Charlie Freeman  
+    callee:{index: 4}, // Olive Powers  
+    helloFile: '1-Charlie_Operator',
+    convoFile: '2-Charlie_Calls_Olive',
     helloText: "Charlie:  Hi.  72 please.",
     convoText: 
       "Olive:  Hello? <br />" +
@@ -14,8 +14,8 @@ const conversations = [
   },  
   // index 1. call 2 Mina calls fire department - Audio 3 - 4
   {
-    caller: {index: 2},  // Mina Newell row: 1, col: 4, 
-    callee:{index: 7}, // Fire, Cheif Burns row: 0, col: 3, 
+    caller: {index: 2},  // Mina Newell  
+    callee:{index: 7}, // Fire, Cheif Burns  
     helloFile: '3-Mina_Calls_Operator',
     convoFile: '4-Mina_Calls_ChiefBurns',
     helloText: "Mina:  Fire department --",
@@ -27,8 +27,8 @@ const conversations = [
   },  
   // index 2, call 3 Tom calls fire department - audio 5 - 6
   {
-    caller: {index: 6}, // Tom Libby row: 0, col: 2, 
-    callee:{index: 7}, // Fire, Burns row: 0, col: 3, 
+    caller: {index: 6}, //  Tom
+    callee:{index: 7}, // Chief Burns
     helloFile: '5-Tom_Calls_Operator_1',
     convoFile: '6-Tom_Calls_Burns',
     helloText: "Tom:  Fire!  Fire station. I have to talk to the fire station…Fire!",
@@ -39,8 +39,8 @@ const conversations = [
   },  
   // index 3, call 4 Tressa calls  - Audio 7
   {
-    caller: { index: 5}, // Tressa to operator row: 0, col: 2,
-    callee:{index: 15}, // None! row: 0, col: 3, 
+    caller: { index: 5}, // Tressa to operator 
+    callee:{index: 15}, // None! , 
     helloFile: '7-Tressa_Calls_Operator',
     convoFile: '',
     helloText: "I smell smoke.  Do you know what’s going on?  Any calls with…",
@@ -50,7 +50,7 @@ const conversations = [
   // index 4 call, 5 Emma calls Olive  - Audio 8-9
   {
     caller: { index: 0}, // Emma to operator 
-    callee:{index: 4}, // None! row: 0, col: 3, 
+    callee:{index: 4}, // None!  
     helloFile: '8-Emma_Calls_Operator',
     convoFile: '9-Emma_Calls_Olive',
     helloText: "72, please",
@@ -91,7 +91,7 @@ const conversations = [
   },  
   // index 7, call 7 Audio 14
   {
-    caller: { index: 7}, // Chief Burns
+    caller: { index: 6}, // Chief Burns, but from Libby's farm
     callee:{index: 15}, //  Operator only
     helloFile: '14-ChiefBurns_Calls_Operator',
     convoFile: '',
@@ -109,26 +109,7 @@ const conversations = [
     convoText: 'Emma:  Village Store. ' +
     'Dr. Freeman:  Emma, wondering if you could get...' ,
   },  
-  // // index , call  Audio 
-  // {
-  //   caller: { index: }, // 
-  //   callee:{index: }, //  
-  //   helloFile: '',
-  //   convoFile: '',
-  //   helloText: '',
-  //   convoText: 
-  //     "none" ,
-  // },  
-  // // index , call  Audio 
-  // {
-  //   caller: { index: }, // 
-  //   callee:{index: }, //  
-  //   helloFile: '',
-  //   convoFile: '',
-  //   helloText: '',
-  //   convoText: 
-  //     "none" ,
-  // },  
+ 
 ];
 
 let persons = [
@@ -147,8 +128,8 @@ let persons = [
     // isPluggedJack: false,
   },
   { // index  2,
-    company: '(Paula Fowler?)',
-    name: 'Mina Newell',
+    company: '',
+    name: 'Mina Newell', // Paula Fowler?
     number: '44',
     ledState: 0,
     // isPluggedJack: false,
@@ -190,49 +171,49 @@ let persons = [
   },
   { // index  8,
     company: '',
-    name: 'Place Holder 1',
-    number: '18',
+    name: 'Jane Doe',
+    number: '30',
     ledState: 0,
     // isPluggedJack: false,
   },
   { // index  9,
     company: '',
-    name: 'Place Holder 2',
+    name: 'Paula Fowler',
     number: '50',
     ledState: 0,
     // isPluggedJack: false,
   },
   { // index  10,
     company: '',
-    name: 'Place Holder 3',
-    number: '59',
+    name: 'Jane Smith',
+    number: '60',
     ledState: 0,
     // isPluggedJack: false,
   },
   { // index  11,
     company: '',
-    name: 'Place Holder 4',
-    number: '77',
+    name: 'John Doe',
+    number: '75',
     ledState: 0,
     // isPluggedJack: false,
   },
   { // index  12,
     company: '',
-    name: 'Place Holder 5',
-    number: '81',
+    name: 'Gary Green',
+    number: '82',
     ledState: 0,
     // isPluggedJack: false,
   },
   { // index  13,
     company: '',
-    name: 'Place Holder 6',
+    name: 'Ruby Red',
     number: '90',
     ledState: 0,
     // isPluggedJack: false,
   },
   { // index  14,
     company: '',
-    name: 'Place Holder 7',
+    name: 'Barry Black',
     number: '120',
     ledState: 0,
     // isPluggedJack: false,
