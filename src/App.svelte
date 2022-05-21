@@ -19,6 +19,7 @@
 	const phoneLines = [
 		{
 			onePlugIsIn: false, 
+			isAtLeastInitiated: false,
 			isEngaged: false,
 			caller: {row: null, col: null, index: null, isPlugged: false},
 			callee: {row: null, col: null, index: null, isPlugged: false},
@@ -26,6 +27,7 @@
 		}, 
 		{
 			onePlugIsIn: false, 
+			isAtLeastInitiated: false,
 			isEngaged: false,
 			caller: {row: null, col: null, index: null,  isPlugged: false},
 			callee: {row: null, col: null, index: null, isPlugged: false},
@@ -33,15 +35,8 @@
 		}, 
 	];
 
-	// phoneLines could be attached to each person
-	// Guess we need to store who is on what connected line
-	// so we can reset their states on un-plug
-	// Maybe use values for phoneLines [-1, -1] default then
-	// store person indexes. 
-	// Test for >= 0 instead of true
-
-	let currConvo = 0;
-	let prevConvo = null;
+	let currConvo = 4;
+	// let prevConvo = null;
 
 	const LED_OFF = 0;
 	const LED_RED = 1;
@@ -52,7 +47,6 @@
 
 	// $: uppercaseName = name.toUpperCase();
 	// $: console.log(name);
-
 	// $: if (name === 'Donaldo') {
 	// 	age = 24;
 	// }
@@ -68,16 +62,8 @@
 		// Set "target", person being called
 		callee =  conversations[currConvo].callee;
 		calleeIndex = conversations[currConvo].callee.index
-
-		// console.log('caller: ' + caller);
-		// audioCaption = "in init: Charlie:  Hi.  72 please."
-
-		// Light Charlie
-		// setIncoming(caller)
 		setIncoming(callerIndex)
-		// Set one end of this line engaged
 	}
-
 
 	// This just rings the buzzer. Next action will
 	// be when user plugs in a plug
@@ -86,11 +72,6 @@
 		// console.log('hoping to play buzzer');
     buzzTrack.play();
     buzzTrack.volume = .8;    
-		// Set caller row and column
-		// jacks[caller.row][caller.col].ledState = LED_RED;
-		// jacks[personIndexRowCol[callerIndex][0]][personIndexRowCol[callerIndex][1]].ledState = LED_RED;
-		// I wish I could call this function in the Panel child
-		// jacks = setJackState(jacks, callerIndex);
 		persons[callerIndex].ledState = LED_RED;
 	}
 
@@ -121,6 +102,7 @@
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
 		 conversations[currConvo].convoFile +  ".mp3");
     phoneLines[lineIndex].audioTrack.play();
+
 		// Handle call end
 		phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
 					phoneLines[lineIndex].audioTrack.currentTime = 0;
@@ -128,10 +110,6 @@
 					setCallFinished(lineIndex);
 		});    	
 	}	
-
-	// function playBuzzer(){
- //    buzzTrack.play();
-	// }	
 
 	function setTimeToNext(timeToWait) {
 	  setTimeout(startNextCall, timeToWait);
@@ -149,10 +127,9 @@
 
 	function startNextCall() {
 		currConvo += 1;
-		prevConvo += 1;
+		// prevConvo += 1;
   	initiateCall(); 
 	}
-
 
 	// --- Handle plug-in ----
 	// plugged in the form of [person index, line index]
@@ -180,16 +157,18 @@
 					// Set first end of this line as in-use
 					// and Record caller for later unplug
 					setPhoneLineCaller(pluggedIdxInfo);
-					// console.log('callerIdx: ' + pluggedIdxInfo.personIdx +
-					// ' line index: ' + pluggedIdxInfo.lineIdx);
+					// atLeastInitiated, prevents an interrupted
+					// call end from spawning a new call
+					// isEngaged doesn't cover the case where the call hassn't
+					// yet been fully connected
+					phoneLines[pluggedIdxInfo.lineIdx].isAtLeastInitiated = true;
 					// Start Debug messages
 					audioCaption = conversations[currConvo].helloText;
 					// console.log('plugged name: ' + pluggedName);
 					// Debug message
 					debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx + 
 						' asks for ' + 
-						persons[conversations[currConvo].callee.index].name + 
-						' <br />';
+						persons[conversations[currConvo].callee.index].name + ' <br />';
 					// Stop buzzer and other convo
 					buzzTrack.pause();
 					// Stop previous conversation, if there is one
@@ -228,10 +207,10 @@
 						// User messag message
 						audioCaption = conversations[currConvo].convoText;
 						// Set timer for next call
-						// Temp hard-wire to interrupt first only
+						// Temp hard-wire to interrupt two calls
 						if (currConvo === 0 || currConvo === 4) {
 							console.log(' currConvo = 0 or 4, 15000 to next')
-							setTimeToNext(15000);							
+							setTimeToNext(15000);
 						}
 						// Debug message
 						debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx;
@@ -242,7 +221,7 @@
 					// 	persons[pluggedIdxInfo.personIdx].wrongNumAnswer, 
 					// 	pluggedIdxInfo.lineIdx
 					// );
-				} // End plugged into wron jack.
+				} // End plugged into wrong jack.
 			} // end if this is the line in use
 		} // end (else) this is "other" end of line in use
 	} // end identifyPlugged
@@ -251,40 +230,26 @@
 		phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn = true;
 		// Set caller 
 		phoneLines[pluggedIdxInfo.lineIdx].caller.index = pluggedIdxInfo.personIdx;
-		// phoneLines[pluggedInfo.lineIdx].caller.row = 
-		// 	pluggedInfo.row;
-		// phoneLines[pluggedInfo.lineIdx].caller.col = 
-		// 	pluggedInfo.col;
 	}
 
 	function setPhoneLineCallee(pluggedIdxInfo) {
 		// Set callee 
 		phoneLines[pluggedIdxInfo.lineIdx].callee.index = pluggedIdxInfo.personIdx;
-		// phoneLines[pluggedInfo.lineIdx].callee.row = 
-		// 	pluggedInfo.row;
-		// phoneLines[pluggedInfo.lineIdx].callee.col = 
-		// 	pluggedInfo.col;
 	}
-
 
 	function unPlug(plugIdx, lineIndex) {
 
 		// Set isPluggedJack to false
 		// how to get coords of unplug???
-		// Maybe store in person what jack
-		// index is ingaged
-		// wait until I have single person/jack id
-		// before I tackle this.
 		// It's just so you can't plug into an
 		// already plugged jack.
-
 		// Hope to leave this in Panel only
 		// persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
 
     // If conversation is in progress
     // (Or even wrong number)
-
     if (phoneLines[lineIndex].isEngaged) {
+			console.log(' -- calling this an unplug')
 			// Stop the audio
 			phoneLines[lineIndex].audioTrack.pause();
 			setCallFinished(lineIndex);
@@ -294,6 +259,7 @@
 	function setCallFinished(lineIndex) {
 		// Clear the line settings
 		phoneLines[lineIndex].onePlugIsIn = false;
+		phoneLines[lineIndex].isAtLeastInitiated = false;
 		phoneLines[lineIndex].isEngaged = false;
 		// Turn of the leds
 		persons[phoneLines[lineIndex].caller.index].ledState = LED_OFF;
@@ -305,16 +271,18 @@
 		}
 		console.log('got past turn callee off');
 
-		// Reset the volume
-		// phoneLines[lineIdxPrev].audioTrack.volume = 0;
+		// Reset the volume -- incase it was silenced by interrupting call
 		phoneLines[lineIndex].audioTrack.volume = 1;
 
 		// Pause and start next call
 		// Don't start next call on finish if other line is engaged
+		console.log(' currConvo: ' + currConvo);
 		let otherLineIdx = (lineIndex === 0) ? 1 : 0;
-		if (!phoneLines[otherLineIdx].isEngaged) {
+		console.log('other line enaged: ' + phoneLines[otherLineIdx].isAtLeastInitiated)
+		if (!phoneLines[otherLineIdx].isAtLeastInitiated) {
+			console.log('inside not not interruption')
 			setTimeToNext(2000);							
-		}
+		};
 	}
 
 </script>
@@ -342,6 +310,4 @@
 	/>
 
 	<p>Debug: {@html debugCaption}</p>
-</div><!-- /wrapper --> 		<!-- phoneLines -->
-
-
+</div><!-- /wrapper --> 	
