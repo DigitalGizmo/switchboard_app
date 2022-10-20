@@ -280,7 +280,7 @@
 
     <!-- plug base -->
     <g transform="translate(0, 1090)">
-      <rect width="1380" height="90" fill="#919090"/>
+      <rect width="1080" height="90" fill="#919090"/>
     </g>
 
   </svg>
