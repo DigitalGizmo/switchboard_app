@@ -66,7 +66,7 @@
 	}
 
 	// This just rings the buzzer. Next action will
-	// be when user plugs in a plug
+	// be when user plugs in a plug - in Panel.svelte drag end: identifyPlugged
 	function setIncoming(callerIndex) {
     // playBuzzer();
 		// console.log('hoping to play buzzer');
@@ -90,13 +90,6 @@
 		}
 	}	
 
-	function playWrongNum(wrongNumFileName, lineIndex){
-		phoneLines[lineIndex].audioTrack =
-     new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
-		 wrongNumFileName +  ".mp3");
-    phoneLines[lineIndex].audioTrack.play();
-	}	
-
 	function playConvo(currConvo, lineIndex){
 		phoneLines[lineIndex].audioTrack =
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
@@ -109,6 +102,20 @@
 					console.log(" -- conversation ended on lineIdx: " + lineIndex);
 					setCallFinished(lineIndex);
 		});    	
+	}	
+
+	function playWrongNum(wrongNumFile, lineIndex){
+		phoneLines[lineIndex].audioTrack =
+     new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
+		 wrongNumFile +  ".mp3");
+    phoneLines[lineIndex].audioTrack.play();
+
+		// // Handle call end
+		// phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
+		// 			phoneLines[lineIndex].audioTrack.currentTime = 0;
+		// 			console.log(" -- conversation ended on lineIdx: " + lineIndex);
+		// 			setCallFinished(lineIndex);
+		// });    		
 	}	
 
 	function setTimeToNext(timeToWait) {
@@ -147,43 +154,47 @@
 			// phoneLines for line in question, test onePlugIsIn value
 			// New use of line --First plugged NOT already plugged in.
 			// Did user correctly plug into caller?
-			// if person index plugged matches that of caller
+			// If person index plugged matches that of caller
 			if (pluggedIdxInfo.personIdx === callerIndex) {
-					// Turn led green
-					persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
-					// Set jack to plugged
-					// Hopeully handle in Panel ony
-					// persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
-					// Set first end of this line as in-use
-					// and Record caller for later unplug
-					setPhoneLineCaller(pluggedIdxInfo);
-					// atLeastInitiated, prevents an interrupted
-					// call end from spawning a new call
-					// isEngaged doesn't cover the case where the call hassn't
-					// yet been fully connected
-					phoneLines[pluggedIdxInfo.lineIdx].isAtLeastInitiated = true;
-					// Start Debug messages
-					audioCaption = conversations[currConvo].helloText;
-					// console.log('plugged name: ' + pluggedName);
-					// Debug message
-					debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx + 
-						' asks for ' + 
-						persons[conversations[currConvo].callee.index].name + ' <br />';
-					// Stop buzzer and other convo
-					buzzTrack.pause();
-					// Stop previous conversation, if there is one
-					// phoneLines[pluggedInfo.lineIdx].audioTrack.pause();
-					console.log(' - lineIdxPrev: ' + lineIdxPrev);
-					if (lineIdxPrev >= 0) {
-						phoneLines[lineIdxPrev].audioTrack.volume = 0;
-					}
-					// Set this line in use only we have gotten this success
-					lineIdxInUse = pluggedIdxInfo.lineIdx;
-					// Set prev for use in next call.
-					lineIdxPrev = lineIdxInUse;
-					// console.log(' setting lineIdxInUse to: ' + lineIdxInUse);
-					playHello(currConvo, pluggedIdxInfo.lineIdx);
-			}   // end if successful plug in to correct caller
+				// Turn led green
+				persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
+				// Set jack to plugged
+				// Hopeully handle in Panel ony
+				// persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
+				// Set first end of this line as in-use
+				// and Record caller for later unplug
+				setPhoneLineCaller(pluggedIdxInfo);
+				// "atLeastInitiated" prevents an interrupted
+				// call end from spawning a new call
+				// isEngaged doesn't cover the case where the call hassn't
+				// yet been fully connected
+				phoneLines[pluggedIdxInfo.lineIdx].isAtLeastInitiated = true;
+				// Start Debug messages
+				audioCaption = conversations[currConvo].helloText;
+				// console.log('plugged name: ' + pluggedName);
+				// Debug message
+				debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx + 
+					' asks for ' + 
+					persons[conversations[currConvo].callee.index].name + ' <br />';
+				// Stop buzzer and other convo
+				buzzTrack.pause();
+				// Stop previous conversation, if there is one
+				// phoneLines[pluggedInfo.lineIdx].audioTrack.pause();
+				console.log(' - lineIdxPrev: ' + lineIdxPrev);
+				if (lineIdxPrev >= 0) {
+					phoneLines[lineIdxPrev].audioTrack.volume = 0;
+				}
+				// Set this line in use only we have gotten this success
+				lineIdxInUse = pluggedIdxInfo.lineIdx;
+				// Set prev for use in next call.
+				lineIdxPrev = lineIdxInUse;
+				// console.log(' setting lineIdxInUse to: ' + lineIdxInUse);
+				playHello(currConvo, pluggedIdxInfo.lineIdx);
+			} else {  // end if successful plug in to correct caller -
+				// Didn't plug into correc calling person
+				audioCaption = "That's not the jack for the person who is asking you to connect!";
+
+			}
 		} else { 
 			// First line used IS TRUE, so we might be on the other plug
 			// But first, is this the line in use?
@@ -192,36 +203,44 @@
 				// Other end already plugged in
 				// Determing correct plugin for second end
 				// if person index matches that of callee
-				if (pluggedIdxInfo.personIdx === calleeIndex) {
-						// Turn led green
-						persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
-						// // Set jack to plugged
-						// Hopeully handle in Panel ony
-						// persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
-						// Set this line as engaged
-						phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
-						// Record callee for later unplug
-						setPhoneLineCallee(pluggedIdxInfo);
-						// audioTrack.pause();
-						playConvo(currConvo,	pluggedIdxInfo.lineIdx);
-						// User messag message
-						audioCaption = conversations[currConvo].convoText;
-						// Set timer for next call
-						// Temp hard-wire to interrupt two calls
-						if (currConvo === 0 || currConvo === 4) {
-							console.log(' currConvo = 0 or 4, 15000 to next')
-							setTimeToNext(15000);
-						}
-						// Debug message
-						debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx;
+
+				// Whether or not this is correct callee
+				// if (pluggedIdxInfo.personIdx === calleeIndex) {
+				// Turn led green
+				persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
+				// // Set jack to plugged
+				// Hopeully handle in Panel ony
+				// persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
+				// Set this line as engaged
+				phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
+				// Record callee for later unplug
+				setPhoneLineCallee(pluggedIdxInfo);
+
+				if (pluggedIdxInfo.personIdx === calleeIndex) { // Correct callee
+					// audioTrack.pause();
+					playConvo(currConvo,	pluggedIdxInfo.lineIdx);
+					// User messag message
+					audioCaption = conversations[currConvo].convoText;
+					// Set timer for next call
+					// Temp hard-wire to interrupt two calls
+					if (currConvo === 0 || currConvo === 4) {
+						console.log(' currConvo = 0 or 4, 15000 to next')
+						setTimeToNext(15000);
+					}
+					// Debug message
+					debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx;
 				} else { // end plugged into to correct callee
+					// Wong Number!
 					console.log('Plugged into wrong jack. Person: ' + persons[pluggedIdxInfo.personIdx].name);
-					// persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
-					// playWrongNum(
-					// 	persons[pluggedIdxInfo.personIdx].wrongNumAnswer, 
-					// 	pluggedIdxInfo.lineIdx
-					// );
-				} // End plugged into wrong jack.
+					debugCaption += 'Plugged into wrong jack. Person: ' + persons[pluggedIdxInfo.personIdx].name + 
+					'  <br /> ';
+					// already LED_GREEN;
+					// playConvo(currConvo,	pluggedIdxInfo.lineIdx);					
+					playWrongNum(
+						persons[pluggedIdxInfo.personIdx].wrongNumFile, 
+						pluggedIdxInfo.lineIdx
+					);
+				} // End plugged into wrong number
 			} // end if this is the line in use
 		} // end (else) this is "other" end of line in use
 	} // end identifyPlugged
