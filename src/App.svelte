@@ -2,6 +2,7 @@
 	import HowTo from "./HowTo.svelte";
 	import Panel from "./Panel.svelte";
 	import { conversations, persons } from './Content.js';
+    import { fcumsum } from "d3";
 	//  
 	// import {setJackState} from './ProtoPanelHelper.js';
 
@@ -35,7 +36,7 @@
 		}, 
 	];
 
-	let currConvo = 4;
+	let currConvo = 0;
 	// let prevConvo = null;
 
 	const LED_OFF = 0;
@@ -104,11 +105,45 @@
 		});    	
 	}	
 
-	function playWrongNum(wrongNumFile, lineIndex){
+	// refactor: maybe use this after all: function playWrongNum(wrongCalleeIdx, lineIndex){
+	function playWrongNum(pluggedPersonIdx, lineIndex){
+		// persons[pluggedIdxInfo.personIdx], 
+		// 				pluggedIdxInfo.lineIdx
+		// persons[pluggedIdxInfo.personIdx].wrongNumFile,
+		let wrongNumFile = persons[pluggedPersonIdx].wrongNumFile;
+		// let lineIndex = pluggedIdxInfo.lineIdx;
 		phoneLines[lineIndex].audioTrack =
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
 		 wrongNumFile +  ".mp3");
     phoneLines[lineIndex].audioTrack.play();
+
+		// Reply from caller saying who caller really wants
+		phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
+					phoneLines[lineIndex].audioTrack.currentTime = 0;
+					console.log(" -- wrong num answer ended on lineIdx: " + lineIndex);
+					playRequestCorrect(lineIndex);
+		});    		
+
+		// // Handle call end
+		// phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
+		// 			phoneLines[lineIndex].audioTrack.currentTime = 0;
+		// 			console.log(" -- conversation ended on lineIdx: " + lineIndex);
+		// 			setCallFinished(lineIndex);
+		// });    		
+	}	
+
+	function playRequestCorrect(lineIndex){
+		phoneLines[lineIndex].audioTrack =
+     new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
+		 conversations[currConvo].retryAfterWrongFile +  ".mp3");
+    phoneLines[lineIndex].audioTrack.play();
+
+		// // Reply from caller saying who caller really wants
+		// phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
+		// 			phoneLines[lineIndex].audioTrack.currentTime = 0;
+		// 			console.log(" -- wrong num answer ended on lineIdx: " + lineIndex);
+		// 			setCallFinished(lineIndex);
+		// });    		
 
 		// // Handle call end
 		// phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
@@ -138,9 +173,11 @@
   	initiateCall(); 
 	}
 
-	// --- Handle plug-in ----
-	// plugged in the form of [person index, line index]
+	/***********
+	  --- Handle plug-in ----
+	**********/
 	function identifyPlugged(pluggedIdxInfo) {
+		// pluggedIdxInfo has [person index, line index]
 		// Get name based on index
 		pluggedName = persons[pluggedIdxInfo.personIdx].name;
 		// Debug msg
@@ -149,7 +186,9 @@
 		// console.log(caller);
 		// console.log('identify plugged, t or f? ' + phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn);
 
-		// If Fresh plugged
+		/********
+		* Fresh plug-in
+		*******/
 		if (!phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn) { 
 			// phoneLines for line in question, test onePlugIsIn value
 			// New use of line --First plugged NOT already plugged in.
@@ -196,6 +235,9 @@
 
 			}
 		} else { 
+			/********
+		  * Other end of the line
+			********/
 			// First line used IS TRUE, so we might be on the other plug
 			// But first, is this the line in use?
 			// console.log(' in else,  lineIdxInUse use is: ' + lineIdxInUse);
@@ -237,7 +279,9 @@
 					// already LED_GREEN;
 					// playConvo(currConvo,	pluggedIdxInfo.lineIdx);					
 					playWrongNum(
-						persons[pluggedIdxInfo.personIdx].wrongNumFile, 
+						// pluggedIdxInfo 
+						// persons[pluggedIdxInfo.personIdx], 
+						pluggedIdxInfo.personIdx, 
 						pluggedIdxInfo.lineIdx
 					);
 				} // End plugged into wrong number
@@ -302,6 +346,10 @@
 			console.log('inside not not interruption')
 			setTimeToNext(2000);							
 		};
+	}
+
+	function retryAfterWrongNum(lineIndex) {
+		//
 	}
 
 </script>

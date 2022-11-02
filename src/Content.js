@@ -5,6 +5,7 @@ const conversations = [
     callee:{index: 4}, // Olive Powers  
     helloFile: '1-Charlie_Operator',
     convoFile: '2-Charlie_Calls_Olive',
+    retryAfterWrongFile: 'Charlie_WrongNumber_Caller',
     helloText: "Charlie:  Hi.  72 please.",
     convoText: 
       "Olive:  Hello? <br />" +
@@ -53,6 +54,7 @@ const conversations = [
     callee:{index: 4}, // None!  
     helloFile: '8-Emma_Calls_Operator',
     convoFile: '9-Emma_Calls_Olive',
+    retryAfterWrongFile: 'Emma_WrongNumber_Caller',
     helloText: "72, please",
     convoText: 
       "Olive: Hello? " +
@@ -118,7 +120,8 @@ let persons = [
     name: 'Emma Powers',
     number: '53',
     ledState: 0,
-    // isPluggedJack: false,
+    wrongNumFile: 'Emma_WrongNumber_Callee',
+    // isPluggedJack: false, 
   },
   { // index  1,
     company: '',
