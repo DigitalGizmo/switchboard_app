@@ -122,35 +122,17 @@
 					phoneLines[lineIndex].audioTrack.currentTime = 0;
 					console.log(" -- wrong num answer ended on lineIdx: " + lineIndex);
 					playRequestCorrect(lineIndex);
-		});    		
-
-		// // Handle call end
-		// phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
-		// 			phoneLines[lineIndex].audioTrack.currentTime = 0;
-		// 			console.log(" -- conversation ended on lineIdx: " + lineIndex);
-		// 			setCallFinished(lineIndex);
-		// });    		
+		});    		  		
 	}	
 
+	// Reply from caller saying who caller really wants
 	function playRequestCorrect(lineIndex){
 		phoneLines[lineIndex].audioTrack =
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
 		 conversations[currConvo].retryAfterWrongFile +  ".mp3");
     phoneLines[lineIndex].audioTrack.play();
-
-		// // Reply from caller saying who caller really wants
-		// phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
-		// 			phoneLines[lineIndex].audioTrack.currentTime = 0;
-		// 			console.log(" -- wrong num answer ended on lineIdx: " + lineIndex);
-		// 			setCallFinished(lineIndex);
-		// });    		
-
-		// // Handle call end
-		// phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
-		// 			phoneLines[lineIndex].audioTrack.currentTime = 0;
-		// 			console.log(" -- conversation ended on lineIdx: " + lineIndex);
-		// 			setCallFinished(lineIndex);
-		// });    		
+		// At this point we hope user unplugs wrong number
+		// Will be handled by "unPlug"
 	}	
 
 	function setTimeToNext(timeToWait) {
@@ -197,9 +179,8 @@
 			if (pluggedIdxInfo.personIdx === callerIndex) {
 				// Turn led green
 				persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
-				// Set jack to plugged
-				// Hopeully handle in Panel ony
-				// persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
+				// Set this person's jack to plugged
+				persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
 				// Set first end of this line as in-use
 				// and Record caller for later unplug
 				setPhoneLineCaller(pluggedIdxInfo);
@@ -238,6 +219,7 @@
 			/********
 		  * Other end of the line
 			********/
+			
 			// First line used IS TRUE, so we might be on the other plug
 			// But first, is this the line in use?
 			// console.log(' in else,  lineIdxInUse use is: ' + lineIdxInUse);
@@ -251,8 +233,7 @@
 				// Turn led green
 				persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
 				// // Set jack to plugged
-				// Hopeully handle in Panel ony
-				// persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
+				persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
 				// Set this line as engaged
 				phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
 				// Record callee for later unplug
@@ -303,6 +284,7 @@
 	function unPlug(plugIdx, lineIndex) {
 
 		// Set isPluggedJack to false
+
 		// how to get coords of unplug???
 		// It's just so you can't plug into an
 		// already plugged jack.
@@ -312,9 +294,21 @@
     // If conversation is in progress
     // (Or even wrong number)
     if (phoneLines[lineIndex].isEngaged) {
-			console.log(' -- calling this an unplug')
+			console.log(' -- index of unpluged: ' + plugIdx);
 			// Stop the audio
 			phoneLines[lineIndex].audioTrack.pause();
+
+			/* Have to know if this was a wrong number, in which case only
+			* turn off the callee light and don't setCallFinished
+			*/
+
+			// if it's callee jack that was unplugged
+			//  and if was during isWrongNumInProgress
+			// then 
+				// (just) turn off this led
+				// which allows another plugin?
+
+
 			setCallFinished(lineIndex);
     }
 	}

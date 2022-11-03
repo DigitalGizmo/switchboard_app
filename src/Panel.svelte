@@ -23,6 +23,16 @@
   // New
   const pluggedIdxInfo = {personIdx: null, lineIdx: null};
 
+  /*
+  * I think (for the hardware version) I need to go by what
+  * jacks are plugged and whether two jacks are connected 
+  * by the "same" line.
+  * Lines won't have ids as such, just 1st line in use
+  * and 2nd line in use.
+  * But here I can use line ids to test "continuity"
+  */
+
+
   let plugs = [
     { index: 0,
       lineIndex: 0,
@@ -92,6 +102,10 @@
   const ROW_OFFSETS = [0, 300, 600]; 
   const JACK_TOP_OFFSET = 202 + 28;
 
+  const getPluggedCol = (proportion_of_total_height) => {
+    pluggedRow = Math.trunc(proportion_of_total_height * NUM_ROWS);
+  }
+
   onMount(() => {
     d3.selectAll('.plug').style('cursor', 'move')
     .call(d3.drag()
@@ -103,6 +117,8 @@
           unPlug(plugIdx, lineIndex);
           // May want to determind row and cell here to set isPlugged=false
           // May separate out the determine Row Call from end to do this.
+          // Don't need plugIdx, do need person/jack index aka pluggedIdxInfo
+
           // Re-lengthen the sleeve
           plugs[plugIdx].sleeveLength = -20;
        }).on("drag", function(d) {
