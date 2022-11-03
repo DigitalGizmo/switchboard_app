@@ -234,12 +234,16 @@
 				persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
 				// // Set jack to plugged
 				persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
-				// Set this line as engaged
-				phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
+
+				// Set this line as engaged // Only if correct
+				// phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
+
 				// Record callee for later unplug
 				setPhoneLineCallee(pluggedIdxInfo);
 
 				if (pluggedIdxInfo.personIdx === calleeIndex) { // Correct callee
+					// Set this line as engaged
+					phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
 					// audioTrack.pause();
 					playConvo(currConvo,	pluggedIdxInfo.lineIdx);
 					// User messag message
@@ -281,42 +285,31 @@
 		phoneLines[pluggedIdxInfo.lineIdx].callee.index = pluggedIdxInfo.personIdx;
 	}
 
-	// function handleUnPlug(plugIdx, lineIndex) {
 	function handleUnPlug(pluggedIdxInfo) {
 		console.log(' got to handleUnPluug');
 		console.log('person idx: ' + pluggedIdxInfo.personIdx +
 		' line index: ' + pluggedIdxInfo.lineIdx);
 
-		// Set isPluggedJack to false
+		// If conversation is in progress
+		// (Or even wrong number)
+		if (phoneLines[pluggedIdxInfo.lineIdx].isEngaged) {
+			console.log(' -- person id unpluged: ' + pluggedIdxInfo.personIdx);
+			// Stop the audio
+			phoneLines[pluggedIdxInfo.lineIdx].audioTrack.pause();
+			setCallFinished(pluggedIdxInfo.lineIdx);
 
-		// how to get coords of unplug???
-		// It's just so you can't plug into an
-		// already plugged jack.
-		// Hope to leave this in Panel only
-		// persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
-
-
-
-			// If conversation is in progress
-			// (Or even wrong number)
-			if (phoneLines[pluggedIdxInfo.lineIdx].isEngaged) {
-				console.log(' -- person id unpluged: ' + pluggedIdxInfo.personIdx);
-				// Stop the audio
-				phoneLines[pluggedIdxInfo.lineIdx].audioTrack.pause();
-
-				/* Have to know if this was a wrong number, in which case only
-				* turn off the callee light and don't setCallFinished
-				*/
-
-				// if it's callee jack that was unplugged
-				//  and if was during isWrongNumInProgress
-				// then 
-					// (just) turn off this led
-					// which allows another plugin?
-
-				// setCallFinished(lineIdx);
-
-
+			/* Have to know if this was a wrong number, in which case only
+			* turn off the callee light and don't setCallFinished
+			*/
+		} else {
+			console.log('line is not engaged, so this must be wrong number')
+			// if it's callee jack that was unplugged
+			persons[phoneLines[pluggedIdxInfo.lineIdx].callee.index].ledState = LED_OFF;
+			phoneLines[pluggedIdxInfo.lineIdx].audioTrack.volume = 0;
+			//  and if was during isWrongNumInProgress
+			// then 
+				// (just) turn off this led
+				// which allows another plugin?
 
     }
 	}

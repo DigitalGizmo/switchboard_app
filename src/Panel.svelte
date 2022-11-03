@@ -138,6 +138,12 @@
       rowColToIndex[pluggedRow][pluggedCol].isPlugged = true;
       // Send action to App.svelte
       handlePlugIn(pluggedIdxInfo);
+
+      // how to get coords of unplug???
+      // It's just so you can't plug into an
+      // already plugged jack.
+      // Hope to leave this in Panel only
+      // persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
     } else { // This is unPlug
       handleUnPlug(pluggedIdxInfo);
       // Re-lengthen the sleeve
