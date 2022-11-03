@@ -24,7 +24,7 @@
 			isEngaged: false,
 			caller: {row: null, col: null, index: null, isPlugged: false},
 			callee: {row: null, col: null, index: null, isPlugged: false},
-			audioTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3"),
+			audioTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/1-Charlie_Operator.mp3"),
 		}, 
 		{
 			onePlugIsIn: false, 
@@ -32,7 +32,7 @@
 			isEngaged: false,
 			caller: {row: null, col: null, index: null,  isPlugged: false},
 			callee: {row: null, col: null, index: null, isPlugged: false},
-			audioTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3"),
+			audioTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/1-Charlie_Operator.mp3"),
 		}, 
 	];
 
@@ -67,7 +67,7 @@
 	}
 
 	// This just rings the buzzer. Next action will
-	// be when user plugs in a plug - in Panel.svelte drag end: identifyPlugged
+	// be when user plugs in a plug - in Panel.svelte drag end: handlePlugIn
 	function setIncoming(callerIndex) {
     // playBuzzer();
 		// console.log('hoping to play buzzer');
@@ -158,7 +158,7 @@
 	/***********
 	  --- Handle plug-in ----
 	**********/
-	function identifyPlugged(pluggedIdxInfo) {
+	function handlePlugIn(pluggedIdxInfo) {
 		// pluggedIdxInfo has [person index, line index]
 		// Get name based on index
 		pluggedName = persons[pluggedIdxInfo.personIdx].name;
@@ -268,7 +268,7 @@
 				} // End plugged into wrong number
 			} // end if this is the line in use
 		} // end (else) this is "other" end of line in use
-	} // end identifyPlugged
+	} // end handlePlugIn
 
 	function setPhoneLineCaller(pluggedIdxInfo) {
 		phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn = true;
@@ -281,7 +281,11 @@
 		phoneLines[pluggedIdxInfo.lineIdx].callee.index = pluggedIdxInfo.personIdx;
 	}
 
-	function unPlug(plugIdx, lineIndex) {
+	// function handleUnPlug(plugIdx, lineIndex) {
+	function handleUnPlug(pluggedIdxInfo) {
+		console.log(' got to handleUnPluug');
+		console.log('person idx: ' + pluggedIdxInfo.personIdx +
+		' line index: ' + pluggedIdxInfo.lineIdx);
 
 		// Set isPluggedJack to false
 
@@ -291,25 +295,29 @@
 		// Hope to leave this in Panel only
 		// persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
 
-    // If conversation is in progress
-    // (Or even wrong number)
-    if (phoneLines[lineIndex].isEngaged) {
-			console.log(' -- index of unpluged: ' + plugIdx);
-			// Stop the audio
-			phoneLines[lineIndex].audioTrack.pause();
-
-			/* Have to know if this was a wrong number, in which case only
-			* turn off the callee light and don't setCallFinished
-			*/
-
-			// if it's callee jack that was unplugged
-			//  and if was during isWrongNumInProgress
-			// then 
-				// (just) turn off this led
-				// which allows another plugin?
 
 
-			setCallFinished(lineIndex);
+			// If conversation is in progress
+			// (Or even wrong number)
+			if (phoneLines[pluggedIdxInfo.lineIdx].isEngaged) {
+				console.log(' -- person id unpluged: ' + pluggedIdxInfo.personIdx);
+				// Stop the audio
+				phoneLines[pluggedIdxInfo.lineIdx].audioTrack.pause();
+
+				/* Have to know if this was a wrong number, in which case only
+				* turn off the callee light and don't setCallFinished
+				*/
+
+				// if it's callee jack that was unplugged
+				//  and if was during isWrongNumInProgress
+				// then 
+					// (just) turn off this led
+					// which allows another plugin?
+
+				// setCallFinished(lineIdx);
+
+
+
     }
 	}
 
@@ -366,8 +374,8 @@
 	<Panel 
 
 		{persons}
-		{identifyPlugged}
-		{unPlug}
+		{handlePlugIn}
+		{handleUnPlug}
 	/>
 
 	<p>Debug: {@html debugCaption}</p>
