@@ -111,6 +111,8 @@
 		// 				pluggedIdxInfo.lineIdx
 		// persons[pluggedIdxInfo.personIdx].wrongNumFile,
 		let wrongNumFile = persons[pluggedPersonIdx].wrongNumFile;
+		console.log('pluggedPersonIdx: ' + pluggedPersonIdx +
+		' wrongNumFile: ' + wrongNumFile);
 		// let lineIndex = pluggedIdxInfo.lineIdx;
 		phoneLines[lineIndex].audioTrack =
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
@@ -220,7 +222,7 @@
 		  * Other end of the line
 			********/
 			
-			// First line used IS TRUE, so we might be on the other plug
+			// First line used IS TRUE, so we must be on the other plug
 			// But first, is this the line in use?
 			// console.log(' in else,  lineIdxInUse use is: ' + lineIdxInUse);
 			if (lineIdxInUse === pluggedIdxInfo.lineIdx) {
@@ -234,7 +236,8 @@
 				persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
 				// // Set jack to plugged
 				persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
-
+				// Stop the hello operator track
+				phoneLines[pluggedIdxInfo.lineIdx].audioTrack.volume = 0;
 				// Set this line as engaged // Only if correct
 				// phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
 
@@ -264,8 +267,6 @@
 					// already LED_GREEN;
 					// playConvo(currConvo,	pluggedIdxInfo.lineIdx);					
 					playWrongNum(
-						// pluggedIdxInfo 
-						// persons[pluggedIdxInfo.personIdx], 
 						pluggedIdxInfo.personIdx, 
 						pluggedIdxInfo.lineIdx
 					);
