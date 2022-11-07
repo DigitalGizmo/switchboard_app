@@ -265,7 +265,12 @@
     stroke-miterlimit:10;
   }
 
-  .led-red {
+  .led-solid {
+    fill:#fc9d03;
+    stroke:#919090;
+  }
+
+  .led-blinking {
     stroke:#919090;
     stroke-width:3;
     stroke-miterlimit:10;
@@ -305,8 +310,8 @@
           </text>
           <circle 
             class="led-light"
-            class:led-green="{persons[rowColToIndex[rowIndex][colIndex].personIdx].ledState === 2}"
-            class:led-red="{persons[rowColToIndex[rowIndex][colIndex].personIdx].ledState === 1}"
+            class:led-solid="{persons[rowColToIndex[rowIndex][colIndex].personIdx].ledState === 2}"
+            class:led-blinking="{persons[rowColToIndex[rowIndex][colIndex].personIdx].ledState === 1}"
             cx="127" 
             cy="150" 
             r="32"/>

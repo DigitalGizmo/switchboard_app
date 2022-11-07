@@ -148,11 +148,11 @@ header {
 }*/
 
 .how-to ul li.ringing:before {
-  background: red;
+  background: #fc9d03;
 }
 
 .how-to ul li.in-use:before {
-   background: #64BC46;
+   background: #fc9d03;
 }
 
 /*//PLUGS//*/

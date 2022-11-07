@@ -15,8 +15,8 @@
     
     <h3>Key</h3>
     <ul>
-      <li class="ringing">red flashing light indicates an incoming call</li>
-      <li class="in-use">green steady light indicates a line is busy on a call</li>
+      <li class="ringing"> flashing light indicates an incoming call</li>
+      <li class="in-use"> steady light indicates a line is busy on a call</li>
     </ul>
 
   </div>
