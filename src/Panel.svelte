@@ -265,11 +265,6 @@
     stroke-miterlimit:10;
   }
 
-  .led-green {
-    fill:#64BC46;
-    stroke:#919090;
-  }
-
   .led-red {
     stroke:#919090;
     stroke-width:3;
@@ -278,11 +273,11 @@
   }
 
   @keyframes blinkingLED {
-      0% { fill: red; }
+      0% { fill: #fc9d03; }
       49% { fill: white; }
-      60% { fill: red; }
+      60% { fill: #fc9d03; }
       99% { fill: white; }
-      100% { fill: red; }
+      100% { fill: #fc9d03; }
   }
 
 </style>
