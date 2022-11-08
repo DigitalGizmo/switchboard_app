@@ -1,19 +1,19 @@
 let rowColToIndex = [
   [
-    {personIdx: 12, isPlugged: false},  //'Place Holder',
-    {personIdx: 0, isPlugged: false}, // 'Emma Powers - store'
-    {personIdx: 1, isPlugged: false}, // 'Mrs. White',
-    {personIdx: 4, isPlugged: false}, // 'Olive Powers',
-    {personIdx: 2, isPlugged: false}, // 'Mina Newell' Paula Fowler?,
-    {personIdx: 13, isPlugged: false}, //'Place Holder',
+    {personIdx: 2, isPlugged: false}, // 44 'Mina Newell' Paula Fowler?,
+    {personIdx: 9, isPlugged: false}, // 50 'Paula FowlerPlace Holder',
+    {personIdx: 1, isPlugged: false}, // 51  'Mrs. White',
+    {personIdx: 0, isPlugged: false}, // 53 'Emma Powers - store'
+    {personIdx: 3, isPlugged: false}, // 56 'Charlie Freeman/ Doc',
+    {personIdx: 10, isPlugged: false}, // 60 'Jane SmithPlace Holder',
   ],
   [
-    {personIdx: 5, isPlugged: false}, // 'Tressa Howe', 
-    {personIdx: 9, isPlugged: false}, //'Place Holder',
-    {personIdx: 3, isPlugged: false}, // name: 'Charlie Freeman',
-    {personIdx: 6, isPlugged: false}, // name: 'Tom Libby',
-    {personIdx: 7, isPlugged: false}, // name: 'Chief Aurthur Burns',
-    {personIdx: 10, isPlugged: false}, //'Place Holder',
+    {personIdx: 4, isPlugged: false}, // 72 'Olive Powers',
+    {personIdx: 5, isPlugged: false}, // 80 'Tressa Howe', 
+    {personIdx: 12, isPlugged: false}, // 82, or any # 'Gary GreenPlace Holder',
+    {personIdx: 6, isPlugged: false}, // 84 'Tom Libby',
+    {personIdx: 13, isPlugged: false}, // 90 or 'Ruby Red Place Holder',
+    {personIdx: 7, isPlugged: false}, // 111 'Chief Aurthur Burns',
   ],
   [
     // {personIdx: 8, isPlugged: false}, // name: 'no name',
