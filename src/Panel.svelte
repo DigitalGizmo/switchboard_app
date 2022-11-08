@@ -90,14 +90,15 @@
   const x42 = PLUG_START_X + INTER_PLUG_DELTA + INTRA_PLUG_DELTA + BODY_LINE_OFFSET_X;
 
   // Panel jacks
-  const PANEL_WIDTH = 1380;
+  const PANEL_WIDTH = 1420;
   const PANEL_HEIGHT = 1200;
-  const NUM_COLS = 5;
+  const NUM_COLS = 6;
   const NUM_ROWS = 4;
-  const CELL_WIDTH = PANEL_WIDTH/NUM_COLS;
+  const JACK_DELTA_X = PANEL_WIDTH/NUM_COLS;
+  const SPACE_BETWEEN_X = 25;
+  const CELL_WIDTH = JACK_DELTA_X - SPACE_BETWEEN_X;
   const CELL_HEIGHT = PANEL_HEIGHT/NUM_ROWS;
   // Take 2 Calculated
-  const JACK_DELTA_X = 275;
   // Starting y for each row
   const ROW_OFFSETS = [0, 300]; // , 600
   const JACK_TOP_OFFSET = 202 + 28;
@@ -126,7 +127,7 @@
       // Snap plug to calculated x and row (unless putting it away)
       if (pluggedRow < 2) { // on the grid
         plugs[plugIdx].y = (pluggedRow * CELL_HEIGHT) + JACK_TOP_OFFSET;
-        plugs[plugIdx].x = (pluggedCol * CELL_WIDTH) + (CELL_WIDTH/2) - 55;
+        plugs[plugIdx].x = (pluggedCol * JACK_DELTA_X) + (CELL_WIDTH/2) - 42; // 1/2 plug width
         plugs[plugIdx].sleeveLength = -5;
       // Register this jack as plugged
       // This won't be of any use unless/until I'm able to
@@ -248,32 +249,32 @@
   <!-- sockets -->
   <svg id="switchboard-grid" class="sockets" version="1.1" xmlns="http://www.w3.org/2000/svg" 
     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-    viewBox="0 0 1420 1200" xml:space="preserve">
+    viewBox="0 0 {PANEL_WIDTH} 1200" xml:space="preserve">
 
     <!-- The following yields the person index nubmer
     rowColToIndex[rowIndex][colIndex] -->
     {#each ROW_OFFSETS as rowY, rowIndex}
       {#each rowColToIndex[rowIndex] as jack, colIndex}
         <g transform="translate({ colIndex * JACK_DELTA_X }, { rowY })" class="socket-plate">
-          <rect width="250" height="275"/>
-          <text x="125" y="35" class="jack-name" text-anchor="middle">
+          <rect width="{CELL_WIDTH}" height="275"/>
+          <text x="{CELL_WIDTH/2}" y="35" class="jack-name" text-anchor="middle">
             {persons[rowColToIndex[rowIndex][colIndex].personIdx].company}
           </text>
-          <text x="125" y="70" class="jack-name" text-anchor="middle">
+          <text x="{CELL_WIDTH/2}" y="70" class="jack-name" text-anchor="middle">
             {persons[rowColToIndex[rowIndex][colIndex].personIdx].name}
           </text>
-          <text x="125" y="103" class="jack-number" text-anchor="middle">
+          <text x="{CELL_WIDTH/2}" y="103" class="jack-number" text-anchor="middle">
             {persons[rowColToIndex[rowIndex][colIndex].personIdx].number}
           </text>
           <circle 
             class="led-light"
             class:led-solid="{persons[rowColToIndex[rowIndex][colIndex].personIdx].ledState === 2}"
             class:led-blinking="{persons[rowColToIndex[rowIndex][colIndex].personIdx].ledState === 1}"
-            cx="127" 
+            cx="{CELL_WIDTH/2}" 
             cy="150" 
             r="32"/>
-          <rect x="102" y="200" width="50" height="50" stroke="#919090"/>
-          <circle cx="126.5" cy="225.5" r="7.5" fill="black"/>
+          <rect x="{(CELL_WIDTH/2-25) }" y="200" width="50" height="50" stroke="#919090"/>
+          <circle cx="{CELL_WIDTH/2}" cy="225.5" r="7.5" fill="black"/>
         </g>
       {/each}
     {/each}
