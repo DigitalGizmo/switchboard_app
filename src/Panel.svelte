@@ -11,7 +11,7 @@
 
   // Plugs
   const PLUG_START_X = 200; // Top left plub body
-  const PLUG_START_Y = 670;
+  const PLUG_START_Y = 660;
   const INTRA_PLUG_DELTA = 100; // Space between plugs
   const INTER_PLUG_DELTA = 500; // Space between setsw
   const BODY_LINE_OFFSET_X = 42; // From plug left to line
@@ -249,7 +249,7 @@
   <!-- sockets -->
   <svg id="switchboard-grid" class="sockets" version="1.1" xmlns="http://www.w3.org/2000/svg" 
     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-    viewBox="0 0 {PANEL_WIDTH} 1200" xml:space="preserve">
+    viewBox="0 0 {PANEL_WIDTH} 950" xml:space="preserve">
 
     <!-- The following yields the person index nubmer
     rowColToIndex[rowIndex][colIndex] -->

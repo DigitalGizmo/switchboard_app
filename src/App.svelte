@@ -3,6 +3,7 @@
 	import Panel from "./Panel.svelte";
 	import { conversations, persons } from './Content.js';
     import { fcumsum } from "d3";
+	import Transcript from "./Transcript.svelte";
 	//  
 	// import {setJackState} from './ProtoPanelHelper.js';
 
@@ -305,7 +306,10 @@
 		} else {
 			console.log('line is not engaged, so this must be wrong number')
 			// if it's callee jack that was unplugged
-			persons[phoneLines[pluggedIdxInfo.lineIdx].callee.index].ledState = LED_OFF;
+			if (phoneLines[pluggedIdxInfo.lineIdx].callee.index) {
+				persons[phoneLines[pluggedIdxInfo.lineIdx].callee.index].ledState = LED_OFF;
+
+			}
 			phoneLines[pluggedIdxInfo.lineIdx].audioTrack.volume = 0;
 			//  and if was during isWrongNumInProgress
 			// then 
@@ -362,7 +366,8 @@
 </header>
 
 <div id="wrapper">      
-	<HowTo 
+	<HowTo />
+	<Transcript 
 		{audioCaption}
 	/>
 	<Panel 
