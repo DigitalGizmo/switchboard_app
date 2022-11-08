@@ -11,7 +11,7 @@
 
   // Plugs
   const PLUG_START_X = 200; // Top left plub body
-  const PLUG_START_Y = 950;
+  const PLUG_START_Y = 670;
   const INTRA_PLUG_DELTA = 100; // Space between plugs
   const INTER_PLUG_DELTA = 500; // Space between setsw
   const BODY_LINE_OFFSET_X = 42; // From plug left to line
@@ -303,8 +303,8 @@
     </g>
 
     <!-- plug base -->
-    <g transform="translate(0, 1090)">
-      <rect width="1080" height="90" fill="#919090"/>
+    <g transform="translate(0, {PLUG_START_Y + 150})">
+      <rect width="{PANEL_WIDTH}" height="90" fill="#919090"/>
     </g>
 
   </svg>
