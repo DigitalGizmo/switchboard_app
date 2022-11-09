@@ -359,10 +359,7 @@
 </style>
 
 <header>
-  <h5>Switchboard Project 
-  	<button on:click="{initiateCall}">Start</button>
-	</h5>
-  <h1>You're the Operator!</h1>
+  <h1>You're the Operator! <button on:click="{initiateCall}">Start</button></h1>
 </header>
 
 <div id="wrapper">      
