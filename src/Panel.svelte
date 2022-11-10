@@ -117,13 +117,14 @@
     if (pluggedRow < 2) {
       pluggedIdxInfo.personIdx = getPersonIdx(pluggedRow, pluggedCol);
     } else {
-      pluggedIdxInfo.personIdx = 99;
+      // Need some reference before active person assigned
+      pluggedIdxInfo.personIdx = 16;
     }
 
     if (isPlugIn) {
       // Test whether there's already a plug in this jack?
   
-      console.log(' plug in, pluggeRow: ' + pluggedRow)
+      // console.log(' plug in, pluggeRow: ' + pluggedRow)
       // Snap plug to calculated x and row (unless putting it away)
       if (pluggedRow < 2) { // on the grid
         plugs[plugIdx].y = (pluggedRow * CELL_HEIGHT) + JACK_TOP_OFFSET;

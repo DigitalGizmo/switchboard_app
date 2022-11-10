@@ -231,6 +231,13 @@ let persons = [
     ledState: 0,
     isPluggedJack: false,
   },
+  { // index  16,
+    company: 'place holder',
+    name: 'before real assignment',
+    number: '16',
+    ledState: 0,
+    isPluggedJack: false,
+  },
 ]
 
 export {persons}

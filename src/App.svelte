@@ -7,7 +7,7 @@
 	//  
 	// import {setJackState} from './ProtoPanelHelper.js';
 
-	let audioCaption = "Transcript: ";
+	let audioCaption = " ";
 	let debugCaption = "Press Start <br />";
 	let caller = [null, null]; // row, col
 	let callerIndex = 0;
@@ -86,8 +86,8 @@
 		if (currConvo === 3 || currConvo === 7) {
 			phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
 						phoneLines[lineIndex].audioTrack.currentTime = 0;
-						console.log(" -- Hello ended on lineIdx: " + lineIndex);
-						setCallFinished(lineIndex);
+						console.log(" - Hello ended on lineIdx: " + lineIndex);
+						setCallCompleted(lineIndex);
 			});    	
 		}
 	}	
@@ -102,7 +102,7 @@
 		phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
 					phoneLines[lineIndex].audioTrack.currentTime = 0;
 					console.log(" -- conversation ended on lineIdx: " + lineIndex);
-					setCallFinished(lineIndex);
+					setCallCompleted(lineIndex);
 		});    	
 	}	
 
@@ -123,7 +123,7 @@
 		// Reply from caller saying who caller really wants
 		phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
 					phoneLines[lineIndex].audioTrack.currentTime = 0;
-					console.log(" -- wrong num answer ended on lineIdx: " + lineIndex);
+					console.log("   - wrong num answer ended on lineIdx: " + lineIndex);
 					playRequestCorrect(lineIndex);
 		});    		  		
 	}	
@@ -141,21 +141,25 @@
 	function setTimeToNext(timeToWait) {
 	  setTimeout(startNextCall, timeToWait);
 	}
+
+	function startNextCall() {
+
+		// currConvo += 1;
+		// uptick currConvo when call complete
+
+		// prevConvo += 1;
+  	initiateCall(); 
+	}
+
 	// So far, just for Tressa's one-way call
 	function setTimeToHangUp(timeToWait, lineIndex) {
 		clearTimeout();
 		console.log('got to setTimeToHangUp, time to wait: ' + timeToWait);
-	  // setTimeout(setCallFinished(lineIndex), timeToWait);
+	  // setTimeout(setCallCompleted(lineIndex), timeToWait);
 	  // setTimeout(alert('time is up'), timeToWait);
 		setTimeout(() => {
-			setCallFinished(lineIndex)
+			setCallCompleted(lineIndex)
 		}, timeToWait)
-	}
-
-	function startNextCall() {
-		currConvo += 1;
-		// prevConvo += 1;
-  	initiateCall(); 
 	}
 
 	/***********
@@ -196,15 +200,20 @@
 				audioCaption = conversations[currConvo].helloText;
 				// console.log('plugged name: ' + pluggedName);
 				// Debug message
-				debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx + 
+				debugCaption += pluggedName + ' new call on line: ' + pluggedIdxInfo.lineIdx + 
 					' asks for ' + 
 					persons[conversations[currConvo].callee.index].name + ' <br />';
+				console.log(' --- New call: ' + pluggedName + ' on line: ' + 
+					pluggedIdxInfo.lineIdx + ' asks for ' + 
+					persons[conversations[currConvo].callee.index].name +
+					' convo: ' + currConvo);
 				// Stop buzzer and other convo
 				buzzTrack.pause();
 				// Stop previous conversation, if there is one
 				// phoneLines[pluggedInfo.lineIdx].audioTrack.pause();
-				console.log(' - lineIdxPrev: ' + lineIdxPrev);
+				// console.log(' - lineIdxPrev: ' + lineIdxPrev);
 				if (lineIdxPrev >= 0) {
+					console.log(' (silencing call on line:) ' + lineIdxPrev);
 					phoneLines[lineIdxPrev].audioTrack.volume = 0;
 				}
 				// Set this line in use only we have gotten this success
@@ -255,7 +264,10 @@
 					// Set timer for next call
 					// Temp hard-wire to interrupt two calls
 					if (currConvo === 0 || currConvo === 4) {
-						console.log(' currConvo = 0 or 4, 15000 to next')
+						console.log(' (starting timer for call that will interrupt)')
+						// Move que to next call
+						currConvo += 1;
+
 						setTimeToNext(15000);
 					}
 					// Debug message
@@ -288,28 +300,45 @@
 	}
 
 	function handleUnPlug(pluggedIdxInfo) {
-		console.log(' got to handleUnPluug');
-		console.log('person idx: ' + pluggedIdxInfo.personIdx +
+		console.log('  Unplug on person idx: ' + pluggedIdxInfo.personIdx +
 		' line index: ' + pluggedIdxInfo.lineIdx);
 
 		// If conversation is in progress
 		// (Or even wrong number)
 		if (phoneLines[pluggedIdxInfo.lineIdx].isEngaged) {
-			console.log(' -- person id unpluged: ' + pluggedIdxInfo.personIdx);
+			console.log(' - Unplugging a call in progress person id: ' + 
+				pluggedIdxInfo.personIdx);
 			// Stop the audio
 			phoneLines[pluggedIdxInfo.lineIdx].audioTrack.pause();
-			setCallFinished(pluggedIdxInfo.lineIdx);
+
+
+
+			// Don't do call completed, might be inadvertent interruption
+
+			setCallCompleted(pluggedIdxInfo.lineIdx);
+
+
 
 			/* Have to know if this was a wrong number, in which case only
-			* turn off the callee light and don't setCallFinished
+			* turn off the callee light and don't setCallCompleted
 			*/
-		} else {
-			console.log('line is not engaged, so this must be wrong number')
+		} else { // Line was not fully engaged
 			// if it's callee jack that was unplugged
 			if (phoneLines[pluggedIdxInfo.lineIdx].callee.index) {
+				console.log('  Unplug on callee thats not engaged')
 				persons[phoneLines[pluggedIdxInfo.lineIdx].callee.index].ledState = LED_OFF;
-
+			} else {
+				// Wasn't callee that was unplugged (& line wasn't engaged),
+				// so might have been wrong num that was unplugged
+				// Need to turn off LED
+				console.log('  Unplug was prob on wrong number, personIdx: ' +
+				pluggedIdxInfo.personIdx)
+				// Cover for before personidx defined
+				// if (pluggedIdxInfo.personIdx) {
+					persons[pluggedIdxInfo.personIdx].ledState = LED_OFF;
+				// }
 			}
+
 			phoneLines[pluggedIdxInfo.lineIdx].audioTrack.volume = 0;
 			//  and if was during isWrongNumInProgress
 			// then 
@@ -319,7 +348,7 @@
     }
 	}
 
-	function setCallFinished(lineIndex) {
+	function setCallCompleted(lineIndex) {
 		// Clear the line settings
 		phoneLines[lineIndex].onePlugIsIn = false;
 		phoneLines[lineIndex].isAtLeastInitiated = false;
@@ -327,23 +356,32 @@
 		// Turn of the leds
 		persons[phoneLines[lineIndex].caller.index].ledState = LED_OFF;
 		// Can't turn off callee led if callee index hasn't been defined
-		console.log('phoneLines[lineIndex].callee.index: '+ phoneLines[lineIndex].callee.index);
+		// console.log('phoneLines[lineIndex].callee.index: '+ phoneLines[lineIndex].callee.index);
 		if (phoneLines[lineIndex].callee.index !== null) {
 			// console.log('got into callee index not null');
 			persons[phoneLines[lineIndex].callee.index].ledState = LED_OFF;
 		}
-		console.log('got past turn callee off');
+		// console.log('got past turn callee off');
+
+		// Register that this convo is complete
+
+
+
 
 		// Reset the volume -- incase it was silenced by interrupting call
 		phoneLines[lineIndex].audioTrack.volume = 1;
 
 		// Pause and start next call
 		// Don't start next call on finish if other line is engaged
-		console.log(' currConvo: ' + currConvo);
+		// console.log(' currConvo: ' + currConvo);
 		let otherLineIdx = (lineIndex === 0) ? 1 : 0;
-		console.log('other line enaged: ' + phoneLines[otherLineIdx].isAtLeastInitiated)
+		// console.log('other line enaged: ' + phoneLines[otherLineIdx].isAtLeastInitiated)
 		if (!phoneLines[otherLineIdx].isAtLeastInitiated) {
-			console.log('inside not not interruption')
+			console.log('   other line not atLeastInitiated, start timer for next call');
+
+			// uptick currConvo here, not in
+			currConvo += 1;
+
 			setTimeToNext(2000);							
 		};
 	}

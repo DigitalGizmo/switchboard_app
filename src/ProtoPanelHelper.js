@@ -23,7 +23,7 @@ let rowColToIndex = [
 ];
 
 const getPersonIdx = (row, col) => {
-  console.log('row: ' + row + ' col: ' + col);
+  // console.log('row: ' + row + ' col: ' + col);
   return rowColToIndex[row][col].personIdx;
 }
 
