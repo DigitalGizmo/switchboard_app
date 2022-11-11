@@ -147,17 +147,18 @@
 	}	
 
 	const setTimeToNext = (timeToWait) => {
-	  callInitTimer = setTimeout(startNextCall, timeToWait);
+	  // callInitTimer = setTimeout(startNextCall, timeToWait);
+	  callInitTimer = setTimeout(initiateCall, timeToWait);
 	}
 
-	const startNextCall = () => {
+	// const startNextCall = () => {
 
-		// currConvo += 1;
-		// uptick currConvo when call complete
+	// 	// currConvo += 1;
+	// 	// uptick currConvo when call complete
 
-		// prevConvo += 1;
-  	initiateCall(); 
-	}
+	// 	// prevConvo += 1;
+  // 	initiateCall(); 
+	// }
 
 	// So far, just for Tressa's one-way call
 	const setTimeToHangUp = (timeToWait, lineIndex) => {
@@ -223,6 +224,10 @@
 				if (lineIdxPrev >= 0) {
 					console.log('    (silencing call on line:) ' + lineIdxPrev);
 					phoneLines[lineIdxPrev].audioTrack.volume = 0;
+					// Set unplug status so that unplugging this silenced call will
+					// handled correctly by..
+					// May need to be per-line
+					unPlugStatus = DURING_INTERRUPT_SILENCE;
 				}
 				// Set this line in use only we have gotten this success
 				lineIdxInUse = pluggedIdxInfo.lineIdx;
@@ -318,7 +323,7 @@
 		// (Or even wrong number)
 		if (phoneLines[pluggedIdxInfo.lineIdx].isEngaged) {
 			console.log('  - Unplugging a call in progress person id: ' + 
-				pluggedIdxInfo.personIdx);
+				persons[pluggedIdxInfo.personIdx].name);
 			// Stop the audio
 			phoneLines[pluggedIdxInfo.lineIdx].audioTrack.pause();
 
@@ -330,6 +335,9 @@
 				clearTimeout(callInitTimer); // bcz we're starting over
 				setCallUnplugged(pluggedIdxInfo.lineIdx); 
 				unPlugStatus = REPLUG_IN_PROGRESS;
+			} else if (unPlugStatus === DURING_INTERRUPT_SILENCE) {
+				console.log('    Unplugging silenced call')
+				stopSilentCall(pluggedIdxInfo.lineIdx);
 			} else { // this is a regular unplug
 				setCallUnplugged(pluggedIdxInfo.lineIdx); 
 			}
@@ -424,6 +432,30 @@
 		}
 		// Reset the volume -- incase it was silenced by interrupting call
 		phoneLines[lineIndex].audioTrack.volume = 1;
+	}
+
+	const stopSilentCall = (lineIndex) => {
+		console.log('  Trying to stop silent call on line: ' + lineIndex);
+		unPlugStatus = NO_UNPLUG_STATUS;
+		// Clear the line settings
+		phoneLines[lineIndex].onePlugIsIn = false;
+		phoneLines[lineIndex].isAtLeastInitiated = false;
+		phoneLines[lineIndex].isEngaged = false;
+
+		// Turn of the leds
+		persons[phoneLines[lineIndex].caller.index].ledState = LED_OFF;
+
+		// Can't turn off callee led if callee index hasn't been defined
+		// console.log('phoneLines[lineIndex].callee.index: '+ phoneLines[lineIndex].callee.index);
+
+		// // if (phoneLines[lineIndex].callee.index !== null) {
+		// 	// console.log('got into callee index not null');
+			persons[phoneLines[lineIndex].callee.index].ledState = LED_OFF;
+		// // }
+
+
+		// Reset the volume -- incase it was silenced by interrupting call
+		// phoneLines[lineIndex].audioTrack.volume = 1;
 	}
 
 	const retryAfterWrongNum = (lineIndex) => {
