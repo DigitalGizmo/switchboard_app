@@ -7,7 +7,10 @@
 </style>
 
   <div class="how-to">
-    <img src="https://dev.digitalgizmo.com/msm-ed/ed-assets/images/how-to-sketch.jpg">
+    <img 
+      src="https://dev.digitalgizmo.com/msm-ed/ed-assets/images/how-to-sketch.jpg"
+      alt="Operator at old-time phone switchboard"
+      />
     <h3>Your Job</h3>
     <p><strong>To answer an incoming call:</strong><br/>
     Drag the plug into the socket with the flashing light.</p>

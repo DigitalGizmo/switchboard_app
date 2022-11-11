@@ -220,7 +220,7 @@
 				// phoneLines[pluggedInfo.lineIdx].audioTrack.pause();
 				// console.log(' - lineIdxPrev: ' + lineIdxPrev);
 				if (lineIdxPrev >= 0) {
-					console.log(' (silencing call on line:) ' + lineIdxPrev);
+					console.log('    (silencing call on line:) ' + lineIdxPrev);
 					phoneLines[lineIdxPrev].audioTrack.volume = 0;
 				}
 				// Set this line in use only we have gotten this success
@@ -271,7 +271,7 @@
 					// Set timer for next call
 					// Temp hard-wire to interrupt two calls
 					if (currConvo === 0 || currConvo === 4) {
-						console.log(' (starting timer for call that will interrupt)')
+						console.log('    (starting timer for call that will interrupt)')
 						// Move que to next call
 						currConvo += 1;
 						// awaitingInterrupt = true;
@@ -308,42 +308,48 @@
 	}
 
 	function handleUnPlug(pluggedIdxInfo) {
-		console.log('  Unplug on person idx: ' + pluggedIdxInfo.personIdx +
-		' line index: ' + pluggedIdxInfo.lineIdx);
+		// console.log('  Unplug on person idx: ' + pluggedIdxInfo.personIdx +
+		// ' line index: ' + pluggedIdxInfo.lineIdx);
+		console.log('  Unplug with status of: ' + unPlugStatus +
+		 ' while line isEngaged = ' + phoneLines[pluggedIdxInfo.lineIdx].isEngaged);
 
 		// If conversation is in progress
 		// (Or even wrong number)
 		if (phoneLines[pluggedIdxInfo.lineIdx].isEngaged) {
-			console.log(' - Unplugging a call in progress person id: ' + 
+			console.log('  - Unplugging a call in progress person id: ' + 
 				pluggedIdxInfo.personIdx);
 			// Stop the audio
 			phoneLines[pluggedIdxInfo.lineIdx].audioTrack.pause();
 
-
-
-			// setCallCompleted? might be inadvertent interruption
-			// might be okay if I decriment currConvo
 			if (unPlugStatus === AWAITING_INTERRUPT) {
-				console.log('  unplug while awaiting interrupt')
-				currConvo -= 1;
+				// Disconnecting a call that had already started a timer
+				// for an interruption
+				console.log('    Unplug while awaiting interrupt')
+				currConvo -= 1; // Undo the increment that was set
 				clearTimeout(); // bcz we're starting over
-				setCallUnplugged(pluggedIdxInfo.lineIdx);
-			} else if (unPlugStatus != REPLUG_IN_PROGRESS) {
-				// Don't do anything about unplug if one end of the line
-				// has already been unplugged.
-				console.log(' Re-plug in progress - unplugging the other end ')
-				// This is the remaining end unplugged, so clear the REPLUG
-				unPlugStatus = NO_UNPLUG_STATUS;
+				setCallUnplugged(pluggedIdxInfo.lineIdx, false); // isToBeRestarte = false
+				unPlugStatus = REPLUG_IN_PROGRESS;
 			} else { // this is a regular unplug
-				setCallUnplugged(pluggedIdxInfo.lineIdx);
+				setCallUnplugged(pluggedIdxInfo.lineIdx, false);
 			}
 
+		} else if (unPlugStatus === REPLUG_IN_PROGRESS) {
+			// Don't do anything about unplug if one end of the line
+			// has already been unplugged.
+			console.log('  Re-plug in progress - unplugging the other end ')
+			// This is the remaining end unplugged, so clear the REPLUG
+			unPlugStatus = NO_UNPLUG_STATUS;
+			
+			
 			/* Have to know if this was a wrong number, in which case only
 			* turn off the callee light and don't setCallUnplugged
 			*/
-		} else { // Line was not fully engaged
-			// if it's callee jack that was unplugged
+		} else  { 
+			// Line was not fully engaged
+			// and unPlugStatus != REPLUG_IN_PROGRESS
+
 			if (phoneLines[pluggedIdxInfo.lineIdx].callee.index) {
+				// if it's callee jack that was unplugged
 				console.log('  Unplug on callee thats not engaged')
 				persons[phoneLines[pluggedIdxInfo.lineIdx].callee.index].ledState = LED_OFF;
 			} else {
@@ -396,11 +402,12 @@
 		};
 	}
 
-	function setCallUnplugged(lineIndex) {
+	function setCallUnplugged(lineIndex, isToBeRestarted) {
 		stopCall(lineIndex);
 		// Pause and start next call
+		if (isToBeRestarted) {
 			setTimeToNext(2000);							
-		
+		}
 	}
 
 	function stopCall(lineIndex) {

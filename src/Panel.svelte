@@ -149,7 +149,10 @@
       // Hope to leave this in Panel only
       // persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
     } else { // This is unPlug
-      handleUnPlug(pluggedIdxInfo);
+      if (pluggedRow < 2) {
+
+        handleUnPlug(pluggedIdxInfo);
+      }
       // Re-lengthen the sleeve
       plugs[plugIdx].sleeveLength = -20;
     }
