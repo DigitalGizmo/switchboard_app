@@ -59,7 +59,7 @@
 	// 	age = 24;
 	// }
 
-	function initiateCall() {
+	const initiateCall = () => {
 		// console.log('got to init call ');
 		// Stop any converstaion that might be in progress
 		// audioTrack.pause();
@@ -75,7 +75,7 @@
 
 	// This just rings the buzzer. Next action will
 	// be when user plugs in a plug - in Panel.svelte drag end: handlePlugIn
-	function setIncoming(callerIndex) {
+	const setIncoming = (callerIndex) => {
     // playBuzzer();
 		// console.log('hoping to play buzzer');
     buzzTrack.play();
@@ -84,7 +84,7 @@
 		console.log(' -- New call being initiated by: ' + persons[callerIndex].name);
 	}
 
-	function playHello(currConvo, lineIndex){
+	const playHello = (currConvo, lineIndex) => {
 		phoneLines[lineIndex].audioTrack =
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
 		 conversations[currConvo].helloFile +  ".mp3");
@@ -99,7 +99,7 @@
 		}
 	}	
 
-	function playConvo(currConvo, lineIndex){
+	const playConvo = (currConvo, lineIndex) => {
 		phoneLines[lineIndex].audioTrack =
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
 		 conversations[currConvo].convoFile +  ".mp3");
@@ -114,7 +114,7 @@
 	}	
 
 	// refactor: maybe use this after all: function playWrongNum(wrongCalleeIdx, lineIndex){
-	function playWrongNum(pluggedPersonIdx, lineIndex){
+	const playWrongNum = (pluggedPersonIdx, lineIndex) => {
 		// persons[pluggedIdxInfo.personIdx], 
 		// 				pluggedIdxInfo.lineIdx
 		// persons[pluggedIdxInfo.personIdx].wrongNumFile,
@@ -136,7 +136,7 @@
 	}	
 
 	// Reply from caller saying who caller really wants
-	function playRequestCorrect(lineIndex){
+	const playRequestCorrect = (lineIndex) => {
 		phoneLines[lineIndex].audioTrack =
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
 		 conversations[currConvo].retryAfterWrongFile +  ".mp3");
@@ -145,11 +145,11 @@
 		// Will be handled by "unPlug"
 	}	
 
-	function setTimeToNext(timeToWait) {
+	const setTimeToNext = (timeToWait) => {
 	  setTimeout(startNextCall, timeToWait);
 	}
 
-	function startNextCall() {
+	const startNextCall = () => {
 
 		// currConvo += 1;
 		// uptick currConvo when call complete
@@ -159,7 +159,7 @@
 	}
 
 	// So far, just for Tressa's one-way call
-	function setTimeToHangUp(timeToWait, lineIndex) {
+	const setTimeToHangUp = (timeToWait, lineIndex) => {
 		clearTimeout();
 		console.log('got to setTimeToHangUp, time to wait: ' + timeToWait);
 	  // setTimeout(setCallCompleted(lineIndex), timeToWait);
@@ -172,7 +172,7 @@
 	/***********
 	  --- Handle plug-in ----
 	**********/
-	function handlePlugIn(pluggedIdxInfo) {
+	const handlePlugIn = (pluggedIdxInfo) => {
 		// pluggedIdxInfo has [person index, line index]
 		// Get name based on index
 		pluggedName = persons[pluggedIdxInfo.personIdx].name;
@@ -296,18 +296,18 @@
 		} // end (else) this is "other" end of line in use
 	} // end handlePlugIn
 
-	function setPhoneLineCaller(pluggedIdxInfo) {
+	const setPhoneLineCaller = (pluggedIdxInfo) => {
 		phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn = true;
 		// Set caller 
 		phoneLines[pluggedIdxInfo.lineIdx].caller.index = pluggedIdxInfo.personIdx;
 	}
 
-	function setPhoneLineCallee(pluggedIdxInfo) {
+	const setPhoneLineCallee = (pluggedIdxInfo) => {
 		// Set callee 
 		phoneLines[pluggedIdxInfo.lineIdx].callee.index = pluggedIdxInfo.personIdx;
 	}
 
-	function handleUnPlug(pluggedIdxInfo) {
+	const handleUnPlug = (pluggedIdxInfo) => {
 		// console.log('  Unplug on person idx: ' + pluggedIdxInfo.personIdx +
 		// ' line index: ' + pluggedIdxInfo.lineIdx);
 		console.log('  Unplug with status of: ' + unPlugStatus +
@@ -373,7 +373,7 @@
     }
 	}
 
-	function setCallCompleted(lineIndex) {
+	const setCallCompleted = (lineIndex) => {
 		stopCall(lineIndex);
 		// Pause and start next call
 		// Don't start next call on finish if other line is engaged
@@ -402,7 +402,7 @@
 		};
 	}
 
-	function setCallUnplugged(lineIndex, isToBeRestarted) {
+	const setCallUnplugged = (lineIndex, isToBeRestarted) => {
 		stopCall(lineIndex);
 		// Pause and start next call
 		if (isToBeRestarted) {
@@ -410,7 +410,7 @@
 		}
 	}
 
-	function stopCall(lineIndex) {
+	const stopCall = (lineIndex) => {
 		// Clear the line settings
 		phoneLines[lineIndex].onePlugIsIn = false;
 		phoneLines[lineIndex].isAtLeastInitiated = false;
@@ -427,7 +427,7 @@
 		phoneLines[lineIndex].audioTrack.volume = 1;
 	}
 
-	function retryAfterWrongNum(lineIndex) {
+	const retryAfterWrongNum = (lineIndex) => {
 		//
 	}
 
