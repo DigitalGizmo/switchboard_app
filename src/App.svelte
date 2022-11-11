@@ -14,7 +14,12 @@
 	let pluggedName = 'caller not yet identified';
 	let callee = [null, null]; // row, col
 	let calleeIndex = 0;
-	let awaitingInterrupt = false;
+	// let awaitingInterrupt = false;
+	const NO_UNPLUG_STATUS = 0;
+	const AWAITING_INTERRUPT = 1;
+	const DURING_INTERRUPT_SILENCE = 2;
+	const REPLUG_IN_PROGRESS = 3;
+	let unPlugStatus = NO_UNPLUG_STATUS;
 	// let audioTrack = null;
 	// let audioTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
 	let buzzTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/buzzer.mp3");
@@ -42,8 +47,8 @@
 	// let prevConvo = null;
 
 	const LED_OFF = 0;
-	const LED_RED = 1;
-	const LED_GREEN = 2;
+	const LED_BLINKING = 1;
+	const LED_SOLID = 2;
 
 	let lineIdxInUse = -1;
 	let lineIdxPrev = -1;
@@ -75,7 +80,8 @@
 		// console.log('hoping to play buzzer');
     buzzTrack.play();
     buzzTrack.volume = .8;    
-		persons[callerIndex].ledState = LED_RED;
+		persons[callerIndex].ledState = LED_BLINKING;
+		console.log(' -- New call being initiated by: ' + persons[callerIndex].name);
 	}
 
 	function playHello(currConvo, lineIndex){
@@ -186,7 +192,7 @@
 			// If person index plugged matches that of caller
 			if (pluggedIdxInfo.personIdx === callerIndex) {
 				// Turn led green
-				persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
+				persons[pluggedIdxInfo.personIdx].ledState = LED_SOLID;
 				// Set this person's jack to plugged
 				persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
 				// Set first end of this line as in-use
@@ -204,8 +210,8 @@
 				debugCaption += pluggedName + ' new call on line: ' + pluggedIdxInfo.lineIdx + 
 					' asks for ' + 
 					persons[conversations[currConvo].callee.index].name + ' <br />';
-				console.log(' --- New call: ' + pluggedName + ' on line: ' + 
-					pluggedIdxInfo.lineIdx + ' asks for ' + 
+				console.log('  Operator connects to: ' + pluggedName + ' on line: ' + 
+					pluggedIdxInfo.lineIdx + ' asking for ' + 
 					persons[conversations[currConvo].callee.index].name +
 					' convo: ' + currConvo);
 				// Stop buzzer and other convo
@@ -244,7 +250,7 @@
 				// Whether or not this is correct callee
 				// if (pluggedIdxInfo.personIdx === calleeIndex) {
 				// Turn led green
-				persons[pluggedIdxInfo.personIdx].ledState = LED_GREEN;
+				persons[pluggedIdxInfo.personIdx].ledState = LED_SOLID;
 				// // Set jack to plugged
 				persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
 				// Stop the hello operator track
@@ -268,7 +274,8 @@
 						console.log(' (starting timer for call that will interrupt)')
 						// Move que to next call
 						currConvo += 1;
-						awaitingInterrupt = true;
+						// awaitingInterrupt = true;
+						unPlugStatus = AWAITING_INTERRUPT;
 						setTimeToNext(15000);
 					}
 					// Debug message
@@ -278,7 +285,7 @@
 					console.log('Plugged into wrong jack. Person: ' + persons[pluggedIdxInfo.personIdx].name);
 					debugCaption += 'Plugged into wrong jack. Person: ' + persons[pluggedIdxInfo.personIdx].name + 
 					'  <br /> ';
-					// already LED_GREEN;
+					// already LED_SOLID;
 					// playConvo(currConvo,	pluggedIdxInfo.lineIdx);					
 					playWrongNum(
 						pluggedIdxInfo.personIdx, 
@@ -316,13 +323,20 @@
 
 			// setCallCompleted? might be inadvertent interruption
 			// might be okay if I decriment currConvo
-			if (awaitingInterrupt) {
+			if (unPlugStatus === AWAITING_INTERRUPT) {
 				console.log('  unplug while awaiting interrupt')
 				currConvo -= 1;
 				clearTimeout(); // bcz we're starting over
+				setCallUnplugged(pluggedIdxInfo.lineIdx);
+			} else if (unPlugStatus != REPLUG_IN_PROGRESS) {
+				// Don't do anything about unplug if one end of the line
+				// has already been unplugged.
+				console.log(' Re-plug in progress - unplugging the other end ')
+				// This is the remaining end unplugged, so clear the REPLUG
+				unPlugStatus = NO_UNPLUG_STATUS;
+			} else { // this is a regular unplug
+				setCallUnplugged(pluggedIdxInfo.lineIdx);
 			}
-			setCallUnplugged(pluggedIdxInfo.lineIdx);
-
 
 			/* Have to know if this was a wrong number, in which case only
 			* turn off the callee light and don't setCallUnplugged
@@ -362,9 +376,11 @@
 		// console.log('other line enaged: ' + phoneLines[otherLineIdx].isAtLeastInitiated)
 		if (phoneLines[otherLineIdx].isAtLeastInitiated) {
 			// This is a behind the scens conversation that
-			// was interrupted -- do nothing
+			// was interrupted 
 			// Dont increment currConvo
-			awaitingInterrupt = false;
+			// Call has been stopped, so
+			unPlugStatus = REPLUG_IN_PROGRESS;
+			// awaitingInterrupt = false;
 		} else { // It's a regular call ending
 			console.log('   other line not atLeastInitiated, ' +
 				'start regular timer for next call');
