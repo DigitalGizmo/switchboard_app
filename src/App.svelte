@@ -52,6 +52,7 @@
 
 	let lineIdxInUse = -1;
 	let lineIdxPrev = -1;
+	let callInitTimer = undefined;
 
 	// $: uppercaseName = name.toUpperCase();
 	// $: console.log(name);
@@ -146,7 +147,7 @@
 	}	
 
 	const setTimeToNext = (timeToWait) => {
-	  setTimeout(startNextCall, timeToWait);
+	  callInitTimer = setTimeout(startNextCall, timeToWait);
 	}
 
 	const startNextCall = () => {
@@ -164,7 +165,7 @@
 		console.log('got to setTimeToHangUp, time to wait: ' + timeToWait);
 	  // setTimeout(setCallCompleted(lineIndex), timeToWait);
 	  // setTimeout(alert('time is up'), timeToWait);
-		setTimeout(() => {
+		callInitTimer = setTimeout(() => {
 			setCallCompleted(lineIndex)
 		}, timeToWait)
 	}
@@ -326,11 +327,11 @@
 				// for an interruption
 				console.log('    Unplug while awaiting interrupt')
 				currConvo -= 1; // Undo the increment that was set
-				clearTimeout(); // bcz we're starting over
-				setCallUnplugged(pluggedIdxInfo.lineIdx, false); // isToBeRestarte = false
+				clearTimeout(callInitTimer); // bcz we're starting over
+				setCallUnplugged(pluggedIdxInfo.lineIdx); 
 				unPlugStatus = REPLUG_IN_PROGRESS;
 			} else { // this is a regular unplug
-				setCallUnplugged(pluggedIdxInfo.lineIdx, false);
+				setCallUnplugged(pluggedIdxInfo.lineIdx); 
 			}
 
 		} else if (unPlugStatus === REPLUG_IN_PROGRESS) {
@@ -402,12 +403,10 @@
 		};
 	}
 
-	const setCallUnplugged = (lineIndex, isToBeRestarted) => {
+	const setCallUnplugged = (lineIndex) => { 
+		// Stop this call and start next 
 		stopCall(lineIndex);
-		// Pause and start next call
-		if (isToBeRestarted) {
-			setTimeToNext(2000);							
-		}
+		setTimeToNext(2000);							
 	}
 
 	const stopCall = (lineIndex) => {
