@@ -14,6 +14,7 @@
 	let pluggedName = 'caller not yet identified';
 	let callee = [null, null]; // row, col
 	let calleeIndex = 0;
+	let awaitingInterrupt = false;
 	// let audioTrack = null;
 	// let audioTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
 	let buzzTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/buzzer.mp3");
@@ -267,7 +268,7 @@
 						console.log(' (starting timer for call that will interrupt)')
 						// Move que to next call
 						currConvo += 1;
-
+						awaitingInterrupt = true;
 						setTimeToNext(15000);
 					}
 					// Debug message
@@ -313,14 +314,18 @@
 
 
 
-			// Don't do call completed, might be inadvertent interruption
-
-			setCallCompleted(pluggedIdxInfo.lineIdx);
-
+			// setCallCompleted? might be inadvertent interruption
+			// might be okay if I decriment currConvo
+			if (awaitingInterrupt) {
+				console.log('  unplug while awaiting interrupt')
+				currConvo -= 1;
+				clearTimeout(); // bcz we're starting over
+			}
+			setCallUnplugged(pluggedIdxInfo.lineIdx);
 
 
 			/* Have to know if this was a wrong number, in which case only
-			* turn off the callee light and don't setCallCompleted
+			* turn off the callee light and don't setCallUnplugged
 			*/
 		} else { // Line was not fully engaged
 			// if it's callee jack that was unplugged
@@ -349,6 +354,40 @@
 	}
 
 	function setCallCompleted(lineIndex) {
+		stopCall(lineIndex);
+		// Pause and start next call
+		// Don't start next call on finish if other line is engaged
+		// console.log(' currConvo: ' + currConvo);
+		let otherLineIdx = (lineIndex === 0) ? 1 : 0;
+		// console.log('other line enaged: ' + phoneLines[otherLineIdx].isAtLeastInitiated)
+		if (phoneLines[otherLineIdx].isAtLeastInitiated) {
+			// This is a behind the scens conversation that
+			// was interrupted -- do nothing
+			// Dont increment currConvo
+			awaitingInterrupt = false;
+		} else { // It's a regular call ending
+			console.log('   other line not atLeastInitiated, ' +
+				'start regular timer for next call');
+
+			// uptick currConvo here, not in
+			// if (awaitingInterrupt) {
+			// 	awaitingInterrupt = false;
+			// } else {
+				currConvo += 1;
+			// }
+
+			setTimeToNext(2000);							
+		};
+	}
+
+	function setCallUnplugged(lineIndex) {
+		stopCall(lineIndex);
+		// Pause and start next call
+			setTimeToNext(2000);							
+		
+	}
+
+	function stopCall(lineIndex) {
 		// Clear the line settings
 		phoneLines[lineIndex].onePlugIsIn = false;
 		phoneLines[lineIndex].isAtLeastInitiated = false;
@@ -361,29 +400,8 @@
 			// console.log('got into callee index not null');
 			persons[phoneLines[lineIndex].callee.index].ledState = LED_OFF;
 		}
-		// console.log('got past turn callee off');
-
-		// Register that this convo is complete
-
-
-
-
 		// Reset the volume -- incase it was silenced by interrupting call
 		phoneLines[lineIndex].audioTrack.volume = 1;
-
-		// Pause and start next call
-		// Don't start next call on finish if other line is engaged
-		// console.log(' currConvo: ' + currConvo);
-		let otherLineIdx = (lineIndex === 0) ? 1 : 0;
-		// console.log('other line enaged: ' + phoneLines[otherLineIdx].isAtLeastInitiated)
-		if (!phoneLines[otherLineIdx].isAtLeastInitiated) {
-			console.log('   other line not atLeastInitiated, start timer for next call');
-
-			// uptick currConvo here, not in
-			currConvo += 1;
-
-			setTimeToNext(2000);							
-		};
 	}
 
 	function retryAfterWrongNum(lineIndex) {
