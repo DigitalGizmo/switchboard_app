@@ -307,8 +307,8 @@
     </g>
 
     <!-- plug base -->
-    <g transform="translate(0, {PLUG_START_Y + 150})">
-      <rect width="{PANEL_WIDTH}" height="90" fill="#919090"/>
+    <g transform="translate(0, {PLUG_START_Y + 176})">
+      <rect width="{PANEL_WIDTH}" height="40" fill="#919090"/>
     </g>
 
   </svg>

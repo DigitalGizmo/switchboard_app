@@ -19,8 +19,8 @@
     
     <h3>Key</h3>
     <ul>
-      <li> a flashing amber light indicates an incoming call</li>
-      <li> a steady amber light indicates a line is busy on a call</li>
+      <li> a flashing light indicates an incoming call</li>
+      <li> a steady light indicates a line is busy on a call</li>
     </ul>
 
   </div>

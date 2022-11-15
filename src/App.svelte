@@ -83,7 +83,7 @@
     // playBuzzer();
 		// console.log('hoping to play buzzer');
     buzzTrack.play();
-    buzzTrack.volume = .8;    
+    buzzTrack.volume = .6;    
 		persons[callerIndex].ledState = LED_BLINKING;
 		console.log(' -- New call being initiated by: ' + persons[callerIndex].name);
 	}
@@ -207,7 +207,7 @@
 		// Get name based on index
 		pluggedName = persons[pluggedIdxInfo.personIdx].name;
 		// Debug msg
-		debugCaption += '<br />------- <br />New plug into: ' + pluggedName + '<br />';
+		// debugCaption += '<br />------- <br />New plug into: ' + pluggedName + '<br />';
 		// console.log(plugged);
 		// console.log(caller);
 		// console.log('identify plugged, t or f? ' + phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn);
@@ -237,7 +237,7 @@
 				audioCaption = conversations[currConvo].helloText;
 				// console.log('plugged name: ' + pluggedName);
 				// Debug message
-				debugCaption += pluggedName + ' new call on line: ' + pluggedIdxInfo.lineIdx + 
+				//debugCaption += pluggedName + ' new call on line: ' + pluggedIdxInfo.lineIdx + 
 					' asks for ' + 
 					persons[conversations[currConvo].callee.index].name + ' <br />';
 				console.log('  Operator connects to: ' + pluggedName + ' on line: ' + 
@@ -310,11 +310,11 @@
 						setTimeToNext(15000);
 					}
 					// Debug message
-					debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx;
+					// debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx;
 				} else { // end plugged into to correct callee
 					// Wong Number!
 					console.log('Plugged into wrong jack. Person: ' + persons[pluggedIdxInfo.personIdx].name);
-					debugCaption += 'Plugged into wrong jack. Person: ' + persons[pluggedIdxInfo.personIdx].name + 
+					// debugCaption += 'Plugged into wrong jack. Person: ' + persons[pluggedIdxInfo.personIdx].name + 
 					'  <br /> ';
 					// already LED_SOLID;
 					// playConvo(currConvo,	pluggedIdxInfo.lineIdx);					
@@ -527,5 +527,5 @@
 		{handleUnPlug}
 	/>
 
-	<p>Debug: {@html debugCaption}</p>
+	<!-- <p>Debug: {@html debugCaption}</p> -->
 </div><!-- /wrapper --> 	
