@@ -129,8 +129,21 @@
 		});    	
 	}	
 
+	const playWrongNum = (currConvo, lineIndex) => {
+		phoneLines[lineIndex].audioTrack =
+     new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/outgoing-ring.mp3");
+    phoneLines[lineIndex].audioTrack.play();
+
+		// Handle call end
+		phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
+					phoneLines[lineIndex].audioTrack.currentTime = 0;
+					playFullWrongNum(currConvo, lineIndex);
+		});    	
+	}	
+
+
 	// refactor: maybe use this after all: function playWrongNum(wrongCalleeIdx, lineIndex){
-	const playWrongNum = (pluggedPersonIdx, lineIndex) => {
+	const playFullWrongNum = (pluggedPersonIdx, lineIndex) => {
 		// persons[pluggedIdxInfo.personIdx], 
 		// 				pluggedIdxInfo.lineIdx
 		// persons[pluggedIdxInfo.personIdx].wrongNumFile,
