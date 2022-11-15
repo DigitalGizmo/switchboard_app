@@ -105,6 +105,18 @@
 
 	const playConvo = (currConvo, lineIndex) => {
 		phoneLines[lineIndex].audioTrack =
+     new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/outgoing-ring.mp3");
+    phoneLines[lineIndex].audioTrack.play();
+
+		// Handle call end
+		phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
+					phoneLines[lineIndex].audioTrack.currentTime = 0;
+					playFullConvo(currConvo, lineIndex);
+		});    	
+	}	
+
+	const playFullConvo = (currConvo, lineIndex) => {
+		phoneLines[lineIndex].audioTrack =
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
 		 conversations[currConvo].convoFile +  ".mp3");
     phoneLines[lineIndex].audioTrack.play();

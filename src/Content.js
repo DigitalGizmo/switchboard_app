@@ -5,7 +5,7 @@ const conversations = [
     callee:{index: 4}, // Olive Powers  
     helloFile: '1-Charlie_Operator',
     convoFile: '2-Charlie_Calls_Olive',
-    retryAfterWrongFile: 'Charlie_WrongNumber_Caller',
+    retryAfterWrongFile: 'Charlie_WrongNumber_Olive',
     helloText: "Charlie:  Hi.  72 please.",
     convoText: 
       "Olive:  Hello? <br />" +
@@ -18,8 +18,8 @@ const conversations = [
     caller: {index: 2},  // Mina Newell  
     callee:{index: 7}, // Fire, Cheif Burns  
     helloFile: '3-Mina_Calls_Operator',
-    convoFile: '4-Mina_Calls_ChiefBurns',
-    retryAfterWrongFile: 'Mina_WrongNumber_Caller',
+    convoFile: '4-Mina_Calls_Burns',
+    retryAfterWrongFile: 'Mina_WrongNumber_FireStation',
     helloText: "Mina:  Fire department --",
     convoText: 
       "Chief Burns: Fire station.  Chief Burns speaking <br />" +
@@ -33,6 +33,7 @@ const conversations = [
     callee:{index: 7}, // Chief Burns
     helloFile: '5-Tom_Calls_Operator_1',
     convoFile: '6-Tom_Calls_Burns',
+    retryAfterWrongFile: 'Tom_WrongNumber_FireStation',
     helloText: "Tom:  Fire!  Fire station. I have to talk to the fire station…Fire!",
     convoText: 
       "Chief Burns: Fire Station. Chief B… <br />" +
@@ -45,6 +46,7 @@ const conversations = [
     callee:{index: 15}, // None! , 
     helloFile: '7-Tressa_Calls_Operator',
     convoFile: '',
+    retryAfterWrongFile: '',
     helloText: "I smell smoke.  Do you know what’s going on?  Any calls with…",
     convoText: 
       "none" ,
@@ -75,18 +77,20 @@ const conversations = [
     callee:{index: 3}, //  
     helloFile: '10-Tom_Calls_Operator_2',
     convoFile: '11-Tom_Calls_Charlie',
+    retryAfterWrongFile: 'Tom_WrongNumber_Dr',
     helloText: 'I need the doctor.  Doc Freeman.',
     convoText: 
       "Charlie Freeman:  Freeman residence.  " +
       "Tom:  I gotta talk to the Doctor." +
       "Charlie:  He went to see Mrs. White.  Who’s this?  …Hello?  Hello?",
   },  
-  // index 6, call 6A  Audio 12-13
+  // index 6, call 6A Tom to Mrs White Audio 12-13
   {
     caller: { index: 6}, // Tom Libby
     callee:{index: 1}, // Mrs. White  
     helloFile: '12-Tom_Calls_Operator_3',
     convoFile: '13-Tom_Calls_Mrs.White',
+    retryAfterWrongFile: 'Tom_WrongNumber_MrsWhite',
     helloText: 'Operator, operator -- I need Mrs. White’s house. I don’t' + 
     'know Mrs. White.  I gotta find Dr. Freeman.',
     convoText: 'Mrs. Mildred White:  Hello.  White residence. ' +
@@ -98,6 +102,7 @@ const conversations = [
     callee:{index: 15}, //  Operator only
     helloFile: '14-ChiefBurns_Calls_Operator',
     convoFile: '',
+    retryAfterWrongFile: '',
     helloText: 'Chief Burns:  Operator, it’s Chief Burns.  I know half the town is calling,',
     convoText: 
       "none" ,
@@ -108,6 +113,7 @@ const conversations = [
     callee:{index: 0}, //  Emma, Village store
     helloFile: '15-Doctor_Calls_Operator',
     convoFile: '16-Doctor_Calls_Store',
+    retryAfterWrongFile: '',
     helloText: 'Dr. Freeman:  Village Store, please',
     convoText: 'Emma:  Village Store. ' +
     'Dr. Freeman:  Emma, wondering if you could get...' ,
@@ -129,6 +135,7 @@ let persons = [
     name: 'Mildred White',
     number: '51',
     ledState: 0,
+    wrongNumFile: 'MrsWhite_WrongNumber_Callee',
     isPluggedJack: false,
   },
   { // index  2,
@@ -136,6 +143,7 @@ let persons = [
     name: 'Mina Newell', // Paula Fowler?
     number: '44',
     ledState: 0,
+    wrongNumFile: 'Mina_WrongNumber_Callee',
     isPluggedJack: false,
   },
   { // index  3,
@@ -159,6 +167,7 @@ let persons = [
     name: 'Tressa Howe',
     number: '80',
     ledState: 0,
+    wrongNumFile: '',
     isPluggedJack: false,
   },
   { // index  6,
@@ -166,6 +175,7 @@ let persons = [
     name: 'Tom Libby',
     number: '84',
     ledState: 0,
+    wrongNumFile: 'Tom_WrongNumber_Callee',
     isPluggedJack: false,
   },
   { // index  7,
@@ -174,33 +184,38 @@ let persons = [
     number: '111',
     ledState: 0,
     wrongNumFile: 'ChiefBurns_WrongNumber_Callee',
+    isPluggedJack: false,
   },
   { // index  8,
     company: '',
-    name: 'Jane Doe',
+    name: 'Cleo',
     number: '30',
     ledState: 0,
+    wrongNumFile: 'Cleo_WrongNumber_Callee',
     isPluggedJack: false,
   },
   { // index  9,
     company: '',
-    name: 'Paula Fowler',
+    name: 'Felt', // Paula Fowler
     number: '50',
     ledState: 0,
+    wrongNumFile: 'Felt_WrongNumber_Callee',
     isPluggedJack: false,
   },
   { // index  10,
     company: '',
-    name: 'Jane Smith',
+    name: 'Luther',
     number: '60',
     ledState: 0,
+    wrongNumFile: 'Luther_WrongNumber_Callee',
     isPluggedJack: false,
   },
   { // index  11,
     company: '',
-    name: 'John Doe',
+    name: 'Troy Bacon',
     number: '75',
     ledState: 0,
+    wrongNumFile: 'TroyBacon_WrongNumber_Callee',
     isPluggedJack: false,
   },
   { // index  12,
@@ -208,6 +223,7 @@ let persons = [
     name: 'Gary Green',
     number: '82',
     ledState: 0,
+    wrongNumFile: '',
     isPluggedJack: false,
   },
   { // index  13,
@@ -215,6 +231,7 @@ let persons = [
     name: 'Ruby Red',
     number: '90',
     ledState: 0,
+    wrongNumFile: '',
     isPluggedJack: false,
   },
   { // index  14,
@@ -222,6 +239,7 @@ let persons = [
     name: 'Barry Black',
     number: '120',
     ledState: 0,
+    wrongNumFile: '',
     isPluggedJack: false,
   },
   { // index  15,
@@ -229,6 +247,7 @@ let persons = [
     name: 'Operator',
     number: '999',
     ledState: 0,
+    wrongNumFile: '',
     isPluggedJack: false,
   },
   { // index  16,
@@ -236,6 +255,7 @@ let persons = [
     name: 'before real assignment',
     number: '16',
     ledState: 0,
+    wrongNumFile: '',
     isPluggedJack: false,
   },
 ]
