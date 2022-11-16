@@ -6,6 +6,7 @@
   export let persons;
   export let handlePlugIn;
   export let handleUnPlug;
+  export let initiateCall;
 
   let name = 'Testing';
 
@@ -309,6 +310,16 @@
     <!-- plug base -->
     <g transform="translate(0, {PLUG_START_Y + 176})">
       <rect width="{PANEL_WIDTH}" height="40" fill="#919090"/>
+
+    </g>
+
+    <!-- <p><button on:click="{initiateCall}">Start</button></p> -->
+    <g class="tbd"
+      transform="translate(0, {PLUG_START_Y + 176})">
+      <rect width="100" height="30" fill="#919090"/>
+      <a href="/" on:click={ e => { e.preventDefault(); initiateCall()}}>
+        <text class="more-tbd">Start</text>
+      </a>
     </g>
 
   </svg>

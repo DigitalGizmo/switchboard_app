@@ -525,6 +525,7 @@
 		{persons}
 		{handlePlugIn}
 		{handleUnPlug}
+		{initiateCall}
 	/>
 
 	<!-- <p>Debug: {@html debugCaption}</p> -->
