@@ -251,6 +251,7 @@
 </style>
 
 <div id="panel">
+  <p><button on:click="{initiateCall}">Start</button></p>
   <!-- sockets -->
   <svg id="switchboard-grid" class="sockets" version="1.1" xmlns="http://www.w3.org/2000/svg" 
     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -311,15 +312,6 @@
     <g transform="translate(0, {PLUG_START_Y + 176})">
       <rect width="{PANEL_WIDTH}" height="40" fill="#919090"/>
 
-    </g>
-
-    <!-- <p><button on:click="{initiateCall}">Start</button></p> -->
-    <g class="tbd"
-      transform="translate(0, {PLUG_START_Y + 176})">
-      <rect width="100" height="30" fill="#919090"/>
-      <a href="/" on:click={ e => { e.preventDefault(); initiateCall()}}>
-        <text class="more-tbd">Start</text>
-      </a>
     </g>
 
   </svg>

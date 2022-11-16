@@ -511,12 +511,12 @@
 	/*none*/
 </style>
 
-<header>
+<!-- <header>
   <h1>You're the Operator! <button on:click="{initiateCall}">Start</button></h1>
-</header>
+</header> -->
 
 <div id="wrapper">      
-	<HowTo />
+	<!-- <HowTo /> -->
 	<Transcript 
 		{audioCaption}
 	/>
