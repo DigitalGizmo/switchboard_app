@@ -29,6 +29,12 @@ h1 {
   margin-bottom: 0;
 }
 
+.launch-page h1 {
+  font-size: 2.5em;
+  margin: 1em 0 .5em 0;
+  text-align: center;
+}
+
 h3 {
   font-size: 1.25em;
   font-weight: bold;
@@ -88,29 +94,73 @@ header {
 
 #wrapper {
   display: grid;
-  grid-template-columns: 75% 23%;
+/*  grid-template-columns: 75% 23%;*/
   grid-template-rows: 65% 30%;
   grid-gap: 12px;
-  margin-top:  20px;
+/*  margin-top:  20px;*/
   height: 100vh;
 }
 
 #panel {
-  grid-column: 1;
+/*  grid-column: 1;*/
   grid-row: 1;
   background-color: aliceblue;
   border: solid 1px #bbd6ff;
   padding: 2%;
+  position: relative;
   text-align: center;
 }
 
-.how-to  {
-  grid-column: 2;
-  grid-row: 1 / 3;
+#panel button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+    appearance: none;
+  background-color: #b12b00;
+  border: 0;
+  border-radius: 3px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: sans-serif;
+  font-size: 1em;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.8em 1.6em;
+  text-decoration: none;
+  transition: background-color 150ms ease;
+  user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
-.captions  {
+#panel button:hover, button:focus, input[type="button"]:hover, input[type="button"]:focus, input[type="reset"]:hover, input[type="reset"]:focus, input[type="submit"]:hover, input[type="submit"]:focus {
+  background-color: #8e2200;
+  color: #fff;
+}
+
+.how-to  {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
+}
+
+.how-to img {
   grid-column: 1;
+}
+
+.how-to div.how-to-text{
+  grid-column: 2;
+}
+
+.go-to-activity {
+  font-weight: bold;
+  font-size: 1.25em;
+  margin: 2em 0;
+
+}
+.captions  {
+/*  grid-column: 1;*/
   grid-row:  2;  
 }
 
@@ -130,31 +180,13 @@ header {
   margin-bottom: .75em;
 }
 
-/*.how-to ul li:before {
-  content: '';
-  display: block;
-  position: absolute;
-  width: 12px; 
-  height: 15px;
-  left: -15px;
-  top: 0.25em;
-}*/
-
-/*.how-to ul li.available:before {
-  background: #BBD6FF;
-}
-
-.how-to ul li.unavailable:before {
-  background: #C4C4C4;
-}*/
-
-.how-to ul li.ringing:before {
+/*.how-to ul li.ringing:before {
   background: #fc9d03;
 }
 
 .how-to ul li.in-use:before {
    background: #fc9d03;
-}
+}*/
 
 /*//PLUGS//*/
 
@@ -199,7 +231,7 @@ header {
 
 
 /* obsolete stles */
-.available {
+/*.available {
   fill: #BBD6FF;
 }
 
@@ -210,3 +242,4 @@ header {
 .ringing {
   fill: #F39393;
 }
+*/
