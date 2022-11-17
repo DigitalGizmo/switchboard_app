@@ -11,7 +11,7 @@ const conversations = [
       "Olive:  Hello? <br />" +
       "Charlie:  Hi Olive, it’s Charlie.  Bowling's off. <br />" +
       "Olive:  What's wrong? <br />" +
-      "Charlie:  My dad has a sick patient and he took the car. <br/>" +
+      "Charlie:  My dad has a sick patient and he's taken the car. <br/>" +
       "Olive:  I suppose that’s what it’s like when your dad’s a doctor. <br/>" +
       "Charlie: Yeh.  He said I can’t hang out if he’s not here. <br/>" +
       "Olive: That’s OK.  Maybe my mom can take us tomorrow. <br/>" +
@@ -144,7 +144,6 @@ const conversations = [
     "Dr. Freeman:  Thanks, bye. <br/>" +
     "Emma: Bye.",
   },  
- 
 ];
 
 let persons = [

@@ -64,17 +64,25 @@
 	// }
 
 	const initiateCall = () => {
-		// console.log('got to init call ');
-		// Stop any converstaion that might be in progress
-		// audioTrack.pause();
-		// First conversation is first pair in first set
-		caller =  conversations[currConvo].caller; // [0,1];
-		callerIndex =  conversations[currConvo].caller.index; // [0,1];
-		// console.log('callerIndex: ' + callerIndex);
-		// Set "target", person being called
-		callee =  conversations[currConvo].callee;
-		calleeIndex = conversations[currConvo].callee.index
-		setIncoming(callerIndex)
+		// Set up for ending audio
+		if (currConvo < 9) {
+			// console.log('got to init call ');
+			// Stop any converstaion that might be in progress
+			// audioTrack.pause();
+			// First conversation is first pair in first set
+			caller =  conversations[currConvo].caller; // [0,1];
+			callerIndex =  conversations[currConvo].caller.index; // [0,1];
+			// console.log('callerIndex: ' + callerIndex);
+			// Set "target", person being called
+			callee =  conversations[currConvo].callee;
+			calleeIndex = conversations[currConvo].callee.index
+			setIncoming(callerIndex)
+		} else {
+			// Play congratulations
+			phoneLines[0].audioTrack =
+				new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/FinishedActivity.mp3");
+				phoneLines[0].audioTrack.play();
+		}
 	}
 
 	// This just rings the buzzer. Next action will
@@ -93,14 +101,14 @@
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
 		 conversations[currConvo].helloFile +  ".mp3");
     phoneLines[lineIndex].audioTrack.play();
-		// Only track if this is converation index 3
+		// Only is only the hello track if this is converation index 3 or 7
 		if (currConvo === 3 || currConvo === 7) {
 			phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
-						phoneLines[lineIndex].audioTrack.currentTime = 0;
-						console.log(" - Hello ended on lineIdx: " + lineIndex);
-						setCallCompleted(lineIndex);
+				phoneLines[lineIndex].audioTrack.currentTime = 0;
+				console.log(" - Hello ended on lineIdx: " + lineIndex);
+				setCallCompleted(lineIndex);
 			});    	
-		}
+		} 
 	}	
 
 	const playConvo = (currConvo, lineIndex) => {
