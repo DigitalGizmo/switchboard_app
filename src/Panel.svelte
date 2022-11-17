@@ -311,8 +311,10 @@
     <!-- plug base -->
     <g transform="translate(0, {PLUG_START_Y + 176})">
       <rect width="{PANEL_WIDTH}" height="40" fill="#919090"/>
-
     </g>
-
   </svg>
+  <p style="text-align:left;">
+    <a style="color:#D0D0D0"
+    href="https://dev.digitalgizmo.com/msm-ed/switchboard/">(Launch page)</a>
+  </p>
 </div>

@@ -9,8 +9,8 @@ const conversations = [
     helloText: "Charlie:  Hi.  72 please.",
     convoText: 
       "Olive:  Hello? <br />" +
-      "Charlie:  Hi Olive, it’s Charlie Freeman.  I can’t go tonight. <br />" +
-      "Olive:  Why not? <br />" +
+      "Charlie:  Hi Olive, it’s Charlie.  Bowling's off. <br />" +
+      "Olive:  What's wrong? <br />" +
       "Charlie:  My dad has a sick patient and he took the car. <br/>" +
       "Olive:  I suppose that’s what it’s like when your dad’s a doctor. <br/>" +
       "Charlie: Yeh.  He said I can’t hang out if he’s not here. <br/>" +
@@ -56,7 +56,7 @@ const conversations = [
     convoFile: '',
     retryAfterWrongFile: '',
     helloText: "Tressa:  I smell smoke.  Do you know what’s going on?  Any calls with… <br/>" +
-    "Background: Fire at Libby’s Farm! <br/>" +
+    "Background: Hey Tressa, did you hear? There’s a fire at Libby’s Farm. <br/>" +
     "Tressa:  Never mind",
     convoText: 
       "none" ,
