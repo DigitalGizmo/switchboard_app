@@ -49,29 +49,23 @@
 	];
 
 	const initiateCall = () => {
-		// Set up for ending audio
 		if (currConvo < 9) {
-			currCallerIndex =  conversations[currConvo].caller.index; // [0,1];
+			currCallerIndex =  conversations[currConvo].caller.index;
 			// Set "target", person being called
 			currCalleeIndex = conversations[currConvo].callee.index
-			setIncoming(conversations[currConvo].caller.index)
+			// This just rings the buzzer. Next action will
+			// be when user plugs in a plug - in Panel.svelte drag end: handlePlugIn
+			buzzTrack.play();
+			buzzTrack.volume = .6;    
+			persons[conversations[currConvo].caller.index].ledState = LED_BLINKING;
+			console.log('-- New call being initiated by: ' + 
+				persons[conversations[currConvo].caller.index].name);
 		} else {
 			// Play congratulations
 			phoneLines[0].audioTrack =
 				new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/FinishedActivity.mp3");
 				phoneLines[0].audioTrack.play();
 		}
-	}
-
-	// This just rings the buzzer. Next action will
-	// be when user plugs in a plug - in Panel.svelte drag end: handlePlugIn
-	const setIncoming = (callerIndex) => {
-    // playBuzzer();
-		// console.log('hoping to play buzzer');
-    buzzTrack.play();
-    buzzTrack.volume = .6;    
-		persons[callerIndex].ledState = LED_BLINKING;
-		console.log('-- New call being initiated by: ' + persons[callerIndex].name);
 	}
 
 	const playHello = (currConvo, lineIndex) => {
@@ -165,15 +159,6 @@
 	  callInitTimer = setTimeout(initiateCall, timeToWait);
 	}
 
-	// const startNextCall = () => {
-
-	// 	// currConvo += 1;
-	// 	// uptick currConvo when call complete
-
-	// 	// prevConvo += 1;
-  // 	initiateCall(); 
-	// }
-
 	// So far, just for Tressa's one-way call
 	const setTimeToHangUp = (timeToWait, lineIndex) => {
 		clearTimeout();
@@ -190,51 +175,32 @@
 	**********/
 	const handlePlugIn = (pluggedIdxInfo) => {
 		// pluggedIdxInfo has [person index, line index]
-		// Get name based on index
-		// pluggedName = persons[pluggedIdxInfo.personIdx].name;
-		// Debug msg
-		// debugCaption += '<br />------- <br />New plug into: ' + pluggedName + '<br />';
-		// console.log(plugged);
-		// console.log(caller);
-		// console.log('identify plugged, t or f? ' + phoneLines[pluggedIdxInfo.lineIdx].caller.isPlugged);
 
 		/********
 		* Fresh plug-in
 		*******/
+		// Is this new use of line -- caller has not been plugged in.
 		if (!phoneLines[pluggedIdxInfo.lineIdx].caller.isPlugged) { 
-			// phoneLines for line in question, test caller.isPlugged value
-			// New use of line --First plugged NOT already plugged in.
-			// Did user correctly plug into caller?
-			// If person index plugged matches that of caller
+			// Did user plug into caller?
 			if (pluggedIdxInfo.personIdx === currCallerIndex) {
-				// Turn led green
 				persons[pluggedIdxInfo.personIdx].ledState = LED_SOLID;
 				// Set this person's jack to plugged
 				persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
-				// Set first end of this line as in-use
-				// and Record caller for later unplug
-				setPhoneLineCaller(pluggedIdxInfo);
-				// "atLeastInitiated" prevents an interrupted
-				// call end from spawning a new call
-				// isEngaged doesn't cover the case where the call hassn't
-				// yet been fully connected
-
-				// The following is redunant with caller.isPlugged
-				// phoneLines[pluggedIdxInfo.lineIdx].isAtLeastInitiated = true;
-
-				// Start Debug messages
+				// Set this line as having caller plugged
+				phoneLines[pluggedIdxInfo.lineIdx].caller.isPlugged = true;
+				// Set identity of caller on this line
+				phoneLines[pluggedIdxInfo.lineIdx].caller.index = pluggedIdxInfo.personIdx;				
+				// Set this line in use only we have gotten this success
+				whichLineInUse = pluggedIdxInfo.lineIdx;
+				// Start Transcript
 				audioCaption = conversations[currConvo].helloText;
-				// console.log('plugged name: ' + pluggedName);
 				// Debug message
-				//debugCaption += pluggedName + ' new call on line: ' + pluggedIdxInfo.lineIdx + 
-					' asks for ' + 
-					persons[conversations[currConvo].callee.index].name + ' <br />';
 				console.log('  Operator connects to: ' + 
 					persons[pluggedIdxInfo.personIdx].name + ' on line: ' + 
 					pluggedIdxInfo.lineIdx + ' asking for ' + 
 					persons[conversations[currConvo].callee.index].name +
 					' convo: ' + currConvo);
-				// Stop buzzer and other convo
+				// Stop buzzer 
 				buzzTrack.pause();
 				// Silence other conversation, if there is one
 				if (prevLineInUse >= 0) {
@@ -244,8 +210,6 @@
 					// handled correctly by..
 					phoneLines[prevLineInUse].unPlugStatus = DURING_INTERRUPT_SILENCE;
 				}
-				// Set this line in use only we have gotten this success
-				whichLineInUse = pluggedIdxInfo.lineIdx;
 				// Set prev for use in next call.
 				prevLineInUse = whichLineInUse;
 				// console.log(' setting whichLineInUse to: ' + whichLineInUse);
@@ -253,7 +217,6 @@
 			} else {  // end if successful plug in to correct caller -
 				// Didn't plug into correc calling person
 				audioCaption = "That's not the jack for the person who is asking you to connect!";
-
 			}
 		} else { 
 			/********
@@ -317,12 +280,6 @@
 			} // end if this is the line in use
 		} // end (else) this is "other" end of line in use
 	} // end handlePlugIn
-
-	const setPhoneLineCaller = (pluggedIdxInfo) => {
-		phoneLines[pluggedIdxInfo.lineIdx].caller.isPlugged = true;
-		// Set caller 
-		phoneLines[pluggedIdxInfo.lineIdx].caller.index = pluggedIdxInfo.personIdx;
-	}
 
 	const setPhoneLineCallee = (pluggedIdxInfo) => {
 		// Set callee 
