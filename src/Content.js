@@ -192,7 +192,7 @@ let persons = [
     name: 'Tressa Howe',
     number: '80',
     ledState: 0,
-    wrongNumFile: '',
+    wrongNumFile: 'Tressa_WrongNumber_Callee',
     isPluggedJack: false,
   },
   { // index  6,

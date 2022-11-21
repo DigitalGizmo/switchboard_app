@@ -1,26 +1,28 @@
 <script>
-	import HowTo from "./HowTo.svelte";
+	// import HowTo from "./HowTo.svelte";
 	import Panel from "./Panel.svelte";
 	import { conversations, persons } from './Content.js';
     import { fcumsum } from "d3";
 	import Transcript from "./Transcript.svelte";
-	//  
-	// import {setJackState} from './ProtoPanelHelper.js';
 
+	let currConvo = 0;
+	let currCallerIndex = 0;
+	let currCalleeIndex = 0;
+	let whichLineInUse = -1;
+	let prevLineInUse = -1;
+
+	let callInitTimer = undefined;
 	let audioCaption = " ";
-	let debugCaption = "Press Start <br />";
-	let caller = [null, null]; // row, col
-	let callerIndex = 0;
-	let pluggedName = 'caller not yet identified';
-	let callee = [null, null]; // row, col
-	let calleeIndex = 0;
-	// let awaitingInterrupt = false;
+
+	const LED_OFF = 0;
+	const LED_BLINKING = 1;
+	const LED_SOLID = 2;
+
 	const NO_UNPLUG_STATUS = 0;
 	const AWAITING_INTERRUPT = 1;
 	const DURING_INTERRUPT_SILENCE = 2;
 	const REPLUG_IN_PROGRESS = 3;
 	const JUST_UNPLUGGED = 4;
-	// let unPlugStatus = NO_UNPLUG_STATUS;
 	// let audioTrack = null;
 	// let audioTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
 	let buzzTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/buzzer.mp3");
@@ -46,37 +48,13 @@
 		}, 
 	];
 
-	let currConvo = 0;
-	// let prevConvo = null;
-
-	const LED_OFF = 0;
-	const LED_BLINKING = 1;
-	const LED_SOLID = 2;
-
-	let lineIdxInUse = -1;
-	let lineIdxPrev = -1;
-	let callInitTimer = undefined;
-
-	// $: uppercaseName = name.toUpperCase();
-	// $: console.log(name);
-	// $: if (name === 'Donaldo') {
-	// 	age = 24;
-	// }
-
 	const initiateCall = () => {
 		// Set up for ending audio
 		if (currConvo < 9) {
-			// console.log('got to init call ');
-			// Stop any converstaion that might be in progress
-			// audioTrack.pause();
-			// First conversation is first pair in first set
-			caller =  conversations[currConvo].caller; // [0,1];
-			callerIndex =  conversations[currConvo].caller.index; // [0,1];
-			// console.log('callerIndex: ' + callerIndex);
+			currCallerIndex =  conversations[currConvo].caller.index; // [0,1];
 			// Set "target", person being called
-			callee =  conversations[currConvo].callee;
-			calleeIndex = conversations[currConvo].callee.index
-			setIncoming(callerIndex)
+			currCalleeIndex = conversations[currConvo].callee.index
+			setIncoming(conversations[currConvo].caller.index)
 		} else {
 			// Play congratulations
 			phoneLines[0].audioTrack =
@@ -93,7 +71,7 @@
     buzzTrack.play();
     buzzTrack.volume = .6;    
 		persons[callerIndex].ledState = LED_BLINKING;
-		console.log(' -- New call being initiated by: ' + persons[callerIndex].name);
+		console.log('-- New call being initiated by: ' + persons[callerIndex].name);
 	}
 
 	const playHello = (currConvo, lineIndex) => {
@@ -156,8 +134,8 @@
 		// 				pluggedIdxInfo.lineIdx
 		// persons[pluggedIdxInfo.personIdx].wrongNumFile,
 		let wrongNumFile = persons[pluggedPersonIdx].wrongNumFile;
-		console.log('pluggedPersonIdx: ' + pluggedPersonIdx +
-		' wrongNumFile: ' + wrongNumFile);
+		// console.log('pluggedPersonIdx: ' + pluggedPersonIdx +
+		// ' wrongNumFile: ' + wrongNumFile);
 		// let lineIndex = pluggedIdxInfo.lineIdx;
 		phoneLines[lineIndex].audioTrack =
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
@@ -213,7 +191,7 @@
 	const handlePlugIn = (pluggedIdxInfo) => {
 		// pluggedIdxInfo has [person index, line index]
 		// Get name based on index
-		pluggedName = persons[pluggedIdxInfo.personIdx].name;
+		// pluggedName = persons[pluggedIdxInfo.personIdx].name;
 		// Debug msg
 		// debugCaption += '<br />------- <br />New plug into: ' + pluggedName + '<br />';
 		// console.log(plugged);
@@ -228,7 +206,7 @@
 			// New use of line --First plugged NOT already plugged in.
 			// Did user correctly plug into caller?
 			// If person index plugged matches that of caller
-			if (pluggedIdxInfo.personIdx === callerIndex) {
+			if (pluggedIdxInfo.personIdx === currCallerIndex) {
 				// Turn led green
 				persons[pluggedIdxInfo.personIdx].ledState = LED_SOLID;
 				// Set this person's jack to plugged
@@ -248,25 +226,26 @@
 				//debugCaption += pluggedName + ' new call on line: ' + pluggedIdxInfo.lineIdx + 
 					' asks for ' + 
 					persons[conversations[currConvo].callee.index].name + ' <br />';
-				console.log('  Operator connects to: ' + pluggedName + ' on line: ' + 
+				console.log('  Operator connects to: ' + 
+					persons[pluggedIdxInfo.personIdx].name + ' on line: ' + 
 					pluggedIdxInfo.lineIdx + ' asking for ' + 
 					persons[conversations[currConvo].callee.index].name +
 					' convo: ' + currConvo);
 				// Stop buzzer and other convo
 				buzzTrack.pause();
 				// Silence other conversation, if there is one
-				if (lineIdxPrev >= 0) {
-					console.log('    (silencing call on line:) ' + lineIdxPrev);
-					phoneLines[lineIdxPrev].audioTrack.volume = 0;
+				if (prevLineInUse >= 0) {
+					console.log('    (silencing call on line:) ' + prevLineInUse);
+					phoneLines[prevLineInUse].audioTrack.volume = 0;
 					// Set unplug status so that unplugging this silenced call will
 					// handled correctly by..
-					phoneLines[lineIdxPrev].unPlugStatus = DURING_INTERRUPT_SILENCE;
+					phoneLines[prevLineInUse].unPlugStatus = DURING_INTERRUPT_SILENCE;
 				}
 				// Set this line in use only we have gotten this success
-				lineIdxInUse = pluggedIdxInfo.lineIdx;
+				whichLineInUse = pluggedIdxInfo.lineIdx;
 				// Set prev for use in next call.
-				lineIdxPrev = lineIdxInUse;
-				// console.log(' setting lineIdxInUse to: ' + lineIdxInUse);
+				prevLineInUse = whichLineInUse;
+				// console.log(' setting whichLineInUse to: ' + whichLineInUse);
 				playHello(currConvo, pluggedIdxInfo.lineIdx);
 			} else {  // end if successful plug in to correct caller -
 				// Didn't plug into correc calling person
@@ -280,8 +259,8 @@
 			
 			// First line used IS TRUE, so we must be on the other plug
 			// But first, is this the line in use?
-			// console.log(' in else,  lineIdxInUse use is: ' + lineIdxInUse);
-			if (lineIdxInUse === pluggedIdxInfo.lineIdx) {
+			// console.log(' in else,  whichLineInUse use is: ' + whichLineInUse);
+			if (whichLineInUse === pluggedIdxInfo.lineIdx) {
 				// Other end already plugged in
 				// Determing correct plugin for second end
 				// if person index matches that of callee
@@ -300,7 +279,7 @@
 				// Record callee for later unplug
 				setPhoneLineCallee(pluggedIdxInfo);
 
-				if (pluggedIdxInfo.personIdx === calleeIndex) { // Correct callee
+				if (pluggedIdxInfo.personIdx === currCalleeIndex) { // Correct callee
 					// Set this line as engaged
 					phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
 					// audioTrack.pause();
@@ -321,7 +300,8 @@
 					// debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx;
 				} else { // end plugged into to correct callee
 					// Wong Number!
-					console.log('Plugged into wrong jack. Person: ' + persons[pluggedIdxInfo.personIdx].name);
+					console.log('   Plugged into wrong jack. Person: ' + 
+						persons[pluggedIdxInfo.personIdx].name);
 					// debugCaption += 'Plugged into wrong jack. Person: ' + persons[pluggedIdxInfo.personIdx].name + 
 					'  <br /> ';
 					// already LED_SOLID;
@@ -497,7 +477,7 @@
 		phoneLines[lineIndex].isEngaged = false;
 		// Also
 		phoneLines[lineIndex].unPlugStatus = NO_UNPLUG_STATUS;
-		lineIdxPrev = -1;
+		prevLineInUse = -1;
 
 		// Turn of the leds
 		persons[phoneLines[lineIndex].caller.index].ledState = LED_OFF;
