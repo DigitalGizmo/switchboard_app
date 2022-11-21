@@ -29,21 +29,21 @@
 
 	const phoneLines = [
 		{
-			onePlugIsIn: false, 
-			isAtLeastInitiated: false,
+			// onePlugIsIn: false, 
+			// isAtLeastInitiated: false,
 			isEngaged: false,
 			unPlugStatus: NO_UNPLUG_STATUS,
-			caller: {row: null, col: null, index: null, isPlugged: false},
-			callee: {row: null, col: null, index: null, isPlugged: false},
+			caller: {index: null, isPlugged: false},
+			callee: {index: null, isPlugged: false},
 			audioTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/1-Charlie_Operator.mp3"),
 		}, 
 		{
-			onePlugIsIn: false, 
-			isAtLeastInitiated: false,
+			// onePlugIsIn: false, 
+			// isAtLeastInitiated: false,
 			isEngaged: false,
 			unPlugStatus: NO_UNPLUG_STATUS,
-			caller: {row: null, col: null, index: null,  isPlugged: false},
-			callee: {row: null, col: null, index: null, isPlugged: false},
+			caller: {index: null, isPlugged: false},
+			callee: {index: null, isPlugged: false},
 			audioTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/1-Charlie_Operator.mp3"),
 		}, 
 	];
@@ -196,13 +196,13 @@
 		// debugCaption += '<br />------- <br />New plug into: ' + pluggedName + '<br />';
 		// console.log(plugged);
 		// console.log(caller);
-		// console.log('identify plugged, t or f? ' + phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn);
+		// console.log('identify plugged, t or f? ' + phoneLines[pluggedIdxInfo.lineIdx].caller.isPlugged);
 
 		/********
 		* Fresh plug-in
 		*******/
-		if (!phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn) { 
-			// phoneLines for line in question, test onePlugIsIn value
+		if (!phoneLines[pluggedIdxInfo.lineIdx].caller.isPlugged) { 
+			// phoneLines for line in question, test caller.isPlugged value
 			// New use of line --First plugged NOT already plugged in.
 			// Did user correctly plug into caller?
 			// If person index plugged matches that of caller
@@ -218,7 +218,10 @@
 				// call end from spawning a new call
 				// isEngaged doesn't cover the case where the call hassn't
 				// yet been fully connected
-				phoneLines[pluggedIdxInfo.lineIdx].isAtLeastInitiated = true;
+
+				// The following is redunant with caller.isPlugged
+				// phoneLines[pluggedIdxInfo.lineIdx].isAtLeastInitiated = true;
+
 				// Start Debug messages
 				audioCaption = conversations[currConvo].helloText;
 				// console.log('plugged name: ' + pluggedName);
@@ -316,7 +319,7 @@
 	} // end handlePlugIn
 
 	const setPhoneLineCaller = (pluggedIdxInfo) => {
-		phoneLines[pluggedIdxInfo.lineIdx].onePlugIsIn = true;
+		phoneLines[pluggedIdxInfo.lineIdx].caller.isPlugged = true;
 		// Set caller 
 		phoneLines[pluggedIdxInfo.lineIdx].caller.index = pluggedIdxInfo.personIdx;
 	}
@@ -416,7 +419,9 @@
 		// 	// Here "other line" is the interrupting call that was unplugged
 		// 	console.log('   we think this is auto end of silenced call during 2nd call unplug');
 
-		if (phoneLines[otherLineIdx].isAtLeastInitiated) {
+		// if (phoneLines[otherLineIdx].isAtLeastInitiated) {
+		if (phoneLines[pluggedIdxInfo.lineIdx].caller.isPlugged) {
+			// This seems wrong: should be testing engaged? or _either_ line plugged?
 			// This is a behind the scens conversation that was interrupted 
 			// Dont increment currConvo
 			// Call has been stopped, so:
@@ -472,8 +477,8 @@
 
 	const clearTheLine = (lineIndex) => {
 		// Clear the line settings
-		phoneLines[lineIndex].onePlugIsIn = false;
-		phoneLines[lineIndex].isAtLeastInitiated = false;
+		phoneLines[lineIndex].caller.isPlugged = false;
+		// phoneLines[lineIndex].isAtLeastInitiated = false;
 		phoneLines[lineIndex].isEngaged = false;
 		// Also
 		phoneLines[lineIndex].unPlugStatus = NO_UNPLUG_STATUS;
