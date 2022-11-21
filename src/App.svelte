@@ -5,7 +5,7 @@
     import { fcumsum } from "d3";
 	import Transcript from "./Transcript.svelte";
 
-	let currConvo = 0;
+	let currConvo = 2;
 	let currCallerIndex = 0;
 	let currCalleeIndex = 0;
 	let whichLineInUse = -1;
@@ -68,17 +68,21 @@
 		}
 	}
 
-	const playHello = (currConvo, lineIndex) => {
+	const playHello = (_currConvo, lineIndex) => {
 		phoneLines[lineIndex].audioTrack =
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
 		 conversations[currConvo].helloFile +  ".mp3");
     phoneLines[lineIndex].audioTrack.play();
-		// Only is only the hello track if this is converation index 3 or 7
-		if (currConvo === 3 || currConvo === 7) {
+		// For convo idxs 3 and 7 there is no full convo, so end after hello.
+		if (_currConvo === 3 || _currConvo === 7) {
 			phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
 				phoneLines[lineIndex].audioTrack.currentTime = 0;
-				console.log(" - Hello ended on lineIdx: " + lineIndex);
-				setCallCompleted(lineIndex);
+				console.log(" - Hello-only ended on lineIdx: " + lineIndex);
+				// setHelloOnlyCompleted(lineIndex)
+				// Prob calling currConvo here since it's also a param
+				clearTheLine(lineIndex);
+				currConvo += 1;
+				setTimeToNext(2000);		
 			});    	
 		} 
 	}	
@@ -360,10 +364,22 @@
     }
 	}
 
+	// Handle end of calls where this is no callee
+	// const setHelloOnlyCompleted = (lineIndex) => {
+	// 	stopCall(lineIndex);
+	// 	currConvo += 1;
+	// 	setTimeToNext(2000);		
+	// }
+
+
+	// Handle completed call. (completed HelloOnly handled separately)
 	const setCallCompleted = (lineIndex) => {
 		let otherLineIdx = (lineIndex === 0) ? 1 : 0;
 		console.log('   line ' + lineIndex + ' stopping, other line has unplug stat of ' + 
-		phoneLines[otherLineIdx].unPlugStatus);
+			phoneLines[otherLineIdx].unPlugStatus);
+
+
+		// Reset call -- should this come later, after forensics?
 		stopCall(lineIndex);
 		// Pause and start next call
 		// Don't start next call on finish if other line is engaged
@@ -377,7 +393,9 @@
 		// 	console.log('   we think this is auto end of silenced call during 2nd call unplug');
 
 		// if (phoneLines[otherLineIdx].isAtLeastInitiated) {
-		if (phoneLines[pluggedIdxInfo.lineIdx].caller.isPlugged) {
+		
+		// If the other line has the caller (or callee?) plugged
+		if (phoneLines[otherLineIdx].caller.isPlugged) {
 			// This seems wrong: should be testing engaged? or _either_ line plugged?
 			// This is a behind the scens conversation that was interrupted 
 			// Dont increment currConvo
