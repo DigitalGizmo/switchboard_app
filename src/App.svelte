@@ -5,7 +5,7 @@
     import { fcumsum } from "d3";
 	import Transcript from "./Transcript.svelte";
 
-	let currConvo = 2;
+	let currConvo = 0;
 	let currCallerIndex = 0;
 	let currCalleeIndex = 0;
 	let whichLineInUse = -1;
@@ -224,31 +224,18 @@
 			}
 		} else { 
 			/********
-		  * Other end of the line
+		  * Other end of the line -- caller is plugged, so this must be the other plug
 			********/
-			
-			// First line used IS TRUE, so we must be on the other plug
-			// But first, is this the line in use?
-			// console.log(' in else,  whichLineInUse use is: ' + whichLineInUse);
+			// But first, make sure this is the line in use
 			if (whichLineInUse === pluggedIdxInfo.lineIdx) {
-				// Other end already plugged in
-				// Determing correct plugin for second end
-				// if person index matches that of callee
-
-				// Whether or not this is correct callee
-				// if (pluggedIdxInfo.personIdx === calleeIndex) {
-				// Turn led green
+				// Whether or not this is correct callee -- turn LED on.
 				persons[pluggedIdxInfo.personIdx].ledState = LED_SOLID;
 				// // Set jack to plugged
 				persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
 				// Stop the hello operator track
 				phoneLines[pluggedIdxInfo.lineIdx].audioTrack.volume = 0;
-				// Set this line as engaged // Only if correct
-				// phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
-
-				// Record callee for later unplug
-				setPhoneLineCallee(pluggedIdxInfo);
-
+				// Set callee -- used by unPlug even if it's the wrong number
+				phoneLines[pluggedIdxInfo.lineIdx].callee.index = pluggedIdxInfo.personIdx;
 				if (pluggedIdxInfo.personIdx === currCalleeIndex) { // Correct callee
 					// Set this line as engaged
 					phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
@@ -262,20 +249,13 @@
 						console.log('    (starting timer for call that will interrupt)')
 						// Move que to next call
 						currConvo += 1;
-						// awaitingInterrupt = true;
+						// Set awaitingInterrupt = true;
 						phoneLines[pluggedIdxInfo.lineIdx].unPlugStatus = AWAITING_INTERRUPT;
 						setTimeToNext(15000);
 					}
-					// Debug message
-					// debugCaption += pluggedName + ' on line: ' + pluggedIdxInfo.lineIdx;
-				} else { // end plugged into to correct callee
-					// Wong Number!
+				} else { // Wong Number!
 					console.log('   Plugged into wrong jack. Person: ' + 
 						persons[pluggedIdxInfo.personIdx].name);
-					// debugCaption += 'Plugged into wrong jack. Person: ' + persons[pluggedIdxInfo.personIdx].name + 
-					'  <br /> ';
-					// already LED_SOLID;
-					// playConvo(currConvo,	pluggedIdxInfo.lineIdx);					
 					playWrongNum(
 						pluggedIdxInfo.personIdx, 
 						pluggedIdxInfo.lineIdx
@@ -284,11 +264,6 @@
 			} // end if this is the line in use
 		} // end (else) this is "other" end of line in use
 	} // end handlePlugIn
-
-	const setPhoneLineCallee = (pluggedIdxInfo) => {
-		// Set callee 
-		phoneLines[pluggedIdxInfo.lineIdx].callee.index = pluggedIdxInfo.personIdx;
-	}
 
 	const handleUnPlug = (pluggedIdxInfo) => {
 		// console.log('  Unplug on person idx: ' + pluggedIdxInfo.personIdx +
