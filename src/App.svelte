@@ -5,13 +5,14 @@
     import { fcumsum } from "d3";
 	import Transcript from "./Transcript.svelte";
 
-	let currConvo = 0;
+	let currConvo = 1;
 	let currCallerIndex = 0;
 	let currCalleeIndex = 0;
 	let whichLineInUse = -1;
 	let prevLineInUse = -1;
 
 	let callInitTimer = undefined;
+	let reconnectTimer = undefined;
 	let audioCaption = " ";
 
 	const LED_OFF = 0;
@@ -163,6 +164,12 @@
 	  callInitTimer = setTimeout(initiateCall, timeToWait);
 	}
 
+	const setTimeReCall = (currConvo, lineIdx) => {
+	  reconnectTimer = setTimeout(function() {
+			playHello(currConvo, lineIdx);
+		}, 2000);
+	}
+	
 	// So far, just for Tressa's one-way call
 	const setTimeToHangUp = (timeToWait, lineIndex) => {
 		clearTimeout();
@@ -177,31 +184,31 @@
 	/***********
 	  --- Handle plug-in ----
 	**********/
-	const handlePlugIn = (pluggedIdxInfo) => {
+	const handlePlugIn = ({lineIdx, personIdx}) => {
 		// pluggedIdxInfo has [person index, line index]
 
 		/********
 		* Fresh plug-in
 		*******/
 		// Is this new use of line -- caller has not been plugged in.
-		if (!phoneLines[pluggedIdxInfo.lineIdx].caller.isPlugged) { 
+		if (!phoneLines[lineIdx].caller.isPlugged) { 
 			// Did user plug into caller?
-			if (pluggedIdxInfo.personIdx === currCallerIndex) {
-				persons[pluggedIdxInfo.personIdx].ledState = LED_SOLID;
+			if (personIdx === currCallerIndex) {
+				persons[personIdx].ledState = LED_SOLID;
 				// Set this person's jack to plugged
-				persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
+				persons[personIdx].isPluggedJack = true;
 				// Set this line as having caller plugged
-				phoneLines[pluggedIdxInfo.lineIdx].caller.isPlugged = true;
+				phoneLines[lineIdx].caller.isPlugged = true;
 				// Set identity of caller on this line
-				phoneLines[pluggedIdxInfo.lineIdx].caller.index = pluggedIdxInfo.personIdx;				
+				phoneLines[lineIdx].caller.index = personIdx;				
 				// Set this line in use only we have gotten this success
-				whichLineInUse = pluggedIdxInfo.lineIdx;
+				whichLineInUse = lineIdx;
 				// Start Transcript
 				audioCaption = conversations[currConvo].helloText;
 				// Debug message
 				console.log('  Operator connects to: ' + 
-					persons[pluggedIdxInfo.personIdx].name + ' on line: ' + 
-					pluggedIdxInfo.lineIdx + ' asking for ' + 
+					persons[personIdx].name + ' on line: ' + 
+					lineIdx + ' asking for ' + 
 					persons[conversations[currConvo].callee.index].name +
 					' convo: ' + currConvo);
 				// Stop buzzer 
@@ -217,7 +224,7 @@
 				// Set prev for use in next call.
 				prevLineInUse = whichLineInUse;
 				// console.log(' setting whichLineInUse to: ' + whichLineInUse);
-				playHello(currConvo, pluggedIdxInfo.lineIdx);
+				playHello(currConvo, lineIdx);
 			} else {  // end if successful plug in to correct caller -
 				// Didn't plug into correc calling person
 				audioCaption = "That's not the jack for the person who is asking you to connect!";
@@ -227,20 +234,20 @@
 		  * Other end of the line -- caller is plugged, so this must be the other plug
 			********/
 			// But first, make sure this is the line in use
-			if (whichLineInUse === pluggedIdxInfo.lineIdx) {
+			if (whichLineInUse === lineIdx) {
 				// Whether or not this is correct callee -- turn LED on.
-				persons[pluggedIdxInfo.personIdx].ledState = LED_SOLID;
+				persons[personIdx].ledState = LED_SOLID;
 				// // Set jack to plugged
-				persons[pluggedIdxInfo.personIdx].isPluggedJack = true;
+				persons[personIdx].isPluggedJack = true;
 				// Stop the hello operator track
-				phoneLines[pluggedIdxInfo.lineIdx].audioTrack.volume = 0;
+				phoneLines[lineIdx].audioTrack.volume = 0;
 				// Set callee -- used by unPlug even if it's the wrong number
-				phoneLines[pluggedIdxInfo.lineIdx].callee.index = pluggedIdxInfo.personIdx;
-				if (pluggedIdxInfo.personIdx === currCalleeIndex) { // Correct callee
+				phoneLines[lineIdx].callee.index = personIdx;
+				if (personIdx === currCalleeIndex) { // Correct callee
 					// Set this line as engaged
-					phoneLines[pluggedIdxInfo.lineIdx].isEngaged = true;
+					phoneLines[lineIdx].isEngaged = true;
 					// audioTrack.pause();
-					playConvo(currConvo,	pluggedIdxInfo.lineIdx);
+					playConvo(currConvo,	lineIdx);
 					// User messag message
 					audioCaption = conversations[currConvo].convoText;
 					// Set timer for next call
@@ -250,15 +257,15 @@
 						// Move que to next call
 						currConvo += 1;
 						// Set awaitingInterrupt = true;
-						phoneLines[pluggedIdxInfo.lineIdx].unPlugStatus = AWAITING_INTERRUPT;
+						phoneLines[lineIdx].unPlugStatus = AWAITING_INTERRUPT;
 						setTimeToNext(15000);
 					}
 				} else { // Wong Number!
 					console.log('   Plugged into wrong jack. Person: ' + 
-						persons[pluggedIdxInfo.personIdx].name);
+						persons[personIdx].name);
 					playWrongNum(
-						pluggedIdxInfo.personIdx, 
-						pluggedIdxInfo.lineIdx
+						personIdx, 
+						lineIdx
 					);
 				} // End plugged into wrong number
 			} // end if this is the line in use
@@ -268,7 +275,7 @@
 	// Handle unplug with an engaged call or otherwise 
 	const handleUnPlug = ({lineIdx, personIdx}) => { // pluggedIdxInfo {lineIdx, personIdx}
 		// console.log('  Unplug on person idx: ' + personIdx +
-		// ' line index: ' + pluggedIdxInfo.lineIdx);
+		// ' line index: ' + lineIdx);
 		console.log('  Unplug line ' + lineIdx + ' with status of: ' + 
 		phoneLines[lineIdx].unPlugStatus +
 		 ' while line isEngaged = ' + phoneLines[lineIdx].isEngaged);
@@ -298,10 +305,19 @@
 				// Try setting this so that if the other silenced call ends
 				// it know this has been unplugged
 				phoneLines[lineIdx].unPlugStatus = JUST_UNPLUGGED;
-				setCallUnplugged(lineIdx); 
-				// stopCall(lineIndex);
-				// setTimeToNext(2000);		
-				// phoneLines[lineIdx].callee.index = personIdx
+				// setCallUnplugged(lineIdx); 
+					// stopCall(lineIndex);
+					// setTimeToNext(2000);		
+				if (phoneLines[lineIdx].callee.index === personIdx) { // callee unplugged
+					// Turn off callee LED
+					persons[phoneLines[lineIdx].callee.index].ledState = LED_OFF;
+					// Mark callee unplugged
+					phoneLines[lineIdx].callee.isPlugged = false;
+					// Leave caller plugged in, replay hello
+					// reconnectTimer = setTimeout(playHello(currConvo, lineIdx), 3000);
+					setTimeReCall(currConvo, lineIdx);
+					// playHello(currConvo, lineIdx);
+				}
 
 			}
 
@@ -356,11 +372,11 @@
 	const setCallCompleted = (lineIndex) => {
 		let otherLineIdx = (lineIndex === 0) ? 1 : 0;
 		console.log('   line ' + lineIndex + ' stopping, other line has unplug stat of ' + 
-			phoneLines[otherLineIdx].unPlugStatus);
+			phoneLstopCallines[otherLineIdx].unPlugStatus);
 
 
 		// Reset call -- should this come later, after forensics?
-		stopCall(lineIndex);
+		(lineIndex);
 		// Pause and start next call
 		// Don't start next call on finish if other line is engaged
 		// console.log(' currConvo: ' + currConvo);
