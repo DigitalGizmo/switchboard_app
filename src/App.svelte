@@ -265,72 +265,77 @@
 		} // end (else) this is "other" end of line in use
 	} // end handlePlugIn
 
-	const handleUnPlug = (pluggedIdxInfo) => {
-		// console.log('  Unplug on person idx: ' + pluggedIdxInfo.personIdx +
+	// Handle unplug with an engaged call or otherwise 
+	const handleUnPlug = ({lineIdx, personIdx}) => { // pluggedIdxInfo {lineIdx, personIdx}
+		// console.log('  Unplug on person idx: ' + personIdx +
 		// ' line index: ' + pluggedIdxInfo.lineIdx);
-		console.log('  Unplug line ' + pluggedIdxInfo.lineIdx + ' with status of: ' + 
-		phoneLines[pluggedIdxInfo.lineIdx].unPlugStatus +
-		 ' while line isEngaged = ' + phoneLines[pluggedIdxInfo.lineIdx].isEngaged);
+		console.log('  Unplug line ' + lineIdx + ' with status of: ' + 
+		phoneLines[lineIdx].unPlugStatus +
+		 ' while line isEngaged = ' + phoneLines[lineIdx].isEngaged);
 
-		// If conversation is in progress
-		// (Or even wrong number)
-		if (phoneLines[pluggedIdxInfo.lineIdx].isEngaged) {
+		// If conversation is in progress -- engaged (implies correct callee)
+		if (phoneLines[lineIdx].isEngaged) {
 			console.log('  - Unplugging a call in progress person id: ' + 
-				persons[pluggedIdxInfo.personIdx].name);
+				persons[personIdx].name);
 			// Stop the audio
-			phoneLines[pluggedIdxInfo.lineIdx].audioTrack.pause();
+			phoneLines[lineIdx].audioTrack.pause();
 
-			if (phoneLines[pluggedIdxInfo.lineIdx].unPlugStatus === AWAITING_INTERRUPT) {
+			// Handle the three cases of unplugging engaged call
+			// 1) call will be interrupted 2) call is silenced, 3) regular calls 			
+			if (phoneLines[lineIdx].unPlugStatus === AWAITING_INTERRUPT) {
 				// Disconnecting a call that had already started a timer
 				// for an interruption
 				console.log('    Unplug while awaiting interrupt')
 				currConvo -= 1; // Undo the increment that was set
 				clearTimeout(callInitTimer); // bcz we're starting over
-				setCallUnplugged(pluggedIdxInfo.lineIdx); 
-				phoneLines[pluggedIdxInfo.lineIdx].unPlugStatus = REPLUG_IN_PROGRESS;
-			} else if (phoneLines[pluggedIdxInfo.lineIdx].unPlugStatus === DURING_INTERRUPT_SILENCE) {
+				setCallUnplugged(lineIdx); 
+				phoneLines[lineIdx].unPlugStatus = REPLUG_IN_PROGRESS;
+			} else if (phoneLines[lineIdx].unPlugStatus === DURING_INTERRUPT_SILENCE) {
 				console.log('    Unplugging silenced call');
-				phoneLines[pluggedIdxInfo.lineIdx].unPlugStatus = NO_UNPLUG_STATUS;
-				stopSilentCall(pluggedIdxInfo.lineIdx);
+				phoneLines[lineIdx].unPlugStatus = NO_UNPLUG_STATUS;
+				stopSilentCall(lineIdx);
 			} else { // this is a regular unplug
 				// Try setting this so that if the other silenced call ends
 				// it know this has been unplugged
-				phoneLines[pluggedIdxInfo.lineIdx].unPlugStatus = JUST_UNPLUGGED;
-				setCallUnplugged(pluggedIdxInfo.lineIdx); 
+				phoneLines[lineIdx].unPlugStatus = JUST_UNPLUGGED;
+				setCallUnplugged(lineIdx); 
+				// stopCall(lineIndex);
+				// setTimeToNext(2000);		
+				// phoneLines[lineIdx].callee.index = personIdx
+
 			}
 
-		} else if (phoneLines[pluggedIdxInfo.lineIdx].unPlugStatus === REPLUG_IN_PROGRESS) {
+		} else if (phoneLines[lineIdx].unPlugStatus === REPLUG_IN_PROGRESS) {
 			// Don't do anything about unplug if one end of the line
 			// has already been unplugged.
 			console.log('  Re-plug in progress - unplugging the other end ')
 			// This is the remaining end unplugged, so clear the REPLUG
-			phoneLines[pluggedIdxInfo.lineIdx].unPlugStatus = NO_UNPLUG_STATUS;
+			phoneLines[lineIdx].unPlugStatus = NO_UNPLUG_STATUS;
 			
 			
 			/* Have to know if this was a wrong number, in which case only
 			* turn off the callee light and don't setCallUnplugged
 			*/
-		} else  { 
-			// Line was not fully engaged
+		} else  { // Line was not fully engaged
 			// and unPlugStatus != REPLUG_IN_PROGRESS
 
-			if (phoneLines[pluggedIdxInfo.lineIdx].callee.index) {
+			if (phoneLines[lineIdx].callee.index) {
 				// if it's callee jack that was unplugged
-				console.log('  Unplug on callee thats not engaged')
-				persons[phoneLines[pluggedIdxInfo.lineIdx].callee.index].ledState = LED_OFF;
+				console.log('  ** Unplug on callee thats not engaged')
+				persons[phoneLines[lineIdx].callee.index].ledState = LED_OFF;
 			} else {
 				// Wasn't callee that was unplugged (& line wasn't engaged),
 				// so might have been wrong num that was unplugged
 				// Need to turn off LED
 				console.log('  Unplug was prob on wrong number, personIdx: ' +
-				pluggedIdxInfo.personIdx)
+				personIdx)
 				// Cover for before personidx defined
-				// if (pluggedIdxInfo.personIdx) {
-					persons[pluggedIdxInfo.personIdx].ledState = LED_OFF;
+				// if (personIdx) {
+					persons[personIdx].ledState = LED_OFF;
 				// }
 			}
 
-			phoneLines[pluggedIdxInfo.lineIdx].audioTrack.volume = 0;
+			phoneLines[lineIdx].audioTrack.volume = 0;
 			//  and if was during isWrongNumInProgress
 			// then 
 				// (just) turn off this led
