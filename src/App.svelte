@@ -189,7 +189,7 @@
 		// pluggedIdxInfo has [person index, line index]
 
 		/********
-		* Fresh plug-in
+		* Fresh plug-in -- aka caller not plugged
 		*******/
 		// Is this new use of line -- caller has not been plugged in.
 		if (!phoneLines[lineIdx].caller.isPlugged) { 
@@ -221,9 +221,12 @@
 						// if (correct callee??)
 						// Stop Hello/Request
 						console.log("  - trying to stop audio on : " + lineIdx);
-						// phoneLines[lineIdx].audioTrack.volume = 0;		
+						// silence request	
 						phoneLines[lineIdx].audioTrack.pause();		
-						phoneLines[lineIdx].unPlugStatus = NO_UNPLUG_STATUS
+						// set line engaged
+						phoneLines[lineIdx].unPlugStatus = NO_UNPLUG_STATUS;
+						phoneLines[lineIdx].isEngaged = true;
+						phoneLines[lineIdx].caller.isPlugged = true;
 						// Start conversation without the ring
 						playFullConvo(currConvo,	lineIdx);
 
@@ -440,36 +443,24 @@
 	// Handle completed call. (completed HelloOnly handled separately)
 	const setCallCompleted = (lineIndex) => {
 		let otherLineIdx = (lineIndex === 0) ? 1 : 0;
-		console.log('   setCallCompleted() - line ' + lineIndex + ' stopping, other line has unplug stat of ' + 
+		console.log('   setCallCompleted() - line ' + lineIndex + 
+			' stopping, other line has unplug stat of ' + 
 			phoneLines[otherLineIdx].unPlugStatus);
-
 
 		// Reset call -- should this come later, after forensics?
 		stopCall(lineIndex);
-		// Pause and start next call
-		// Don't start next call on finish if other line is engaged
-		// console.log(' currConvo: ' + currConvo);
-		// console.log('other line enaged: ' + phoneLines[otherLineIdx].isAtLeastInitiated)
 		
-		// if (phoneLines[otherLineIdx].unPlugStatus === REPLUG_IN_PROGRESS) {
-		// 	// Handle case where this is a silenced call ending automatically
-		// 	// while the interrupting call has been unplugged
-		// 	// Here "other line" is the interrupting call that was unplugged
-		// 	console.log('   we think this is auto end of silenced call during 2nd call unplug');
-
-		// if (phoneLines[otherLineIdx].isAtLeastInitiated) {
-		
-		// If the other line has the caller (or callee?) plugged
-		if (phoneLines[otherLineIdx].caller.isPlugged) {
-			// This seems wrong: should be testing engaged? or _either_ line plugged?
-			// This is a behind the scens conversation that was interrupted 
+		// Don't start next call on finish if other line has callee or caller plugged
+		if (phoneLines[otherLineIdx].caller.isPlugged ||
+			phoneLines[otherLineIdx].callee.isPlugged) {
+			console.log('   Unplug with caller or callee plugged on other line')
+			// This is a behind the scenes conversation that was interrupted
+			// and is ending.
 			// Dont increment currConvo
 			// Call has been stopped, so:
 			phoneLines[lineIndex].unPlugStatus = REPLUG_IN_PROGRESS;
-			// awaitingInterrupt = false;
-
 		} else { // It's a regular call ending
-			console.log('   other line not atLeastInitiated, ');
+			console.log('   other line has neither caller nor callee plugged, ');
 			
 			// if (phoneLines[otherLineIdx].unPlugStatus === JUST_UNPLUGGED) {
 			if (phoneLines[otherLineIdx].unPlugStatus === REPLUG_IN_PROGRESS) {
@@ -477,14 +468,13 @@
 				// while the interrupting call has been unplugged
 				// Here "other line" is the interrupting call that was unplugged
 				console.log('   we think this is auto end of silenced call during 2nd call unplug');
-			} else {
+			} else { // Regular ending
 				console.log('  increment and start regular timer for next call');
 
 				// ? Set other line to no unplug stats
 				// (This might be a silenced call ending, the other line needs to lose
 				// its DURING INTERRUPTIN status)
 				// phoneLines[otherLineIdx].unPlugStatus = NO_UNPLUG_STATUS;	
-
 
 				// phoneLines[lineIndex].unPlugStatus = NO_UNPLUG_STATUS;	
 
