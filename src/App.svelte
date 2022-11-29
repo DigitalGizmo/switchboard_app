@@ -5,7 +5,7 @@
     import { fcumsum } from "d3";
 	import Transcript from "./Transcript.svelte";
 
-	let currConvo = 1;
+	let currConvo = 0;
 	let currCallerIndex = 0;
 	let currCalleeIndex = 0;
 	let whichLineInUse = -1;
@@ -221,9 +221,22 @@
 						// if (correct callee??)
 						// Stop Hello/Request
 						console.log("  - trying to stop audio on : " + lineIdx);
-						phoneLines[lineIdx].audioTrack.volume = 0;						
+						// phoneLines[lineIdx].audioTrack.volume = 0;		
+						phoneLines[lineIdx].audioTrack.pause();		
+						phoneLines[lineIdx].unPlugStatus = NO_UNPLUG_STATUS
 						// Start conversation without the ring
 						playFullConvo(currConvo,	lineIdx);
+
+						// If this is redo of call to be interrupted then restar timer
+						if (currConvo === 0 || currConvo === 4) {
+							console.log('    (starting timer for call that will interrupt)')
+							// Move que to next call
+							currConvo += 1;
+							// Set awaitingInterrupt = true;
+							phoneLines[lineIdx].unPlugStatus = AWAITING_INTERRUPT;
+							// clearTimeout(callInitTimer)
+							setTimeToNext(11000); // less than reg 15 secs bcz no ring
+						}
 					} else {
 						console.log('   We should not get here');
 					}
@@ -308,22 +321,40 @@
 
 			// Handle the three cases of unplugging engaged call
 			// 1) call will be interrupted 2) call is silenced, 3) regular calls 			
-			if (phoneLines[lineIdx].unPlugStatus === AWAITING_INTERRUPT) {
-				// Disconnecting a call that had already started a timer
-				// for an interruption
-				console.log('    Unplug while awaiting interrupt')
-				currConvo -= 1; // Undo the increment that was set
-				clearTimeout(callInitTimer); // bcz we're starting over
-				setCallUnplugged(lineIdx); 
-				phoneLines[lineIdx].unPlugStatus = REPLUG_IN_PROGRESS;
-			} else if (phoneLines[lineIdx].unPlugStatus === DURING_INTERRUPT_SILENCE) {
+			// if (phoneLines[lineIdx].unPlugStatus === AWAITING_INTERRUPT) {
+			// 	// Disconnecting a call that had already started a timer
+			// 	// for an interruption
+			// 	console.log('    Unplug while awaiting interrupt')
+			// 	currConvo -= 1; // Undo the increment that was set
+			// 	clearTimeout(callInitTimer); // bcz we're starting over
+			// 	setCallUnplugged(lineIdx); 
+			// 	phoneLines[lineIdx].unPlugStatus = REPLUG_IN_PROGRESS;
+				
+			// } else if (phoneLines[lineIdx].unPlugStatus === DURING_INTERRUPT_SILENCE) {
+			if (phoneLines[lineIdx].unPlugStatus === DURING_INTERRUPT_SILENCE) {
+
+
 				console.log('    Unplugging silenced call');
 				phoneLines[lineIdx].unPlugStatus = NO_UNPLUG_STATUS;
 				stopSilentCall(lineIdx);
 			} else { // this is a regular unplug
+
+				if (phoneLines[lineIdx].unPlugStatus === AWAITING_INTERRUPT) {
+					// Disconnecting a call that had already started a timer
+					// for an interruption
+					console.log('    Unplug while awaiting interrupt')
+					currConvo -= 1; // Undo the increment that was set
+					clearTimeout(callInitTimer); // bcz we're starting over
+					// setCallUnplugged(lineIdx); 
+					// phoneLines[lineIdx].unPlugStatus = REPLUG_IN_PROGRESS;
+				}
+
+
+
 				// Try setting this so that if the other silenced call ends
 				// it know this has been unplugged
-				phoneLines[lineIdx].unPlugStatus = JUST_UNPLUGGED;
+				// phoneLines[lineIdx].unPlugStatus = JUST_UNPLUGGED;
+				phoneLines[lineIdx].unPlugStatus = REPLUG_IN_PROGRESS;
 				// setCallUnplugged(lineIdx); 
 					// stopCall(lineIndex);
 					// setTimeToNext(2000);		
@@ -334,7 +365,8 @@
 					// Mark callee unplugged
 					phoneLines[lineIdx].callee.isPlugged = false;
 					phoneLines[lineIdx].isEngaged = false;
-					phoneLines[lineIdx].audioTrack.volume = 0;
+					phoneLines[lineIdx].audioTrack.pause();
+					// phoneLines[lineIdx].audioTrack.volume = 0;
 					// Leave caller plugged in, replay hello
 					// reconnectTimer = setTimeout(playHello(currConvo, lineIdx), 3000);
 					setTimeReCall(currConvo, lineIdx);
@@ -387,7 +419,8 @@
 				// }
 			}
 
-			phoneLines[lineIdx].audioTrack.volume = 0;
+			// phoneLines[lineIdx].audioTrack.volume = 0;
+			phoneLines[lineIdx].audioTrack.pause();
 			//  and if was during isWrongNumInProgress
 			// then 
 				// (just) turn off this led
@@ -438,7 +471,8 @@
 		} else { // It's a regular call ending
 			console.log('   other line not atLeastInitiated, ');
 			
-			if (phoneLines[otherLineIdx].unPlugStatus === JUST_UNPLUGGED) {
+			// if (phoneLines[otherLineIdx].unPlugStatus === JUST_UNPLUGGED) {
+			if (phoneLines[otherLineIdx].unPlugStatus === REPLUG_IN_PROGRESS) {
 				// Handle case where this is a silenced call ending automatically
 				// while the interrupting call has been unplugged
 				// Here "other line" is the interrupting call that was unplugged
