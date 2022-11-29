@@ -24,6 +24,7 @@
 	const DURING_INTERRUPT_SILENCE = 2;
 	const REPLUG_IN_PROGRESS = 3;
 	const JUST_UNPLUGGED = 4;
+	const CALLER_UNPLUGGED = 5;
 	// let audioTrack = null;
 	// let audioTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
 	let buzzTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/buzzer.mp3");
@@ -213,23 +214,37 @@
 					' convo: ' + currConvo);
 				// Stop buzzer 
 				buzzTrack.pause();
-				// Silence other conversation, if there is one
-				if (prevLineInUse >= 0) {
+				// Handle case where caller was unplugged
+				if (phoneLines[lineIdx].unPlugStatus === CALLER_UNPLUGGED) {
+					console.log("  - Caller was unplugged: " + lineIdx);
+					if (phoneLines[lineIdx].callee.isPlugged) {
+						// if (correct callee??)
+						// Stop Hello/Request
+						console.log("  - trying to stop audio on : " + lineIdx);
+						phoneLines[lineIdx].audioTrack.volume = 0;						
+						// Start conversation without the ring
+						playFullConvo(currConvo,	lineIdx);
+					} else {
+						console.log('   We should not get here');
+					}
+				} else if (prevLineInUse >= 0) { // Silence other conversation, if there is one
 					console.log('    (silencing call on line:) ' + prevLineInUse);
 					phoneLines[prevLineInUse].audioTrack.volume = 0;
 					// Set unplug status so that unplugging this silenced call will
 					// handled correctly by..
 					phoneLines[prevLineInUse].unPlugStatus = DURING_INTERRUPT_SILENCE;
+					playHello(currConvo, lineIdx);
+				} else { // Regular, just play incoming Hello/Request
+					playHello(currConvo, lineIdx);
 				}
-				// Set prev for use in next call.
+				// Set prev for use in next call. Here??
 				prevLineInUse = whichLineInUse;
 				// console.log(' setting whichLineInUse to: ' + whichLineInUse);
-				playHello(currConvo, lineIdx);
 			} else {  // end if successful plug in to correct caller -
 				// Didn't plug into correc calling person
 				audioCaption = "That's not the jack for the person who is asking you to connect!";
 			}
-		} else { 
+		} else { // caller is plugged
 			/********
 		  * Other end of the line -- caller is plugged, so this must be the other plug
 			********/
@@ -244,9 +259,13 @@
 				// Set callee -- used by unPlug even if it's the wrong number
 				phoneLines[lineIdx].callee.index = personIdx;
 				if (personIdx === currCalleeIndex) { // Correct callee
+					console.log('   Plugging into correct callee');
 					// Set this line as engaged
 					phoneLines[lineIdx].isEngaged = true;
-					// audioTrack.pause();
+					// Also set line callee plugged
+					phoneLines[lineIdx].callee.isPlugged = true;
+					// Silence incoming Hello/Request, if necessary
+					phoneLines[lineIdx].audioTrack.volume = 0;
 					playConvo(currConvo,	lineIdx);
 					// User messag message
 					audioCaption = conversations[currConvo].convoText;
@@ -309,14 +328,31 @@
 					// stopCall(lineIndex);
 					// setTimeToNext(2000);		
 				if (phoneLines[lineIdx].callee.index === personIdx) { // callee unplugged
+					console.log('   Unplugging callee');
 					// Turn off callee LED
 					persons[phoneLines[lineIdx].callee.index].ledState = LED_OFF;
 					// Mark callee unplugged
 					phoneLines[lineIdx].callee.isPlugged = false;
+					phoneLines[lineIdx].isEngaged = false;
+					phoneLines[lineIdx].audioTrack.volume = 0;
 					// Leave caller plugged in, replay hello
 					// reconnectTimer = setTimeout(playHello(currConvo, lineIdx), 3000);
 					setTimeReCall(currConvo, lineIdx);
 					// playHello(currConvo, lineIdx);
+				} else if (phoneLines[lineIdx].caller.index === personIdx) { // caller unplugged
+					// stopCall(lineIndex);
+					// setTimeToNext(2000);							
+					phoneLines[lineIdx].caller.isPlugged = false;
+					phoneLines[lineIdx].isEngaged = false;
+					// Also
+					phoneLines[lineIdx].unPlugStatus = CALLER_UNPLUGGED;
+					// ? prevLineInUse = -1;
+					// Turn off caller LED
+					persons[phoneLines[lineIdx].caller.index].ledState = LED_OFF;
+					setTimeToNext(2000);							
+
+				} else { 
+					console.log('    This should not happen');
 				}
 
 			}
@@ -328,15 +364,15 @@
 			// This is the remaining end unplugged, so clear the REPLUG
 			phoneLines[lineIdx].unPlugStatus = NO_UNPLUG_STATUS;
 			
-			
-			/* Have to know if this was a wrong number, in which case only
-			* turn off the callee light and don't setCallUnplugged
-			*/
+			// Somewher in here condition for if CALLER_UNPLUGGED then
+			// 		don't unplug the callee
+		} else if (phoneLines[lineIdx].unPlugStatus === CALLER_UNPLUGGED) {
+			// Also test for whether this unplug was an erroneous attempt
+			// at re-plugging the caller??
+			console.log('   Unplugg on the wrong jack during caller unplug')
 		} else  { // Line was not fully engaged
-			// and unPlugStatus != REPLUG_IN_PROGRESS
-
-			if (phoneLines[lineIdx].callee.index) {
-				// if it's callee jack that was unplugged
+			
+			if (phoneLines[lineIdx].callee.index) { // callee jack was unplugged
 				console.log('  ** Unplug on callee thats not engaged')
 				persons[phoneLines[lineIdx].callee.index].ledState = LED_OFF;
 			} else {
@@ -371,12 +407,12 @@
 	// Handle completed call. (completed HelloOnly handled separately)
 	const setCallCompleted = (lineIndex) => {
 		let otherLineIdx = (lineIndex === 0) ? 1 : 0;
-		console.log('   line ' + lineIndex + ' stopping, other line has unplug stat of ' + 
-			phoneLstopCallines[otherLineIdx].unPlugStatus);
+		console.log('   setCallCompleted() - line ' + lineIndex + ' stopping, other line has unplug stat of ' + 
+			phoneLines[otherLineIdx].unPlugStatus);
 
 
 		// Reset call -- should this come later, after forensics?
-		(lineIndex);
+		stopCall(lineIndex);
 		// Pause and start next call
 		// Don't start next call on finish if other line is engaged
 		// console.log(' currConvo: ' + currConvo);
@@ -446,22 +482,23 @@
 		clearTheLine(lineIndex);
 	}
 
-	const clearTheLine = (lineIndex) => {
+	const clearTheLine = (lineIdx) => {
 		// Clear the line settings
-		phoneLines[lineIndex].caller.isPlugged = false;
-		// phoneLines[lineIndex].isAtLeastInitiated = false;
-		phoneLines[lineIndex].isEngaged = false;
+		phoneLines[lineIdx].caller.isPlugged = false;
+		phoneLines[lineIdx].callee.isPlugged = false;
+		// phoneLines[lineIdx].isAtLeastInitiated = false;
+		phoneLines[lineIdx].isEngaged = false;
 		// Also
-		phoneLines[lineIndex].unPlugStatus = NO_UNPLUG_STATUS;
+		phoneLines[lineIdx].unPlugStatus = NO_UNPLUG_STATUS;
 		prevLineInUse = -1;
 
 		// Turn of the leds
-		persons[phoneLines[lineIndex].caller.index].ledState = LED_OFF;
+		persons[phoneLines[lineIdx].caller.index].ledState = LED_OFF;
 		// Can't turn off callee led if callee index hasn't been defined
-		// console.log('phoneLines[lineIndex].callee.index: '+ phoneLines[lineIndex].callee.index);
-		if (phoneLines[lineIndex].callee.index !== null) {
+		// console.log('phoneLines[lineIdx].callee.index: '+ phoneLines[lineIdx].callee.index);
+		if (phoneLines[lineIdx].callee.index !== null) {
 			// console.log('got into callee index not null');
-			persons[phoneLines[lineIndex].callee.index].ledState = LED_OFF;
+			persons[phoneLines[lineIdx].callee.index].ledState = LED_OFF;
 		}
 	}
 
