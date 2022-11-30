@@ -23,7 +23,6 @@
 	const AWAITING_INTERRUPT = 1;
 	const DURING_INTERRUPT_SILENCE = 2;
 	const REPLUG_IN_PROGRESS = 3;
-	const JUST_UNPLUGGED = 4;
 	const CALLER_UNPLUGGED = 5;
 	// let audioTrack = null;
 	// let audioTrack = new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/charlie-calls.mp3");
@@ -31,8 +30,6 @@
 
 	const phoneLines = [
 		{
-			// onePlugIsIn: false, 
-			// isAtLeastInitiated: false,
 			isEngaged: false,
 			unPlugStatus: NO_UNPLUG_STATUS,
 			caller: {index: null, isPlugged: false},
@@ -40,8 +37,6 @@
 			audioTrack: new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/1-Charlie_Operator.mp3"),
 		}, 
 		{
-			// onePlugIsIn: false, 
-			// isAtLeastInitiated: false,
 			isEngaged: false,
 			unPlugStatus: NO_UNPLUG_STATUS,
 			caller: {index: null, isPlugged: false},
@@ -126,7 +121,6 @@
 					playFullWrongNum(currConvo, lineIndex);
 		});    	
 	}	
-
 
 	// refactor: maybe use this after all: function playWrongNum(wrongCalleeIdx, lineIndex){
 	const playFullWrongNum = (pluggedPersonIdx, lineIndex) => {
@@ -321,27 +315,16 @@
 				persons[personIdx].name);
 			// Stop the audio
 			phoneLines[lineIdx].audioTrack.pause();
-
-			// Handle the three cases of unplugging engaged call
-			// 1) call will be interrupted 2) call is silenced, 3) regular calls 			
-			// if (phoneLines[lineIdx].unPlugStatus === AWAITING_INTERRUPT) {
-			// 	// Disconnecting a call that had already started a timer
-			// 	// for an interruption
-			// 	console.log('    Unplug while awaiting interrupt')
-			// 	currConvo -= 1; // Undo the increment that was set
-			// 	clearTimeout(callInitTimer); // bcz we're starting over
-			// 	setCallUnplugged(lineIdx); 
-			// 	phoneLines[lineIdx].unPlugStatus = REPLUG_IN_PROGRESS;
 				
 			// } else if (phoneLines[lineIdx].unPlugStatus === DURING_INTERRUPT_SILENCE) {
 			if (phoneLines[lineIdx].unPlugStatus === DURING_INTERRUPT_SILENCE) {
-
 
 				console.log('    Unplugging silenced call');
 				phoneLines[lineIdx].unPlugStatus = NO_UNPLUG_STATUS;
 				stopSilentCall(lineIdx);
 			} else { // this is a regular unplug
-
+				// Handle the three cases of unplugging engaged call
+				// 1) call will be interrupted 2) call is silenced, 3) regular calls 		
 				if (phoneLines[lineIdx].unPlugStatus === AWAITING_INTERRUPT) {
 					// Disconnecting a call that had already started a timer
 					// for an interruption
@@ -351,12 +334,8 @@
 					// setCallUnplugged(lineIdx); 
 					// phoneLines[lineIdx].unPlugStatus = REPLUG_IN_PROGRESS;
 				}
-
-
-
 				// Try setting this so that if the other silenced call ends
 				// it know this has been unplugged
-				// phoneLines[lineIdx].unPlugStatus = JUST_UNPLUGGED;
 				phoneLines[lineIdx].unPlugStatus = REPLUG_IN_PROGRESS;
 				// setCallUnplugged(lineIdx); 
 					// stopCall(lineIndex);
@@ -369,7 +348,6 @@
 					phoneLines[lineIdx].callee.isPlugged = false;
 					phoneLines[lineIdx].isEngaged = false;
 					phoneLines[lineIdx].audioTrack.pause();
-					// phoneLines[lineIdx].audioTrack.volume = 0;
 					// Leave caller plugged in, replay hello
 					// reconnectTimer = setTimeout(playHello(currConvo, lineIdx), 3000);
 					setTimeReCall(currConvo, lineIdx);
@@ -432,14 +410,6 @@
     }
 	}
 
-	// Handle end of calls where this is no callee
-	// const setHelloOnlyCompleted = (lineIndex) => {
-	// 	stopCall(lineIndex);
-	// 	currConvo += 1;
-	// 	setTimeToNext(2000);		
-	// }
-
-
 	// Handle completed call. (completed HelloOnly handled separately)
 	const setCallCompleted = (lineIndex) => {
 		let otherLineIdx = (lineIndex === 0) ? 1 : 0;
@@ -461,8 +431,6 @@
 			phoneLines[lineIndex].unPlugStatus = REPLUG_IN_PROGRESS;
 		} else { // It's a regular call ending
 			console.log('   other line has neither caller nor callee plugged, ');
-			
-			// if (phoneLines[otherLineIdx].unPlugStatus === JUST_UNPLUGGED) {
 			if (phoneLines[otherLineIdx].unPlugStatus === REPLUG_IN_PROGRESS) {
 				// Handle case where this is a silenced call ending automatically
 				// while the interrupting call has been unplugged
@@ -470,14 +438,6 @@
 				console.log('   we think this is auto end of silenced call during 2nd call unplug');
 			} else { // Regular ending
 				console.log('  increment and start regular timer for next call');
-
-				// ? Set other line to no unplug stats
-				// (This might be a silenced call ending, the other line needs to lose
-				// its DURING INTERRUPTIN status)
-				// phoneLines[otherLineIdx].unPlugStatus = NO_UNPLUG_STATUS;	
-
-				// phoneLines[lineIndex].unPlugStatus = NO_UNPLUG_STATUS;	
-
 				// Uptick currConvo here, when call is comlete
 				currConvo += 1;
 				setTimeToNext(2000);							
@@ -510,7 +470,6 @@
 		// Clear the line settings
 		phoneLines[lineIdx].caller.isPlugged = false;
 		phoneLines[lineIdx].callee.isPlugged = false;
-		// phoneLines[lineIdx].isAtLeastInitiated = false;
 		phoneLines[lineIdx].isEngaged = false;
 		// Also
 		phoneLines[lineIdx].unPlugStatus = NO_UNPLUG_STATUS;
@@ -526,19 +485,12 @@
 		}
 	}
 
-	// const retryAfterWrongNum = (lineIndex) => {
-	// 	//
-	// }
-
 </script>
 
 <style>
 	/*none*/
 </style>
 
-<!-- <header>
-  <h1>You're the Operator! <button on:click="{initiateCall}">Start</button></h1>
-</header> -->
 
 <div id="wrapper">      
 	<!-- <HowTo /> -->
