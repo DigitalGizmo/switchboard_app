@@ -70,6 +70,8 @@
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
 		 conversations[currConvo].helloFile +  ".mp3");
     phoneLines[lineIndex].audioTrack.play();
+		// Set Transcript
+		audioCaption = conversations[currConvo].helloText;
 		// For convo idxs 3 and 7 there is no full convo, so end after hello.
 		if (_currConvo === 3 || _currConvo === 7) {
 			phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
@@ -88,7 +90,6 @@
 		phoneLines[lineIndex].audioTrack =
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/outgoing-ring.mp3");
     phoneLines[lineIndex].audioTrack.play();
-
 		// Handle call end
 		phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
 					phoneLines[lineIndex].audioTrack.currentTime = 0;
@@ -101,7 +102,8 @@
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
 		 conversations[currConvo].convoFile +  ".mp3");
     phoneLines[lineIndex].audioTrack.play();
-
+		// Set Transcript 
+		audioCaption = conversations[currConvo].convoText;
 		// Handle call end
 		phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
 					phoneLines[lineIndex].audioTrack.currentTime = 0;
@@ -198,8 +200,7 @@
 				phoneLines[lineIdx].caller.index = personIdx;				
 				// Set this line in use only we have gotten this success
 				whichLineInUse = lineIdx;
-				// Start Transcript
-				audioCaption = conversations[currConvo].helloText;
+				
 				// Debug message
 				console.log('  Operator connects to: ' + 
 					persons[personIdx].name + ' on line: ' + 
@@ -277,8 +278,8 @@
 					// Silence incoming Hello/Request, if necessary
 					phoneLines[lineIdx].audioTrack.volume = 0;
 					playConvo(currConvo,	lineIdx);
-					// User messag message
-					audioCaption = conversations[currConvo].convoText;
+					// Transcript set by playConvo
+					// audioCaption = conversations[currConvo].convoText;
 					// Set timer for next call
 					// Temp hard-wire to interrupt two calls
 					if (currConvo === 0 || currConvo === 4) {
@@ -287,7 +288,7 @@
 						currConvo += 1;
 						// Set awaitingInterrupt = true;
 						phoneLines[lineIdx].unPlugStatus = AWAITING_INTERRUPT;
-						setTimeToNext(15000);
+						setTimeToNext(14000);
 					}
 				} else { // Wong Number!
 					console.log('   Plugged into wrong jack. Person: ' + 
@@ -306,7 +307,7 @@
 		// console.log('  Unplug on person idx: ' + personIdx +
 		// ' line index: ' + lineIdx);
 		console.log('  Unplug line ' + lineIdx + ' with status of: ' + 
-		phoneLines[lineIdx].unPlugStatus +
+			phoneLines[lineIdx].unPlugStatus +
 		 ' while line isEngaged = ' + phoneLines[lineIdx].isEngaged);
 
 		// If conversation is in progress -- engaged (implies correct callee)
@@ -315,10 +316,10 @@
 				persons[personIdx].name);
 			// Stop the audio
 			phoneLines[lineIdx].audioTrack.pause();
-				
-			// } else if (phoneLines[lineIdx].unPlugStatus === DURING_INTERRUPT_SILENCE) {
+			// Clear Transcript 
+			audioCaption = " ";		
+			// First, handle case here this a sileced call that's being unplugged		
 			if (phoneLines[lineIdx].unPlugStatus === DURING_INTERRUPT_SILENCE) {
-
 				console.log('    Unplugging silenced call');
 				phoneLines[lineIdx].unPlugStatus = NO_UNPLUG_STATUS;
 				stopSilentCall(lineIdx);
@@ -347,7 +348,7 @@
 					// Mark callee unplugged
 					phoneLines[lineIdx].callee.isPlugged = false;
 					phoneLines[lineIdx].isEngaged = false;
-					phoneLines[lineIdx].audioTrack.pause();
+					phoneLines[lineIdx].audioTrack.pause();				
 					// Leave caller plugged in, replay hello
 					// reconnectTimer = setTimeout(playHello(currConvo, lineIdx), 3000);
 					setTimeReCall(currConvo, lineIdx);
