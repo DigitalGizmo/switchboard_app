@@ -114,9 +114,8 @@
 
 	const playWrongNum = (currConvo, lineIndex) => {
 		phoneLines[lineIndex].audioTrack =
-     new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/outgoing-ring.mp3");
+     new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/single-ring.mp3");
     phoneLines[lineIndex].audioTrack.play();
-
 		// Handle call end
 		phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
 					phoneLines[lineIndex].audioTrack.currentTime = 0;
@@ -126,18 +125,14 @@
 
 	// refactor: maybe use this after all: function playWrongNum(wrongCalleeIdx, lineIndex){
 	const playFullWrongNum = (pluggedPersonIdx, lineIndex) => {
-		// persons[pluggedIdxInfo.personIdx], 
-		// 				pluggedIdxInfo.lineIdx
-		// persons[pluggedIdxInfo.personIdx].wrongNumFile,
 		let wrongNumFile = persons[pluggedPersonIdx].wrongNumFile;
-		// console.log('pluggedPersonIdx: ' + pluggedPersonIdx +
-		// ' wrongNumFile: ' + wrongNumFile);
-		// let lineIndex = pluggedIdxInfo.lineIdx;
+
 		phoneLines[lineIndex].audioTrack =
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
-		 wrongNumFile +  ".mp3");
+		 persons[pluggedPersonIdx].wrongNumFile +  ".mp3");
     phoneLines[lineIndex].audioTrack.play();
-
+		// Set Transcript 
+		audioCaption = persons[pluggedPersonIdx].wrongNumText;		
 		// Reply from caller saying who caller really wants
 		phoneLines[lineIndex].audioTrack.addEventListener("ended", function(){
 					phoneLines[lineIndex].audioTrack.currentTime = 0;
@@ -152,6 +147,8 @@
      new Audio("https://dev.digitalgizmo.com/msm-ed/ed-assets/audio/" + 
 		 conversations[currConvo].retryAfterWrongFile +  ".mp3");
     phoneLines[lineIndex].audioTrack.play();
+		// Transcript for correction
+		audioCaption = conversations[currConvo].retryAfterWrongText;
 		// At this point we hope user unplugs wrong number
 		// Will be handled by "unPlug"
 	}	
@@ -337,7 +334,7 @@
 				}
 				// Try setting this so that if the other silenced call ends
 				// it know this has been unplugged
-				phoneLines[lineIdx].unPlugStatus = REPLUG_IN_PROGRESS;
+				phoneLines[lineIdx].unPlugStatus = REPLUG_IN_PROGRESS; // CALLEE_UNPLUGGED?
 				// setCallUnplugged(lineIdx); 
 					// stopCall(lineIndex);
 					// setTimeToNext(2000);		
@@ -389,6 +386,8 @@
 			if (phoneLines[lineIdx].callee.index) { // callee jack was unplugged
 				console.log('  ** Unplug on callee thats not engaged')
 				persons[phoneLines[lineIdx].callee.index].ledState = LED_OFF;
+				// Clear transcript?
+				audioCaption = " ";
 			} else {
 				// Wasn't callee that was unplugged (& line wasn't engaged),
 				// so might have been wrong num that was unplugged
@@ -424,12 +423,16 @@
 		// Don't start next call on finish if other line has callee or caller plugged
 		if (phoneLines[otherLineIdx].caller.isPlugged ||
 			phoneLines[otherLineIdx].callee.isPlugged) {
-			console.log('   Unplug with caller or callee plugged on other line')
+			console.log('   Completing call with caller or callee plugged on other line')
 			// This is a behind the scenes conversation that was interrupted
 			// and is ending.
 			// Dont increment currConvo
 			// Call has been stopped, so:
-			phoneLines[lineIndex].unPlugStatus = REPLUG_IN_PROGRESS;
+
+			// phoneLines[lineIndex].unPlugStatus = REPLUG_IN_PROGRESS;
+			phoneLines[lineIndex].unPlugStatus = NO_UNPLUG_STATUS;
+
+
 		} else { // It's a regular call ending
 			console.log('   other line has neither caller nor callee plugged, ');
 			if (phoneLines[otherLineIdx].unPlugStatus === REPLUG_IN_PROGRESS) {
@@ -437,6 +440,12 @@
 				// while the interrupting call has been unplugged
 				// Here "other line" is the interrupting call that was unplugged
 				console.log('   we think this is auto end of silenced call during 2nd call unplug');
+
+
+				// Reset the unplug status
+				phoneLines[otherLineIdx].unPlugStatus = NO_UNPLUG_STATUS;
+
+
 			} else { // Regular ending
 				console.log('  increment and start regular timer for next call');
 				// Uptick currConvo here, when call is comlete
