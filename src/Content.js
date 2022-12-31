@@ -144,7 +144,7 @@ const conversations = [
   },  
   // index 8, call 8 Dr. Freeman calls Village Store, Audio 16-16
   {
-    caller: { index: 3}, // Dr. Freeman
+    caller: { index: 6}, // Dr. Freeman but from Libby's farm
     callee:{index: 0}, //  Emma, Village store
     helloFile: '15-Doctor_Calls_Operator',
     convoFile: '16-Doctor_Calls_Store',

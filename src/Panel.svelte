@@ -111,11 +111,12 @@
     // Calculate closest column
     let proportion_of_total = dx/PANEL_WIDTH;
     pluggedCol = Math.trunc(proportion_of_total * NUM_COLS);
+    console.log(  'Panel, proportion of total:' + proportion_of_total + '  plugged col: ' + pluggedCol);
 
     // Set line index param
     pluggedIdxInfo.lineIdx = plugs[plugIdx].lineIndex;
     // Get person index from row, col (if in the grid)
-    if (pluggedRow < 2) {
+    if (pluggedRow < 2 && dx > 0 && pluggedCol < 6) {
       pluggedIdxInfo.personIdx = getPersonIdx(pluggedRow, pluggedCol);
     } else {
       // Need some reference before active person assigned
@@ -127,16 +128,17 @@
   
       // console.log(' plug in, pluggeRow: ' + pluggedRow)
       // Snap plug to calculated x and row (unless putting it away)
-      if (pluggedRow < 2) { // on the grid
+      // Redundant with get person index above, but not worth refactoring now
+      if (pluggedRow < 2 && dx > 0 && pluggedCol < 6) { // on the grid
         plugs[plugIdx].y = (pluggedRow * CELL_HEIGHT) + JACK_TOP_OFFSET;
         plugs[plugIdx].x = (pluggedCol * JACK_DELTA_X) + (CELL_WIDTH/2) - 42; // 1/2 plug width
         plugs[plugIdx].sleeveLength = -5;
-      // Register this jack as plugged
-      // This won't be of any use unless/until I'm able to
-      // translate an unPlug to a specific jack
-      rowColToIndex[pluggedRow][pluggedCol].isPlugged = true;
-      // Send action to App.svelte
-      handlePlugIn(pluggedIdxInfo);
+        // Register this jack as plugged
+        // This won't be of any use unless/until I'm able to
+        // translate an unPlug to a specific jack
+        rowColToIndex[pluggedRow][pluggedCol].isPlugged = true;
+        // Send action to App.svelte
+        handlePlugIn(pluggedIdxInfo);
 
       } else { // Bottom -- putting it away
         plugs[plugIdx].y = PLUG_START_Y;
@@ -176,9 +178,9 @@
        }).on("end", function (d){
           // May want to separate out this as a function to be called by unplug
           plugIdx = d3.select(this).attr("id");
-          if (d.y < 930) {
-            handlePlugAction(d.x, d.y, plugIdx, true); // isPlugIn = true
-          }
+          // Don't need condition for going below the board (d.y < 930) {
+          handlePlugAction(d.x, d.y, plugIdx, true); // isPlugIn = true
+          // }
        }) // end on end
     ); // end call drag
   });
